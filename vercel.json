@@ -1,0 +1,11 @@
+{
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/new", "destination": "/" },
+    { "source": "/promises", "destination": "/" },
+    { "source": "/promises/:page", "destination": "/" },
+    { "source": "/mine", "destination": "/" },
+    { "source": "/mine/:page", "destination": "/" },
+    { "source": "/promise/:id", "destination": "/" }
+  ]
+}

@@ -1,0 +1,605 @@
+import type { PromiseInfoReturnType, PromiseState } from "./types";
+
+import { colord } from "colord";
+import { BigNumber } from "ethers";
+import { memo, useMemo } from "react";
+import { a, useTransition } from "react-spring";
+import { match, P } from "ts-pattern";
+import { useAccount, useContractRead, useContractReads } from "wagmi";
+import { Link, useLocation } from "wouter";
+import { PinkyPromiseAbi } from "./abis";
+import { Button } from "./Button";
+import { COLORS } from "./constants";
+import {
+  enumKeyToColor,
+  isColorEnumKey,
+  promiseStateFromEnumKey,
+  usePinkyPromiseContractAddress,
+} from "./contract-utils";
+import { LoadingFingers } from "./LoadingFingers";
+import { Pagination } from "./Pagination";
+import { useResetScroll } from "./react-utils";
+import { SvgDocFingers, SvgDocTape } from "./SvgDoc";
+import { isPromiseStateEnumKey } from "./types";
+import {
+  blocksToText,
+  formatDate,
+  formatPromiseState,
+  promiseColors,
+  textToBlocks,
+} from "./utils";
+
+const PROMISES_PER_PAGE = 9;
+
+type PromiseCardData = {
+  bodyText: string;
+  colors: ReturnType<typeof promiseColors>;
+  signedOn: string;
+  signeesCount: number;
+  state: PromiseState;
+  title: string;
+};
+
+const WIDTH = 400 * 3 + 40 * 2;
+
+export const PromisesScreen = memo(function PromisesScreen({
+  mineOnly = false,
+  page,
+}: {
+  mineOnly?: boolean;
+  page: number;
+}) {
+  const contractAddress = usePinkyPromiseContractAddress();
+  const [_, setLocation] = useLocation();
+  const { address } = useAccount();
+
+  const signeePromises = useContractRead({
+    address: contractAddress,
+    abi: PinkyPromiseAbi,
+    functionName: "signeePromises",
+    args: address ? [address] : undefined,
+    enabled: Boolean(mineOnly && address),
+  });
+
+  const totalRead = useContractRead({
+    address: contractAddress,
+    abi: PinkyPromiseAbi,
+    functionName: "total",
+    enabled: !mineOnly,
+  });
+
+  const {
+    status: idsStatus,
+    refetch: idsRefetch,
+  } = mineOnly ? signeePromises : totalRead;
+
+  const total = mineOnly
+    ? (signeePromises.data?.length ?? 0)
+    : (totalRead.data?.toNumber() ?? 0);
+
+  const [ids, cardsKeys] = useMemo(() => {
+    const ids = (
+      mineOnly
+        ? signeePromises.data?.map((v) => v.toString()).reverse() ?? []
+        : Array.from({ length: total }).map((_, index) => `${total - index}`)
+    ).slice(
+      (page - 1) * PROMISES_PER_PAGE,
+      (page - 1) * PROMISES_PER_PAGE + PROMISES_PER_PAGE,
+    );
+    return [
+      ids,
+      ids.map((id) => `${mineOnly}-${page}-${id}`),
+    ];
+  }, [page, total, signeePromises, mineOnly]);
+
+  const promisesInfo = useContractReads({
+    contracts: ids.map((id) => ({
+      address: contractAddress,
+      abi: PinkyPromiseAbi,
+      functionName: "promiseInfo",
+      args: [BigNumber.from(id)],
+    })),
+    enabled: Boolean(contractAddress) && ids.length > 0,
+    select: (data) => (
+      (data as PromiseInfoReturnType[])?.map((info): PromiseCardData => {
+        const colorEnumKey = info?.data.color ?? 0;
+        const signedOnTimestamp = Number((info?.signedOn ?? 0).toString());
+        return {
+          bodyText: blocksToText(textToBlocks(info?.data.body ?? "")),
+          colors: promiseColors(
+            enumKeyToColor(isColorEnumKey(colorEnumKey) ? colorEnumKey ?? 0 : 0),
+          ),
+          signedOn: signedOnTimestamp === 0
+            ? "−"
+            : formatDate(new Date(signedOnTimestamp * 1000)),
+          signeesCount: (info?.signees ?? []).length,
+          state: promiseStateFromEnumKey(
+            isPromiseStateEnumKey(info?.state) ? info?.state : 0,
+          ),
+          title: info?.data.title ?? "",
+        };
+      })
+    ),
+  });
+
+  const hasLoadedIds = idsStatus === "success";
+  const loadingStatus = mineOnly
+    ? (hasLoadedIds ? promisesInfo.status : idsStatus)
+    : (promisesInfo.status === "idle"
+      ? "loading"
+      : promisesInfo.status);
+  const refetch = hasLoadedIds ? promisesInfo.refetch : idsRefetch;
+
+  const cardsData = useMemo(() => {
+    const { data } = promisesInfo;
+    return data
+      ? (
+        cardsKeys.map((key, index) => (
+          key.startsWith("empty-")
+            ? { type: "empty", key } as const
+            : {
+              type: "promise",
+              key,
+              promise: {
+                id: ids[index],
+                data: data[index],
+              },
+            } as const
+        ))
+      )
+      : [];
+  }, [cardsKeys, promisesInfo]);
+
+  const loadingTransition = useTransition({
+    cardsData,
+    hasLoadedIds,
+    refetch,
+    status: loadingStatus,
+    connectPlease: mineOnly && !address,
+    mineOnly,
+  }, {
+    keys: ({ hasLoadedIds, status, mineOnly, connectPlease }) => (
+      `${hasLoadedIds}${status}${mineOnly}${connectPlease}`
+    ),
+    from: { opacity: 0, transform: "scale3d(0.9, 0.9, 1)" },
+    enter: { opacity: 1, transform: "scale3d(1, 1, 1)" },
+    leave: { opacity: 0, immediate: true },
+    config: { mass: 1, friction: 80, tension: 1800 },
+  });
+
+  useResetScroll([page]);
+
+  return (
+    <div
+      css={{
+        flexGrow: 1,
+        display: "flex",
+        flexDirection: "column",
+        width: WIDTH,
+        margin: "0 auto",
+      }}
+    >
+      <div
+        css={{
+          overflow: loadingStatus === "success" ? "visible" : "hidden",
+          flexGrow: 1,
+          position: "relative",
+          display: "grid",
+          placeItems: "center",
+          width: "100%",
+        }}
+      >
+        {loadingTransition((style, { status, cardsData, refetch, connectPlease }) =>
+          match(connectPlease || status)
+            .with(true, () => (
+              <a.div
+                style={style}
+                css={{
+                  position: "absolute",
+                  zIndex: 2,
+                  inset: "0",
+                  display: "grid",
+                  placeItems: "center",
+                  color: COLORS.white,
+                }}
+              >
+                <div
+                  css={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 18,
+                  }}
+                >
+                  Connect your account to see your promises
+                </div>
+              </a.div>
+            ))
+            .with("loading", () => (
+              <a.div
+                style={style}
+                css={{
+                  position: "absolute",
+                  zIndex: 2,
+                  inset: "0 0 auto",
+                  display: "grid",
+                  placeItems: "center",
+                  height: "100%",
+                }}
+              >
+                <LoadingFingers />
+              </a.div>
+            ))
+            .with("error", () => (
+              <a.div
+                style={style}
+                css={{
+                  position: "absolute",
+                  zIndex: 2,
+                  inset: "0",
+                  display: "grid",
+                  placeItems: "center",
+                  color: COLORS.white,
+                }}
+              >
+                <div
+                  css={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 18,
+                  }}
+                >
+                  <LoadingFingers
+                    color={COLORS.red}
+                    label="Error loading promises"
+                  />
+                  <Button
+                    label="Retry"
+                    color={COLORS.red}
+                    onClick={refetch}
+                    size="large"
+                  />
+                </div>
+              </a.div>
+            ))
+            .with(P.union("success", "idle"), () => (
+              cardsData.length > 0
+                ? (
+                  <a.div
+                    style={style}
+                    css={{
+                      position: "absolute",
+                      zIndex: 2,
+                      inset: "24px 0 auto",
+                      display: "grid",
+                      placeItems: "center",
+                      paddingBottom: 80,
+                    }}
+                  >
+                    <PromisesGrid
+                      cards={cardsData}
+                      onNextPage={page < Math.ceil(total / PROMISES_PER_PAGE)
+                        ? () => {
+                          setLocation(
+                            `/${mineOnly ? "mine" : "promises"}/${page + 1}`,
+                          );
+                        }
+                        : undefined}
+                      onPrevPage={page > 1
+                        ? () => {
+                          setLocation(
+                            `/${mineOnly ? "mine" : "promises"}/${page - 1}`,
+                          );
+                        }
+                        : undefined}
+                      page={page}
+                    />
+                  </a.div>
+                )
+                : (
+                  <a.div
+                    style={style}
+                    css={{
+                      position: "absolute",
+                      zIndex: 2,
+                      inset: "0",
+                      display: "grid",
+                      placeItems: "center",
+                      color: COLORS.white,
+                    }}
+                  >
+                    <div
+                      css={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: 18,
+                      }}
+                    >
+                      <LoadingFingers
+                        color={COLORS.white}
+                        label="No promises"
+                      />
+                      <Button
+                        label="New"
+                        color={COLORS.white}
+                        onClick={() => {
+                          setLocation("/new");
+                        }}
+                        size="large"
+                      />
+                    </div>
+                  </a.div>
+                )
+            ))
+            .otherwise(() => null)
+        )}
+      </div>
+    </div>
+  );
+});
+
+const PromiseCard = memo(function PromiseCard({
+  promiseData,
+  promiseId,
+}: {
+  promiseData: PromiseCardData;
+  promiseId: string;
+}) {
+  return (
+    <Link href={`/promise/${promiseId}`}>
+      <a
+        draggable="false"
+        css={{
+          contain: "content",
+          display: "flex",
+          flexDirection: "column",
+          width: "100%",
+          textDecoration: "none",
+          color: promiseData.colors.contentColor,
+          background: promiseData.colors.color,
+          borderRadius: 64,
+          boxShadow: "0 40px 40px rgba(43, 8, 28, 0.10)",
+          userSelect: "none",
+          "&:focus-visible": {
+            outline: `2px solid ${COLORS.white}`,
+            outlineOffset: "3px",
+          },
+          "&:active": {
+            transform: "translate(1px, 1px)",
+          },
+        }}
+      >
+        <section
+          css={{
+            display: "flex",
+            flexDirection: "column",
+            height: 400,
+            padding: "32px 32px 24px",
+          }}
+        >
+          <div
+            className="header"
+            css={{
+              position: "relative",
+              display: "flex",
+              justifyContent: "space-between",
+              paddingBottom: 24,
+              fontSize: 18,
+              textTransform: "uppercase",
+              "&:after": {
+                content: "''",
+                position: "absolute",
+                inset: "auto 0 0",
+                height: 2,
+                background: promiseData.colors.contentColor,
+              },
+              "& > div + div": {
+                textAlign: "right",
+              },
+            }}
+          >
+            <div>
+              <div css={{ fontSize: 14 }}>Pinky Promise</div>
+              <div>
+                <strong>{promiseId}</strong>
+              </div>
+            </div>
+            <div>
+              <div>{promiseData.signedOn}</div>
+              <div css={{ fontSize: 14 }}>
+                <strong>{formatPromiseState(promiseData.state)}</strong>
+              </div>
+            </div>
+          </div>
+          <h1
+            css={{
+              overflow: "hidden",
+              padding: "24px 0 8px",
+              fontSize: 32,
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              fontWeight: 500,
+            }}
+          >
+            {promiseData.title}
+          </h1>
+          <div
+            css={{
+              overflow: "hidden",
+              display: "-webkit-box",
+              height: 3 * 28,
+              WebkitBoxOrient: "vertical",
+              WebkitLineClamp: 3,
+              lineHeight: "28px",
+              wordBreak: "break-word",
+            }}
+          >
+            {promiseData.bodyText}
+          </div>
+          <div
+            css={{
+              flexGrow: 1,
+              display: "flex",
+              alignItems: "end",
+              justifyContent: "center",
+            }}
+          >
+            <div
+              css={{
+                width: 64,
+                height: 64,
+                "svg": {
+                  transform: "scale(0.8) translateY(-8px)",
+                  transformOrigin: "0 0",
+                  fill: promiseData.colors.contentColor,
+                },
+              }}
+            >
+              <SvgDocFingers />
+            </div>
+          </div>
+        </section>
+        {(promiseData.state === "Nullified"
+          || promiseData.state === "Discarded")
+          && (
+            <SvgDocTape
+              width={400}
+              height={400}
+              {...promiseData.colors}
+            />
+          )}
+      </a>
+    </Link>
+  );
+});
+
+const EmptyCard = memo(function EmptyCard() {
+  return (
+    <Link href="/new">
+      <a
+        draggable="false"
+        css={{
+          display: "grid",
+          placeItems: "center",
+          width: "100%",
+          height: 400,
+          background: colord(COLORS.grey).alpha(0.4).toHex(),
+          borderRadius: "64px",
+          boxShadow: "0 40px 40px rgba(43, 8, 28, 0.10)",
+          "&:focus-visible": {
+            outline: `2px solid ${COLORS.white}`,
+            outlineOffset: "3px",
+          },
+          "&:active": {
+            transform: "translate(1px, 1px)",
+          },
+        }}
+      >
+        <div
+          css={{
+            display: "grid",
+            placeItems: "center",
+            width: "40px",
+            height: "40px",
+            color: COLORS.white,
+            background: COLORS.pink,
+            border: "0",
+            borderRadius: "50%",
+          }}
+        >
+          <svg width="40" height="40" fill="none" viewBox="0 0 40 40">
+            <path
+              d="M9 20h22M20 31V9"
+              stroke={COLORS.white}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+            />
+          </svg>
+        </div>
+      </a>
+    </Link>
+  );
+});
+
+function PromisesGrid({
+  cards,
+  onNextPage,
+  onPrevPage,
+  page,
+}: {
+  cards: Array<
+    | { type: "empty"; key: string }
+    | {
+      type: "promise";
+      key: string;
+      promise: { id: string; data: PromiseCardData };
+    }
+  >;
+  onNextPage?: () => void;
+  onPrevPage?: () => void;
+  page: number;
+}) {
+  const transitions = useTransition(cards, {
+    keys: (card) => card.key,
+    from: {
+      opacity: 0,
+      transform: "scale3d(0.7, 0.7, 1)",
+    },
+    enter: {
+      opacity: 1,
+      transform: "scale3d(1, 1, 1)",
+    },
+    config: {
+      mass: 1,
+      friction: 100,
+      tension: 1200,
+    },
+  });
+  return (
+    <div>
+      <div
+        css={{
+          display: "grid",
+          gridTemplateColumns: "repeat(3, 400px)",
+          gap: 40,
+        }}
+      >
+        {transitions((style, card) => (
+          <div
+            css={{
+              position: "relative",
+              height: 400,
+            }}
+          >
+            <a.div
+              style={style}
+              css={{
+                position: "absolute",
+                inset: 0,
+                transformOrigin: "50% 50%",
+                contain: "size layout style",
+              }}
+            >
+              {card.type === "empty"
+                ? <EmptyCard />
+                : (
+                  <PromiseCard
+                    promiseId={card.promise.id}
+                    promiseData={card.promise.data}
+                  />
+                )}
+            </a.div>
+          </div>
+        ))}
+      </div>
+      <Pagination
+        onNext={onNextPage}
+        onPrev={onPrevPage}
+        page={page}
+      />
+    </div>
+  );
+}

@@ -1,0 +1,4 @@
+base64/=lib/base64/
+dk1a-stringutils/=lib/dk1a-stringutils/src/
+forge-std/=lib/forge-std/src/
+solmate/=lib/solmate/src/
