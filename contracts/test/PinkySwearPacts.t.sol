@@ -18,65 +18,204 @@ string constant text1 = unicode"# Pact of the Norsemen\n\n"
 uint16 constant height1 = 936;
 
 contract PinkySwearPactsTest is Test {
-    PinkySwearPacts private pacts = new PinkySwearPacts("Pinky Swear Pacts", "PSP");
-
-    uint256 private pact1Id;
+    PinkySwearPacts pacts = new PinkySwearPacts("Pinky Swear Pacts", "PSP");
 
     function setUp() public {}
 
     function test_newPact() public {
-        address[] memory signers = new address[](6);
-        signers[0] = address(this);
-        signers[1] = makeAddr("alice");
-        signers[2] = makeAddr("bob");
-        signers[3] = makeAddr("carol");
-        signers[4] = makeAddr("dave");
-        signers[5] = makeAddr("erin");
+        address[] memory signees = new address[](3);
+        signees[0] = address(this);
+        signees[1] = makeAddr("alice");
+        signees[2] = makeAddr("bob");
 
-        pacts.newPact(signers, text1, height1);
+        PinkySwearPacts.PactData memory pactData;
+        pactData.height = height1;
+        pactData.text = text1;
+        pactData.color = PinkySwearPacts.PactColor.BubbleGum;
+
+        pacts.newPact(pactData, signees);
     }
 
     function test_signPact() public {
-        address[] memory _signers = new address[](3);
-        _signers[0] = address(this);
-        _signers[1] = makeAddr("alice");
-        _signers[2] = makeAddr("bob");
+        address[] memory signees_ = new address[](3);
+        signees_[0] = address(this);
+        signees_[1] = makeAddr("alice");
+        signees_[2] = makeAddr("bob");
 
-        uint256 pactId = pacts.newPact(_signers, text1, height1);
+        PinkySwearPacts.PactData memory pactData;
+        uint256 pactId = pacts.newPact(pactData, signees_);
+
+        PinkySwearPacts.PactState state;
+
+        address[] memory signees;
+        PinkySwearPacts.SigningState[] memory signingStates;
+
+        (signees, signingStates) = pacts.signeesStates(pactId);
+        assertEq(signees.length, 3);
+        assertEq(signees[0], signees_[0]);
+        assertEq(signees[1], signees_[1]);
+        assertEq(signees[2], signees_[2]);
+        assertEq(uint256(signingStates[0]), uint256(PinkySwearPacts.SigningState.Signed)); // auto sign if the creator is a signee
+        assertEq(uint256(signingStates[1]), uint256(PinkySwearPacts.SigningState.Pending));
+        assertEq(uint256(signingStates[2]), uint256(PinkySwearPacts.SigningState.Pending));
+
+        state = pacts.pactState(pactId);
+        assertEq(uint256(state), uint256(PinkySwearPacts.PactState.Draft));
+
+        vm.prank(makeAddr("bob"));
+        pacts.sign(pactId);
+
+        (signees, signingStates) = pacts.signeesStates(pactId);
+        assertEq(uint256(signingStates[0]), uint256(PinkySwearPacts.SigningState.Signed));
+        assertEq(uint256(signingStates[1]), uint256(PinkySwearPacts.SigningState.Pending));
+        assertEq(uint256(signingStates[2]), uint256(PinkySwearPacts.SigningState.Signed));
+
+        vm.prank(makeAddr("alice"));
+        pacts.sign(pactId);
+
+        state = pacts.pactState(pactId);
+        assertEq(uint256(state), uint256(PinkySwearPacts.PactState.Final));
+
+        (signees, signingStates) = pacts.signeesStates(pactId);
+        assertEq(uint256(signingStates[0]), uint256(PinkySwearPacts.SigningState.Signed));
+        assertEq(uint256(signingStates[1]), uint256(PinkySwearPacts.SigningState.Signed));
+        assertEq(uint256(signingStates[2]), uint256(PinkySwearPacts.SigningState.Signed));
+    }
+
+    function test_discard() public {
+        address[] memory signees_ = new address[](3);
+        signees_[0] = address(this);
+        signees_[1] = makeAddr("alice");
+        signees_[2] = makeAddr("bob");
+
+        PinkySwearPacts.PactData memory pactData;
+        uint256 pactId = pacts.newPact(pactData, signees_);
+
+        assertEq(uint256(pacts.pactState(pactId)), uint256(PinkySwearPacts.PactState.Draft));
 
         vm.prank(makeAddr("bob"));
         pacts.sign(pactId);
 
         vm.prank(makeAddr("alice"));
+        pacts.discard(pactId);
+
+        assertEq(uint256(pacts.pactState(pactId)), uint256(PinkySwearPacts.PactState.Discarded));
+
+        vm.prank(makeAddr("alice"));
+        vm.expectRevert("PinkySwearPacts: only non-discarded drafts can receive signatures");
         pacts.sign(pactId);
 
-        (address[] memory signers, PinkySwearPacts.SigningState[] memory signed) = pacts.signeesStates(pactId);
+        vm.prank(makeAddr("alice"));
+        vm.expectRevert("PinkySwearPacts: only drafts can get discarded");
+        pacts.discard(pactId);
 
-        for (uint256 i = 0; i < signers.length; i++) {
-            emit log_address(signers[i]);
-            emit log(signed[i] == PinkySwearPacts.SigningState.Signed ? "yes" : "no");
-        }
+        vm.prank(makeAddr("bob"));
+        vm.expectRevert("PinkySwearPacts: only drafts can get discarded");
+        pacts.discard(pactId);
     }
 
-    // function test_pactAsSvg() public {
-    //     emit log(string.concat("\n", pacts.pactAsSvg(0x1)));
-    //     // emit log(pacts.tokenURI(0x2));
-    // }
+    function test_nullify() public {
+        address[] memory signees_ = new address[](3);
+        signees_[0] = address(this);
+        signees_[1] = makeAddr("alice");
+        signees_[2] = makeAddr("bob");
 
-    // function test_tokenURI() public {
-    //     emit log(pacts.tokenURI(0x1));
-    //     // emit log(pacts.tokenURI(0x2));
-    // }
+        PinkySwearPacts.PactData memory pactData;
 
-    // function test_locked() public {
-    //     // assertTrue(pacts.locked(pact1Id));
-    // }
+        uint256 pactId = pacts.newPact(pactData, signees_);
 
-    // function testFail_locked() public view {
-    //     pacts.locked(0x0);
-    // }
+        PinkySwearPacts.SigningState[] memory signingStates;
 
-    // function test_erc5192Interface() public {
-    //     assertTrue(pacts.supportsInterface(ERC5192ID));
-    // }
+        vm.prank(makeAddr("alice"));
+        pacts.sign(pactId);
+        vm.prank(makeAddr("bob"));
+        pacts.sign(pactId);
+
+        assertEq(uint256(pacts.pactState(pactId)), uint256(PinkySwearPacts.PactState.Final));
+
+        vm.prank(makeAddr("alice"));
+        pacts.nullify(pactId);
+
+        (, signingStates) = pacts.signeesStates(pactId);
+
+        assertEq(uint256(signingStates[0]), uint256(PinkySwearPacts.SigningState.Signed));
+        assertEq(uint256(signingStates[1]), uint256(PinkySwearPacts.SigningState.NullRequest));
+        assertEq(uint256(signingStates[2]), uint256(PinkySwearPacts.SigningState.Signed));
+        assertEq(uint256(pacts.pactState(pactId)), uint256(PinkySwearPacts.PactState.Final));
+
+        vm.prank(makeAddr("bob"));
+        pacts.nullify(pactId);
+
+        (, signingStates) = pacts.signeesStates(pactId);
+
+        assertEq(uint256(signingStates[0]), uint256(PinkySwearPacts.SigningState.Signed));
+        assertEq(uint256(signingStates[1]), uint256(PinkySwearPacts.SigningState.NullRequest));
+        assertEq(uint256(signingStates[2]), uint256(PinkySwearPacts.SigningState.NullRequest));
+        assertEq(uint256(pacts.pactState(pactId)), uint256(PinkySwearPacts.PactState.Final));
+
+        vm.prank(makeAddr("bob"));
+        pacts.cancelNullify(pactId);
+
+        (, signingStates) = pacts.signeesStates(pactId);
+
+        assertEq(uint256(signingStates[0]), uint256(PinkySwearPacts.SigningState.Signed));
+        assertEq(uint256(signingStates[1]), uint256(PinkySwearPacts.SigningState.NullRequest));
+        assertEq(uint256(signingStates[2]), uint256(PinkySwearPacts.SigningState.Signed));
+        assertEq(uint256(pacts.pactState(pactId)), uint256(PinkySwearPacts.PactState.Final));
+
+        vm.prank(makeAddr("bob"));
+        pacts.nullify(pactId);
+        vm.prank(address(this));
+        pacts.nullify(pactId);
+
+        (, signingStates) = pacts.signeesStates(pactId);
+
+        assertEq(uint256(signingStates[0]), uint256(PinkySwearPacts.SigningState.NullRequest));
+        assertEq(uint256(signingStates[1]), uint256(PinkySwearPacts.SigningState.NullRequest));
+        assertEq(uint256(signingStates[2]), uint256(PinkySwearPacts.SigningState.NullRequest));
+        assertEq(uint256(pacts.pactState(pactId)), uint256(PinkySwearPacts.PactState.Nullified));
+    }
+
+    // Duplicated signees should trigger a revert
+    function test_uniqueSignees() public {
+        address[] memory signees = new address[](6);
+        signees[0] = address(this);
+        signees[1] = makeAddr("alice");
+        signees[2] = makeAddr("alice");
+
+        PinkySwearPacts.PactData memory pactData;
+
+        vm.expectRevert("PinkySwearPacts: each signee must be unique");
+        pacts.newPact(pactData, signees);
+    }
+
+    // NFTs should always be locked (soulbound)
+    function test_locked() public {
+        address[] memory signees_ = new address[](2);
+        signees_[0] = address(this);
+        signees_[1] = makeAddr("alice");
+
+        PinkySwearPacts.PactData memory pactData;
+        uint256 pactId = pacts.newPact(pactData, signees_);
+
+        vm.expectRevert("PinkySwearPacts: tokenId not assigned");
+        pacts.locked(0x1);
+
+        vm.prank(makeAddr("alice"));
+        pacts.sign(pactId);
+
+        assertTrue(pacts.locked(0x1));
+        assertTrue(pacts.locked(0x2));
+
+        vm.expectRevert("PinkySwearPacts: tokenId not assigned");
+        pacts.locked(0x3);
+
+        // 0x0 is never assigned
+        vm.expectRevert("PinkySwearPacts: tokenId not assigned");
+        pacts.locked(0x0);
+    }
+
+    function test_erc5192Interface() public {
+        assertTrue(pacts.supportsInterface(ERC5192ID));
+    }
 }

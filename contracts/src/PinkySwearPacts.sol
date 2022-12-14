@@ -7,17 +7,34 @@ import "./IERC5192.sol";
 import "./PinkySwearPactsSvg.sol";
 
 contract PinkySwearPacts is ERC721, IERC5192 {
-    struct Pact {
+    struct PactData {
+        PactColor color;
+        uint16 height;
         string text;
-        uint16 imageHeight;
+    }
+
+    struct Pact {
+        PactData data;
         address[] signees;
-        // Keep track of the current state of the pact:
+        //
+        // Pact.state keeps track of the state of the pact by using a counter:
+        //
         //   state <  signees.length         => contract just created
         //   state >= signees.length         => contract signed
         //   state == signees.length * 2     => contract nullified
         //   state == signees.length * 2 + 1 => contract discarded
-        // See also state(pactId)
+        //
+        // See also state(pactId).
+        //
         uint256 state;
+    }
+
+    enum PactColor {
+        BubbleGum,
+        BlueberryCake,
+        PlainNoodles,
+        TomatoSauce,
+        BurntToast
     }
 
     enum PactState {
@@ -29,7 +46,7 @@ contract PinkySwearPacts is ERC721, IERC5192 {
     }
 
     enum SigningState {
-        None, // default state, only used to require unique signees
+        None, // default state is only used to enforce unique signees, see newPact()
         Pending, // awaiting signature
         Signed,
         NullRequest // nullification requested (implies signed)
@@ -44,7 +61,7 @@ contract PinkySwearPacts is ERC721, IERC5192 {
     // pactId => signer => SigningState
     // We use SigningState rather than a boolean in this mapping,
     // so we can rely on SigningState.None (the default) to ensure that
-    // Pact.signees only contain unique signatures.
+    // Pact.signees only contain unique signatures (see newPact()).
     mapping(uint256 => mapping(address => SigningState)) private _signingStates;
 
     // pact state change
@@ -56,6 +73,8 @@ contract PinkySwearPacts is ERC721, IERC5192 {
     // request to nullify the pact
     event NullifyRequest(uint256 pactId, address signer);
     event CancelNullifyRequest(uint256 pactId, address signer);
+
+    error InvalidPactState();
 
     constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) {}
 
@@ -74,7 +93,7 @@ contract PinkySwearPacts is ERC721, IERC5192 {
     }
 
     // Get the pact state, based on pact.signees and pact.state
-    function _state(Pact storage pact) private view returns (PactState) {
+    function _pactState(Pact storage pact) private view returns (PactState) {
         // signees cannot be empty except when the pact does not exist (default value)
         if (pact.signees.length == 0) {
             return PactState.None;
@@ -91,47 +110,38 @@ contract PinkySwearPacts is ERC721, IERC5192 {
         return PactState.Nullified;
     }
 
-    function state(uint256 pactId) public view returns (PactState) {
-        return _state(_pacts[pactId]);
-    }
-
     // Create a new pact
-    function newPact(address[] calldata signees, string calldata text, uint16 imageHeight)
-        external
-        returns (uint256 pactId)
-    {
-        require(signees.length > 0, "PinkySwearPacts: a pact requires at least one signer");
+    function newPact(PactData calldata pactData, address[] calldata signees) external returns (uint256 pactId) {
+        require(signees.length > 0, "PinkySwearPacts: a pact requires at least one signee");
 
         pactId = ++_latestPactId;
 
         Pact storage pact = _pacts[pactId];
-        pact.text = text;
-        pact.imageHeight = imageHeight;
 
-        emit PactUpdate(pactId, PactState.Draft);
-
-        // Mint one NFT for each signer
+        // Populate the signing states
         for (uint256 i = 0; i < signees.length; i++) {
-            // Ensure unique signees
-            if (_signingStates[pactId][signees[i]] != SigningState.None) {
-                continue;
-            }
-
-            pact.signees.push(signees[i]);
+            require(
+                _signingStates[pactId][signees[i]] == SigningState.None, "PinkySwearPacts: each signee must be unique"
+            );
 
             // Sign if the sender is one of the pact signees
             if (signees[i] == msg.sender) {
-                _signingStates[pactId][msg.sender] = SigningState.Signed;
                 pact.state++;
+                _signingStates[pactId][msg.sender] = SigningState.Signed;
                 emit AddSignature(pactId, msg.sender);
             } else {
                 _signingStates[pactId][signees[i]] = SigningState.Pending;
             }
         }
 
-        // Only happens if msg.sender is the only signer
-        if (_state(pact) == PactState.Final) {
-            _mintPactNft(pactId, pact.signees[0]);
+        pact.data = pactData;
+        pact.signees = signees;
+
+        emit PactUpdate(pactId, PactState.Draft);
+
+        // If msg.sender is the sole signer, finalize the pact
+        if (_pactState(pact) == PactState.Final) {
+            _mintPactNft(pactId, msg.sender);
             emit PactUpdate(pactId, PactState.Final);
         }
     }
@@ -149,7 +159,7 @@ contract PinkySwearPacts is ERC721, IERC5192 {
     function discard(uint256 pactId) external {
         Pact storage pact = _pacts[pactId];
 
-        require(_state(pact) == PactState.Draft, "PinkySwearPacts: only drafts can get discarded");
+        require(_pactState(pact) == PactState.Draft, "PinkySwearPacts: only drafts can get discarded");
         require(
             _signingStates[pactId][msg.sender] != SigningState.None,
             "PinkySwearPacts: drafts can only get discarded by signees"
@@ -164,20 +174,21 @@ contract PinkySwearPacts is ERC721, IERC5192 {
     function sign(uint256 pactId) external {
         Pact storage pact = _pacts[pactId];
 
-        require(_state(pact) == PactState.Draft, "PinkySwearPacts: only non-discarded drafts can receive signatures");
+        require(
+            _pactState(pact) == PactState.Draft, "PinkySwearPacts: only non-discarded drafts can receive signatures"
+        );
         require(
             _signingStates[pactId][msg.sender] != SigningState.None,
             "PinkySwearPacts: drafts can only get signed by signees"
         );
         require(_signingStates[pactId][msg.sender] == SigningState.Pending, "PinkySwearPacts: already signed");
 
-        _signingStates[pactId][msg.sender] = SigningState.Signed;
-
         pact.state++;
+        _signingStates[pactId][msg.sender] = SigningState.Signed;
         emit AddSignature(pactId, msg.sender);
 
         // Last signer creates the NFTs
-        if (_state(pact) == PactState.Final) {
+        if (_pactState(pact) == PactState.Final) {
             for (uint256 i = 0; i < pact.signees.length; i++) {
                 _mintPactNft(pactId, pact.signees[i]);
             }
@@ -192,10 +203,9 @@ contract PinkySwearPacts is ERC721, IERC5192 {
     function nullify(uint256 pactId) external {
         Pact storage pact = _pacts[pactId];
 
-        require(_state(pact) == PactState.Final, "PinkySwearPacts: only signed pacts can get nullified");
+        require(_pactState(pact) == PactState.Final, "PinkySwearPacts: only signed pacts can get nullified");
         require(
-            _signingStates[pactId][msg.sender] == SigningState.Signed,
-            "PinkySwearPacts: nullification already requested"
+            _signingStates[pactId][msg.sender] == SigningState.Signed, "PinkySwearPacts: invalid nullification request"
         );
 
         _signingStates[pactId][msg.sender] = SigningState.NullRequest;
@@ -203,7 +213,7 @@ contract PinkySwearPacts is ERC721, IERC5192 {
         pact.state++;
         emit NullifyRequest(pactId, msg.sender);
 
-        if (_state(pact) == PactState.Nullified) {
+        if (_pactState(pact) == PactState.Nullified) {
             emit PactUpdate(pactId, PactState.Nullified);
         }
     }
@@ -213,7 +223,7 @@ contract PinkySwearPacts is ERC721, IERC5192 {
     function cancelNullify(uint256 pactId) external {
         Pact storage pact = _pacts[pactId];
 
-        require(_state(pact) == PactState.Final, "PinkySwearPacts: only signed pacts can get nullified");
+        require(_pactState(pact) == PactState.Final, "PinkySwearPacts: only signed pacts can get nullified");
         require(
             _signingStates[pactId][msg.sender] == SigningState.NullRequest,
             "PinkySwearPacts: nullification cancel not needed"
@@ -232,7 +242,7 @@ contract PinkySwearPacts is ERC721, IERC5192 {
         returns (address[] memory signees, SigningState[] memory signingStates)
     {
         Pact storage pact = _pacts[pactId];
-        require(_state(pact) != PactState.None, "PinkySwearPacts: non existant pact");
+        require(_pactState(pact) != PactState.None, "PinkySwearPacts: non existant pact");
 
         signees = pact.signees;
         signingStates = new SigningState[](signees.length);
@@ -241,16 +251,34 @@ contract PinkySwearPacts is ERC721, IERC5192 {
         }
     }
 
+    function pactState(uint256 pactId) public view returns (PactState) {
+        return _pactState(_pacts[pactId]);
+    }
+
+    function pactInfo(uint256 pactId)
+        public
+        view
+        returns (PactData memory data, PactState state, address[] memory signees, SigningState[] memory signingStates)
+    {
+        Pact storage pact = _pacts[pactId];
+        require(_pactState(pact) != PactState.None, "PinkySwearPacts: non existant pact");
+
+        data = pact.data;
+        state = _pactState(pact);
+
+        (signees, signingStates) = signeesStates(pactId);
+    }
+
     // Render the pact as an svg image.
     function pactAsSvg(uint256 pactId) public view returns (string memory) {
         Pact storage pact = _pacts[pactId];
-        require(_state(pact) != PactState.None, "PinkySwearPacts: non existant pact");
+        require(_pactState(pact) != PactState.None, "PinkySwearPacts: non existant pact");
 
         (address[] memory signees, SigningState[] memory signingStates) = signeesStates(pactId);
 
         return PinkySwearPactsSvg.pactSvgWrapper(
-            pact.imageHeight,
-            PinkySwearPactsSvg.pactTextToHtml(pact.text),
+            pact.data.height,
+            PinkySwearPactsSvg.pactTextToHtml(pact.data.text),
             PinkySwearPactsSvg.pactSignersToHtml(signees, signingStates)
         );
     }
