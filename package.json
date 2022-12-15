@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite dev --port 3000",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "update-abi": "./scripts/update-abi.sh"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
