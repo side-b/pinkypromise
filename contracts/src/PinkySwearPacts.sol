@@ -82,14 +82,17 @@ contract PinkySwearPacts is ERC721, IERC5192 {
         return interfaceId == type(IERC5192).interfaceId || super.supportsInterface(interfaceId);
     }
 
-    function tokenURI(uint256 tokenId) public view override returns (string memory) {
-        uint256 pactId = _pactIdsByTokenId[tokenId];
-        return string.concat("data:image/svg+xml;base64,", Base64.encode(bytes(pactAsSvg(pactId))));
-    }
-
     function locked(uint256 tokenId) external view returns (bool) {
         require(_ownerOf[tokenId] != address(0), "PinkySwearPacts: tokenId not assigned");
         return true; // always locked
+    }
+
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        return pactURI(_pactIdsByTokenId[tokenId]);
+    }
+
+    function pactURI(uint256 pactId) public view returns (string memory) {
+        return string.concat("data:image/svg+xml;base64,", Base64.encode(bytes(pactAsSvg(pactId))));
     }
 
     // Get the pact state, based on pact.signees and pact.state
@@ -235,7 +238,7 @@ contract PinkySwearPacts is ERC721, IERC5192 {
         emit CancelNullifyRequest(pactId, msg.sender);
     }
 
-    // Get the signees and their corresponding signing statuses.
+    // Get the signees of a pact and their corresponding signing statuses.
     function signeesStates(uint256 pactId)
         public
         view

@@ -11,7 +11,7 @@ contract PinkySwearPactsScript is Script {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
 
-        PinkySwearPacts psp = new PinkySwearPacts("Pinky Swear Pacts", "PSP");
+        new PinkySwearPacts("Pinky Swear Pacts", "PSP");
 
         vm.stopBroadcast();
     }
