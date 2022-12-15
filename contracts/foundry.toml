@@ -4,7 +4,7 @@ out = 'out'
 libs = ['lib']
 
 [rpc_endpoints]
-sepolia = "${SEPOLIA_RPC_URL}"
+sepolia = "${RPC_URL_SEPOLIA}"
 
 [etherscan]
 sepolia = { key = "${ETHERSCAN_API_KEY}" }
