@@ -16,23 +16,9 @@ export const PinkySwearPactsAbi = [
     "type": "constructor",
   },
   {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "pactId",
-        "type": "uint256",
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "signer",
-        "type": "address",
-      },
-    ],
-    "name": "AddNullifyRequest",
-    "type": "event",
+    "inputs": [],
+    "name": "InvalidPactState",
+    "type": "error",
   },
   {
     "anonymous": false,
@@ -133,6 +119,25 @@ export const PinkySwearPactsAbi = [
       },
     ],
     "name": "Locked",
+    "type": "event",
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "pactId",
+        "type": "uint256",
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "signer",
+        "type": "address",
+      },
+    ],
+    "name": "NullifyRequest",
     "type": "event",
   },
   {
@@ -333,19 +338,31 @@ export const PinkySwearPactsAbi = [
   {
     "inputs": [
       {
+        "components": [
+          {
+            "internalType": "enum PinkySwearPacts.PactColor",
+            "name": "color",
+            "type": "uint8",
+          },
+          {
+            "internalType": "uint16",
+            "name": "height",
+            "type": "uint16",
+          },
+          {
+            "internalType": "string",
+            "name": "text",
+            "type": "string",
+          },
+        ],
+        "internalType": "struct PinkySwearPacts.PactData",
+        "name": "pactData",
+        "type": "tuple",
+      },
+      {
         "internalType": "address[]",
         "name": "signees",
         "type": "address[]",
-      },
-      {
-        "internalType": "string",
-        "name": "text",
-        "type": "string",
-      },
-      {
-        "internalType": "uint16",
-        "name": "imageHeight",
-        "type": "uint16",
       },
     ],
     "name": "newPact",
@@ -405,6 +422,76 @@ export const PinkySwearPactsAbi = [
         "internalType": "string",
         "name": "",
         "type": "string",
+      },
+    ],
+    "stateMutability": "view",
+    "type": "function",
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "pactId",
+        "type": "uint256",
+      },
+    ],
+    "name": "pactInfo",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "enum PinkySwearPacts.PactColor",
+            "name": "color",
+            "type": "uint8",
+          },
+          {
+            "internalType": "uint16",
+            "name": "height",
+            "type": "uint16",
+          },
+          {
+            "internalType": "string",
+            "name": "text",
+            "type": "string",
+          },
+        ],
+        "internalType": "struct PinkySwearPacts.PactData",
+        "name": "data",
+        "type": "tuple",
+      },
+      {
+        "internalType": "enum PinkySwearPacts.PactState",
+        "name": "state",
+        "type": "uint8",
+      },
+      {
+        "internalType": "address[]",
+        "name": "signees",
+        "type": "address[]",
+      },
+      {
+        "internalType": "enum PinkySwearPacts.SigningState[]",
+        "name": "signingStates",
+        "type": "uint8[]",
+      },
+    ],
+    "stateMutability": "view",
+    "type": "function",
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "pactId",
+        "type": "uint256",
+      },
+    ],
+    "name": "pactState",
+    "outputs": [
+      {
+        "internalType": "enum PinkySwearPacts.PactState",
+        "name": "",
+        "type": "uint8",
       },
     ],
     "stateMutability": "view",
@@ -511,25 +598,6 @@ export const PinkySwearPactsAbi = [
         "internalType": "enum PinkySwearPacts.SigningState[]",
         "name": "signingStates",
         "type": "uint8[]",
-      },
-    ],
-    "stateMutability": "view",
-    "type": "function",
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "pactId",
-        "type": "uint256",
-      },
-    ],
-    "name": "state",
-    "outputs": [
-      {
-        "internalType": "enum PinkySwearPacts.PactState",
-        "name": "",
-        "type": "uint8",
       },
     ],
     "stateMutability": "view",

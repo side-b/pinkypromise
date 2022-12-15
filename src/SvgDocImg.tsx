@@ -1,3 +1,5 @@
+import type { Address } from "./types";
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { DOC_WIDTH } from "./constants";
 import { SvgDoc } from "./SvgDoc";
@@ -12,7 +14,7 @@ export function SvgDocImg(
     alt: string;
     height: number;
     html: string;
-    signees: [string, boolean][];
+    signees: Address[];
   },
 ) {
   return (

@@ -1,3 +1,5 @@
+import type { Address } from "./types";
+
 import { createElement, useEffect, useRef } from "react";
 import { DOC_SHADOW_OFFSET, DOC_WIDTH } from "./constants";
 
@@ -11,7 +13,7 @@ export function SvgDoc({
   height: number;
   html: string;
   onHeight?: (height: number) => void;
-  signees: [string, boolean][];
+  signees: Address[];
   width?: number;
 }) {
   const contentRef = useRef<HTMLDivElement>(null);
@@ -101,10 +103,8 @@ export function SvgDoc({
               />
               <div className="signees">
                 <h2>Signees</h2>
-                {signees.map(([account, signed]) => (
-                  <div key={account}>
-                    {account} ({signed ? "signed" : "pending"})
-                  </div>
+                {signees.map((account) => (
+                  <div key={account}>{account}</div>
                 ))}
               </div>
             </div>

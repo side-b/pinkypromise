@@ -1,4 +1,9 @@
-const PLACEHOLDERS = [
+import type { Address } from "./types";
+
+const PLACEHOLDERS: Array<{
+  text: string;
+  signees: Address[];
+}> = [
   {
     text: `# Pact of the Norsemen
 
@@ -39,11 +44,11 @@ And never rise up again.`,
       "0xfe595222280dd7278aa3ddd389cc1e1d145cc4ba",
     ],
   },
-] as const;
+];
 
 export function placeholder() {
   return PLACEHOLDERS[1];
-  return PLACEHOLDERS[
-    Math.floor(Math.random() * PLACEHOLDERS.length)
-  ];
+  // return PLACEHOLDERS[
+  //   Math.floor(Math.random() * PLACEHOLDERS.length)
+  // ];
 }
