@@ -2,22 +2,26 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
+import "solmate/utils/LibString.sol";
+import "../src/AddressToString.sol";
 import "../src/PinkySwearPacts.sol";
 
 bytes4 constant ERC5192ID = 0xb45a3c0e;
 
-string constant text1 = unicode"# Pact of the Norsemen\n\n"
-    unicode"The Norsemen entering the pact of foster brotherhood (Icelandic: Fóstbræðralag)\n\n"
-    unicode"## Article 1\n\n"
-    unicode"involved a rite in which they let their blood flow while they ducked underneath an arch formed by a strip of turf propped up by a spear or spears. An example is described in Gísla saga.[1][2] In Fóstbræðra saga, the bond of Thorgeir Havarsson (Þorgeir Hávarsson) and Thormod Bersason (Þormóð Bersason) is sealed by such ritual as well, the ritual being called a leikr.[3]\n\n"
-    unicode"## Article 2\n\n"
-    unicode"Örvar-Oddr's saga contains another notable account of blood brotherhood. Örvar-Oddr, after fighting the renowned Swedish warrior Hjalmar to a draw, entered a foster brotherhood with him by the turf-raising ritual. Afterwards, the strand of turf was put back during oaths and incantations.[citation needed]\n\n"
-    unicode"## Article 3\n\n"
-    unicode"In the mythology of Northern Europe, Gunther and Högni became the blood brothers of Sigurd when he married their sister Gudrun. In Wagner's opera Götterdämmerung, the concluding part of his Ring Cycle, the same occurs between Gunther and Wagner's version of Sigurd, Siegfried, which is marked by the \"Blood Brotherhood Leitmotiv\". Additionally, it is briefly stated in Lokasenna that Odin and Loki are blood brothers.\n\n";
+// forgefmt: disable-start
+string constant text1 = 
+    unicode"Pinky, pinky bow-bell,\n"
+    unicode"Whoever tells a lie\n"
+    unicode"Will sink down to the bad place\n"
+    unicode"And never rise up again.";
+// forgefmt: disable-end
 
 uint16 constant height1 = 936;
 
 contract PinkySwearPactsTest is Test {
+    using LibString for uint256;
+    using AddressToString for address;
+
     PinkySwearPacts pacts = new PinkySwearPacts("Pinky Swear Pacts", "PSP");
 
     function setUp() public {}
@@ -178,7 +182,7 @@ contract PinkySwearPactsTest is Test {
 
     // Duplicated signees should trigger a revert
     function test_uniqueSignees() public {
-        address[] memory signees = new address[](6);
+        address[] memory signees = new address[](3);
         signees[0] = address(this);
         signees[1] = makeAddr("alice");
         signees[2] = makeAddr("alice");
@@ -187,6 +191,57 @@ contract PinkySwearPactsTest is Test {
 
         vm.expectRevert("PinkySwearPacts: each signee must be unique");
         pacts.newPact(pactData, signees);
+    }
+
+    function test_signeePacts() public {
+        address[] memory signees = new address[](2);
+        signees[0] = address(this);
+        signees[1] = makeAddr("alice");
+
+        PinkySwearPacts.PactData memory pactData;
+
+        // pact1: draft
+        pacts.newPact(pactData, signees);
+
+        // pact2: discarded
+        uint256 pact2 = pacts.newPact(pactData, signees);
+        pacts.discard(pact2);
+
+        // pact3: final
+        uint256 pact3 = pacts.newPact(pactData, signees);
+        vm.prank(makeAddr("alice"));
+        pacts.sign(pact3);
+
+        // pact4: nullified
+        uint256 pact4 = pacts.newPact(pactData, signees);
+        vm.prank(makeAddr("alice"));
+        pacts.sign(pact4);
+        vm.prank(makeAddr("alice"));
+        pacts.nullify(pact4);
+        vm.prank(address(this));
+        pacts.nullify(pact4);
+
+        // pact5: only one signee
+        delete signees[1];
+        pacts.newPact(pactData, signees);
+
+        uint256[] memory thisPacts = pacts.signeePacts(address(this));
+        uint256[] memory alicePacts = pacts.signeePacts(makeAddr("alice"));
+        uint256[] memory bobPacts = pacts.signeePacts(makeAddr("bob"));
+
+        assertEq(thisPacts.length, 5);
+        assertEq(alicePacts.length, 4);
+        assertEq(bobPacts.length, 0);
+
+        // emit log("\nthisPacts:");
+        // for (uint256 i = 0; i < thisPacts.length; i++) {
+        //     emit log(string.concat(i.toString(), ": 0x", thisPacts[i].toString()));
+        // }
+
+        // emit log("\nalicePacts:");
+        // for (uint256 i = 0; i < alicePacts.length; i++) {
+        //     emit log(string.concat(i.toString(), ": 0x", alicePacts[i].toString()));
+        // }
     }
 
     // NFTs should always be locked (soulbound)

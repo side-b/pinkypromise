@@ -57,6 +57,7 @@ contract PinkySwearPacts is ERC721, IERC5192 {
 
     mapping(uint256 => Pact) private _pacts;
     mapping(uint256 => uint256) private _pactIdsByTokenId;
+    mapping(address => uint256[]) private _pactIdsBySignee;
 
     // pactId => signer => SigningState
     // We use SigningState rather than a boolean in this mapping,
@@ -135,6 +136,9 @@ contract PinkySwearPacts is ERC721, IERC5192 {
             } else {
                 _signingStates[pactId][signees[i]] = SigningState.Pending;
             }
+
+            // Used to retreive the pacts where a given account is participating
+            _pactIdsBySignee[signees[i]].push(pactId);
         }
 
         pact.data = pactData;
@@ -252,6 +256,10 @@ contract PinkySwearPacts is ERC721, IERC5192 {
         for (uint256 i = 0; i < signees.length; i++) {
             signingStates[i] = _signingStates[pactId][signees[i]];
         }
+    }
+
+    function signeePacts(address signee) public view returns (uint256[] memory pactIds) {
+        pactIds = _pactIdsBySignee[signee];
     }
 
     function pactState(uint256 pactId) public view returns (PactState) {
