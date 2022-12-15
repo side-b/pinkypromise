@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import { Global } from "@emotion/react";
 
 export function GlobalStyles({ children }: { children: ReactNode }) {
