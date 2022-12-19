@@ -602,6 +602,25 @@ export const PinkySwearPactsAbi = [
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "signee",
+        "type": "address",
+      },
+    ],
+    "name": "signeePacts",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "pactIds",
+        "type": "uint256[]",
+      },
+    ],
+    "stateMutability": "view",
+    "type": "function",
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint256",
         "name": "pactId",
         "type": "uint256",

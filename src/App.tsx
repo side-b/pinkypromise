@@ -1,35 +1,33 @@
 import { Route, Router, Switch } from "wouter";
-import { ConnectButton } from "./ConnectButton";
 import { CreatePromise } from "./CreatePromise";
+import { Dev } from "./Dev";
 import { GlobalStyles } from "./GlobalStyles";
+import { Header } from "./Header";
 import { Home } from "./Home";
 import { Pact } from "./Pact";
+import { Pacts } from "./Pacts";
 
 export function App() {
   return (
     <GlobalStyles>
       <div>
-        <div
-          css={{
-            display: "flex",
-            justifyContent: "flex-end",
-            padding: "20px 20px 0 0",
-          }}
-        >
-          <ConnectButton />
-        </div>
+        <Header />
         <Router>
           <Switch>
+            <Route path="/dev">
+              <Dev />
+            </Route>
             <Route path="/">
               <Home />
             </Route>
             <Route path="/new">
               <CreatePromise />
             </Route>
+            <Route path="/pacts/:address">
+              {({ address }: { address: string }) => <Pacts address={address} />}
+            </Route>
             <Route path="/pact/:pactId">
-              {({ pactId }: { pactId: string }) => (
-                <Pact pactId={pactId} />
-              )}
+              {({ pactId }: { pactId: string }) => <Pact pactId={pactId} />}
             </Route>
             <Route>
               <div>

@@ -6,14 +6,12 @@ import { CONTRACT_ADDRESS } from "./environment";
 
 export function Pact({ pactId }: { pactId: string }) {
   const reads = useContractReads({
-    contracts: [
-      {
-        address: CONTRACT_ADDRESS,
-        abi: PinkySwearPactsAbi,
-        functionName: "pactAsSvg",
-        args: [BigNumber.from(pactId)],
-      },
-    ],
+    contracts: [{
+      address: CONTRACT_ADDRESS,
+      abi: PinkySwearPactsAbi,
+      functionName: "pactAsSvg",
+      args: [BigNumber.from(pactId)],
+    }],
   });
 
   if (reads.status === "loading") {

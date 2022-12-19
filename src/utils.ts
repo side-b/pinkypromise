@@ -7,6 +7,8 @@ export function isAddress(address: string): address is Address {
   return ADDRESS_RE.test(address);
 }
 
+export const ADDRESS_NULL = "0x0000000000000000000000000000000000000000" as const;
+
 type HtmlBlock = {
   type: "p";
   content: string;

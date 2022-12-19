@@ -5,12 +5,7 @@ import { utils as ethersUtils } from "ethers";
 import { useEffect } from "react";
 import { useCallback, useMemo, useState } from "react";
 import { match } from "ts-pattern";
-import {
-  useContractWrite,
-  useNetwork,
-  usePrepareContractWrite,
-  useWaitForTransaction,
-} from "wagmi";
+import { useContractWrite, useNetwork, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import { Link } from "wouter";
 import { PinkySwearPactsAbi } from "./abis";
 import { CONTRACT_ADDRESS } from "./environment";
@@ -108,9 +103,7 @@ export function CreatePromise() {
             .with({ write: "success", result: "success" }, () => {
               const draftUpdateEvent = txResult.data?.logs
                 .map(parsePinkySwearPactsLog)
-                .find(event =>
-                  event.name === "PactUpdate" && event.args.state === 1
-                );
+                .find(event => event.name === "PactUpdate" && event.args.state === 1);
 
               const pactId = draftUpdateEvent?.args.pactId?.toString();
 
@@ -120,8 +113,7 @@ export function CreatePromise() {
 
               return (
                 <span>
-                  <Link href={`/pact/${pactId}`}>pact #{pactId}</Link>{" "}
-                  created 🤌 (
+                  <Link href={`/pact/${pactId}`}>pact #{pactId}</Link> created 🤌 (
                   <a
                     href={`${(
                       chain?.blockExplorers?.default.url
@@ -341,6 +333,12 @@ function PromiseForm({
           </div>
         </div>
         <div css={{ position: "relative" }}>
+          <SvgDoc
+            height={docHeight}
+            html={html}
+            onHeight={setDocHeight}
+            signees={validSignees}
+          />
           <div css={{ position: "relative", overflow: "hidden" }}>
             <div
               css={{

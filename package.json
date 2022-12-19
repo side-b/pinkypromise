@@ -7,7 +7,8 @@
     "dev": "vite dev --port 3000",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "update-abi": "./scripts/update-abi.sh"
+    "update-abi": "./scripts/update-abi.sh",
+    "update-svg-contract": "tsx scripts/codegen-PinkySwearPactsSvg.sol.tsx > contracts/src/PinkySwearPactsSvg.sol && forge fmt contracts/src/PinkySwearPactsSvg.sol"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
@@ -23,9 +24,12 @@
   },
   "devDependencies": {
     "@emotion/babel-plugin": "^11.10.5",
+    "@types/node": "^18.11.15",
     "@types/react": "^18.0.24",
     "@types/react-dom": "^18.0.8",
     "@vitejs/plugin-react": "^3.0.0",
+    "lightningcss": "^1.17.1",
+    "tsx": "^3.12.1",
     "typescript": "^4.9.4",
     "vite": "^4.0.0"
   }
