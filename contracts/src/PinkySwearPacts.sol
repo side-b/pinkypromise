@@ -290,7 +290,7 @@ contract PinkySwearPacts is ERC721, IERC5192 {
         return PinkySwearPactsSvg.pactSvgWrapper(
             pact.data.height,
             PinkySwearPactsSvg.pactTextToHtml(pact.data.text),
-            PinkySwearPactsSvg.pactSignersToHtml(signees, signingStates)
+            PinkySwearPactsSvg.pactSigneesToHtml(signees, signingStates)
         );
     }
 }
