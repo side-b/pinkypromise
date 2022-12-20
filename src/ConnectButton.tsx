@@ -1,4 +1,6 @@
 import { ConnectButton as RKConnectButton } from "@rainbow-me/rainbowkit";
+import { COLORS } from "./constants";
+import { shortenAddress } from "./utils";
 
 export function ConnectButton() {
   return (
@@ -14,7 +16,7 @@ export function ConnectButton() {
         const ready = mounted;
         const connected = ready && account && chain;
 
-        if (!ready) { return null; }
+        if (!ready) return null;
 
         if (!connected) {
           return <button onClick={openConnectModal}>Connect</button>;
@@ -25,8 +27,23 @@ export function ConnectButton() {
         }
 
         return (
-          <button onClick={openAccountModal} type="button">
-            {account.displayName}
+          <button
+            onClick={openAccountModal}
+            type="button"
+            css={{
+              height: "40px",
+              padding: "0 32px",
+              color: COLORS.white,
+              background: "transparent",
+              border: `2px solid ${COLORS.white}`,
+              borderRadius: "20px",
+              cursor: "pointer",
+              "&:active": {
+                transform: "translate(1px, 1px)",
+              },
+            }}
+          >
+            {shortenAddress(account.address)}
           </button>
         );
       }}

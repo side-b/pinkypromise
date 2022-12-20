@@ -1,6 +1,8 @@
+import { useAccount } from "wagmi";
 import { Link } from "wouter";
 
 export function Home() {
+  const account = useAccount();
   return (
     <div
       css={{
@@ -18,6 +20,7 @@ export function Home() {
         }}
       >
         <h1>Pinky Promise</h1>
+        {account.address && <Link href={`/pacts/${account.address}`}>ur pacts</Link>}
         <Link href="/new">COOL COOL</Link>
       </div>
     </div>
