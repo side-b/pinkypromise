@@ -1,8 +1,10 @@
 import type { Address, ColorId } from "./types";
 
+import { useMemo } from "react";
 import { COLORS, footerImageUrl, PLACEHOLDER_BODY, PLACEHOLDER_TITLE } from "./constants";
 import { Container } from "./Container";
 import { EthIcon } from "./EthIcon";
+import { blocksToHtml, textToBlocks } from "./utils";
 
 import zigzag from "./zigzag.svg";
 
@@ -17,6 +19,7 @@ export function PinkyPromise({
   signees: Address[];
   title?: string;
 }) {
+  const bodyHtml = useMemo(() => blocksToHtml(textToBlocks(body || PLACEHOLDER_BODY)), [body]);
   return (
     <Container>
       <div
@@ -34,7 +37,7 @@ export function PinkyPromise({
             fontSize: "18px",
           }}
         >
-          {body || PLACEHOLDER_BODY}
+          <div dangerouslySetInnerHTML={{ __html: bodyHtml }} />
         </div>
         <div
           css={{
