@@ -38,6 +38,25 @@ export function CreatePromise() {
     signees: [[account.address ?? "", ""]],
     title: "",
   });
+
+  const newPromiseData = useMemo<{
+    body: string;
+    color: ColorId;
+    signees: Address[];
+    title: string;
+  }>(() => ({
+    body: editorData.body.trim(),
+    color: editorData.color,
+    signees: editorData.signees.map(signee => signee[0]).filter(isAddress),
+    title: editorData.title.trim(),
+  }), [editorData]);
+
+  const submitEnabled = Boolean(
+    newPromiseData.body
+      && newPromiseData.title
+      && newPromiseData.signees.length > 0,
+  );
+
   const [newPactData, setNewPactData] = useState<
     null | {
       text: string;
@@ -94,8 +113,9 @@ export function CreatePromise() {
     leave: { immediate: true },
     config: {
       mass: 1,
-      friction: 50,
+      friction: 60,
       tension: 400,
+      precision: 0.01,
     },
   });
 
@@ -121,6 +141,7 @@ export function CreatePromise() {
               <Editor
                 data={editorData}
                 onChange={setEditorData}
+                submitEnabled={submitEnabled}
               />
             </a.div>
           )

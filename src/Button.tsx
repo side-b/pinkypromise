@@ -2,11 +2,13 @@ import { useMemo } from "react";
 import { COLORS } from "./constants";
 
 export function Button({
+  disabled,
   label,
   mode = "secondary",
   onClick,
   size = "regular",
 }: {
+  disabled?: boolean;
   label: string;
   mode?: "secondary" | "primary";
   onClick?: () => void;
@@ -30,6 +32,7 @@ export function Button({
 
   return (
     <button
+      disabled={disabled}
       onClick={onClick}
       css={{
         display: "flex",
@@ -48,8 +51,11 @@ export function Button({
           outline: `2px solid ${COLORS.pink}`,
           outlineOffset: "3px",
         },
-        "&:active": {
+        "&:active:not(:disabled)": {
           transform: "translate3d(1px, 1px, 0)",
+        },
+        "&:disabled": {
+          opacity: 0.5,
         },
         ...modeStyles,
       }}

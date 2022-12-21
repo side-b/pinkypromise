@@ -47,12 +47,18 @@ export function EditorBar({
             [scrollY, windowResize.height],
             (scrollY, winHeight) => {
               const wh = winHeight || window.innerHeight;
-              const buttonsHeight = 304;
               return Math.max(
-                16, // prevent to overlap the header
-                (360 - 120) // [desired top] - [header height]
-                  + scrollY
-                  + Math.min(0, wh - (360 + buttonsHeight + 20)), // prevent to go lower than the viewport
+                120 - Math.min(scrollY, 120) + 16, // prevent overlaping the header + 16px
+                360 // desired top
+                  - scrollY
+                  + Math.min( // prevent going lower than viewport
+                    0,
+                    wh - (
+                      360 // desired top
+                      + 304 // buttons height
+                      + 24 // extra spacing
+                    ),
+                  ),
               );
             },
           ),
@@ -82,6 +88,9 @@ export function EditorBar({
                   key={id}
                   onClick={() => onPreviewToggle()}
                   css={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                     width: "40px",
                     height: "40px",
                     background: "transparent",
@@ -90,6 +99,10 @@ export function EditorBar({
                     cursor: "pointer",
                     "&:active": {
                       transform: "translate(1px, 1px)",
+                    },
+                    "&:focus-visible": {
+                      outline: `2px solid ${COLORS.pink}`,
+                      outlineOffset: "3px",
                     },
                   }}
                 >
@@ -152,6 +165,10 @@ function ColorButton({
         cursor: "pointer",
         "&:active": {
           transform: "translate(1px, 1px)",
+        },
+        "&:focus-visible": {
+          outline: `2px solid ${COLORS.pink}`,
+          outlineOffset: "3px",
         },
       }}
     >

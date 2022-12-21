@@ -1,10 +1,11 @@
 import type { ColorId } from "./types";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { a, useTransition } from "react-spring";
 import { Button } from "./Button";
 import { COLORS, PLACEHOLDER_BODY, PLACEHOLDER_TITLE } from "./constants";
 import { Container } from "./Container";
+import { isAddress } from "./utils";
 
 const CONFIRM_MESSAGE = `Non-fungible tokens (NFTs) are unique crypto assets that are stored on a blockchain.
 Creating an NFT allows users to upload digital media.`;
@@ -19,9 +20,11 @@ export type EditorData = {
 export function Editor({
   data,
   onChange,
+  submitEnabled,
 }: {
   data: EditorData;
   onChange: (data: EditorData) => void;
+  submitEnabled?: boolean;
 }) {
   const [signeeFocusRequest, setSigneeFocusRequest] = useState<number>(-1);
 
@@ -196,6 +199,7 @@ export function Editor({
                 mode="primary"
                 label="Good to go"
                 size="large"
+                disabled={!submitEnabled}
               />
             </div>
           </div>
