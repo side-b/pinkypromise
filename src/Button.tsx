@@ -2,12 +2,14 @@ import { useMemo } from "react";
 import { COLORS } from "./constants";
 
 export function Button({
+  accentColor,
   disabled,
   label,
   mode = "secondary",
   onClick,
   size = "regular",
 }: {
+  accentColor?: string;
   disabled?: boolean;
   label: string;
   mode?: "secondary" | "primary";
@@ -18,15 +20,15 @@ export function Button({
     if (mode === "primary") {
       return {
         color: COLORS.white,
-        background: COLORS.pink,
-        borderColor: COLORS.pink,
+        background: accentColor ?? COLORS.pink,
+        borderColor: accentColor ?? COLORS.pink,
       };
     }
     // secondary
     return {
-      color: COLORS.pink,
+      color: accentColor ?? COLORS.pink,
       background: "transparent",
-      borderColor: COLORS.pink,
+      borderColor: accentColor ?? COLORS.pink,
     };
   }, [mode]);
 

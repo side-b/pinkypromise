@@ -159,12 +159,13 @@ export function Editor({
                     }}
                   />
                   <Remove
+                    accentColor={COLORS[data.color]}
+                    onClick={() => {
+                      removeFormSignee(id);
+                    }}
                     css={{
                       position: "absolute",
                       inset: "20px 12px auto auto",
-                    }}
-                    onClick={() => {
-                      removeFormSignee(id);
                     }}
                   />
                 </div>
@@ -173,6 +174,7 @@ export function Editor({
           </div>
           <div css={{ padding: "16px 0 48px" }}>
             <Button
+              accentColor={COLORS[data.color]}
               label="Add signee"
               size="large"
               onClick={() => {
@@ -191,11 +193,12 @@ export function Editor({
               borderRadius: "64px",
             }}
           >
-            <div css={{ color: COLORS.pink }}>
+            <div css={{ color: COLORS[data.color] }}>
               {CONFIRM_MESSAGE}
             </div>
             <div>
               <Button
+                accentColor={COLORS[data.color]}
                 mode="primary"
                 label="Good to go"
                 size="large"
@@ -210,9 +213,11 @@ export function Editor({
 }
 
 function Remove({
+  accentColor,
   className,
   onClick,
 }: {
+  accentColor: string;
   className?: string;
   onClick?: () => void;
 }) {
@@ -229,7 +234,7 @@ function Remove({
         width: "40px",
         height: "40px",
         color: COLORS.white,
-        background: COLORS.pink,
+        background: accentColor,
         border: "0",
         borderRadius: "50%",
         cursor: "pointer",
