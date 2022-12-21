@@ -5,7 +5,7 @@ import type { Address, ColorId, Log } from "./types";
 import { utils as ethersUtils } from "ethers";
 import { useEffect } from "react";
 import { useCallback, useMemo, useState } from "react";
-import { a, useTransition } from "react-spring";
+import { a, useSpring, useTransition } from "react-spring";
 import { match } from "ts-pattern";
 import { useAccount, useContractWrite, useNetwork, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import { Link } from "wouter";
@@ -87,24 +87,27 @@ export function CreatePromise() {
     background.set(editorColor);
   }, [background, editorColor]);
 
-  const previewTransitions = useTransition(preview, {
+  const previewTransitions = useTransition({ preview, editorColor }, {
+    keys: ({ preview, editorColor }) => String(preview + editorColor),
     from: { transform: "scale(0.8) translateY(80px)" },
     enter: { transform: "scale(1) translateY(0)" },
     leave: { immediate: true },
     config: {
       mass: 1,
-      friction: 30,
+      friction: 50,
       tension: 400,
-      precision: 0.001,
     },
   });
 
   return (
     <div css={{ padding: "16px 0 0" }}>
-      {previewTransitions((styles, preview) => (
+      {previewTransitions((styles, { preview }) => (
         preview
           ? (
-            <a.div style={styles} css={{ transformOrigin: "50% 50%" }}>
+            <a.div
+              style={styles}
+              css={{ transformOrigin: "50% 50%" }}
+            >
               <PinkyPromise
                 body={editorData.body}
                 color={editorData.color}
@@ -126,6 +129,7 @@ export function CreatePromise() {
         color={editorData.color}
         onColor={(color) => {
           setEditorData((data) => ({ ...data, color }));
+          setPreview(true);
         }}
         onPreviewToggle={() => {
           setPreview(v => !v);

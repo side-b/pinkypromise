@@ -45,12 +45,15 @@ export function EditorBar({
         style={{
           top: to(
             [scrollY, windowResize.height],
-            (scroll, height) => {
-              const height_ = height || window.innerHeight;
+            (scrollY, winHeight) => {
+              const wh = winHeight || window.innerHeight;
               const buttonsHeight = 304;
-              const requiredHeight = buttonsHeight + 360 + 20;
-              const base = height_ < requiredHeight ? 360 - (requiredHeight - height_) : 360;
-              return (scroll > base - 40 ? 40 : base - scroll);
+              return Math.max(
+                16, // prevent to overlap the header
+                (360 - 120) // [desired top] - [header height]
+                  + scrollY
+                  + Math.min(0, wh - (360 + buttonsHeight + 20)), // prevent to go lower than the viewport
+              );
             },
           ),
         }}
