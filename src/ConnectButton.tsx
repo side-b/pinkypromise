@@ -1,5 +1,5 @@
 import { ConnectButton as RKConnectButton } from "@rainbow-me/rainbowkit";
-import { COLORS } from "./constants";
+import { Button } from "./Button";
 import { shortenAddress } from "./utils";
 
 export function ConnectButton() {
@@ -19,32 +19,31 @@ export function ConnectButton() {
         if (!ready) return null;
 
         if (!connected) {
-          return <button onClick={openConnectModal}>Connect</button>;
+          return (
+            <Button
+              accentColor="white"
+              onClick={openConnectModal}
+              label="Connect"
+            />
+          );
         }
 
         if (chain.unsupported) {
-          return <button onClick={openChainModal}>Wrong network</button>;
+          return (
+            <Button
+              accentColor="white"
+              onClick={openChainModal}
+              label="Wrong network"
+            />
+          );
         }
 
         return (
-          <button
+          <Button
+            accentColor="white"
             onClick={openAccountModal}
-            type="button"
-            css={{
-              height: "40px",
-              padding: "0 32px",
-              color: COLORS.white,
-              background: "transparent",
-              border: `2px solid ${COLORS.white}`,
-              borderRadius: "20px",
-              cursor: "pointer",
-              "&:active": {
-                transform: "translate(1px, 1px)",
-              },
-            }}
-          >
-            {shortenAddress(account.address)}
-          </button>
+            label={shortenAddress(account.address)}
+          />
         );
       }}
     </RKConnectButton.Custom>

@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { match } from "ts-pattern";
 import { COLORS } from "./constants";
 
 export function Button({
@@ -14,7 +15,7 @@ export function Button({
   label: string;
   mode?: "secondary" | "primary";
   onClick?: () => void;
-  size: "regular" | "large";
+  size?: "regular" | "large" | "giant";
 }) {
   const modeStyles = useMemo(() => {
     if (mode === "primary") {
@@ -40,7 +41,11 @@ export function Button({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        height: "64px",
+        height: match(size)
+          .with("regular", () => "40px")
+          .with("large", () => "64px")
+          .with("giant", () => "136px")
+          .exhaustive(),
         padding: "0 24px",
         textTransform: "lowercase",
         fontSize: size === "large" ? "26px" : "18px",

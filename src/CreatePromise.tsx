@@ -14,6 +14,7 @@ import { Editor } from "./Editor";
 import { EditorBar } from "./EditorBar";
 import { CONTRACT_ADDRESS } from "./environment";
 import { useBackground } from "./GlobalStyles";
+import { Header } from "./Header";
 import { PinkyPromise } from "./PinkyPromise";
 import { placeholder } from "./placeholder";
 import { SvgDoc } from "./SvgDoc";
@@ -112,51 +113,54 @@ export function CreatePromise() {
     enter: { transform: "scale(1) translateY(0)" },
     leave: { immediate: true },
     config: {
-      mass: 1,
-      friction: 60,
-      tension: 400,
+      mass: 1.5,
+      friction: 80,
+      tension: 800,
     },
   });
 
   return (
-    <div css={{ padding: "16px 0 0" }}>
-      {previewTransitions((styles, { preview }) => (
-        preview
-          ? (
-            <a.div
-              style={styles}
-              css={{ transformOrigin: "50% 50%" }}
-            >
-              <PinkyPromise
-                body={editorData.body}
-                color={editorData.color}
-                signees={editorData.signees.map(([address]) => address).filter(isAddress)}
-                title={editorData.title || "Pinky Promise"}
-              />
-            </a.div>
-          )
-          : (
-            <a.div style={styles} css={{ transformOrigin: "50% 50%" }}>
-              <Editor
-                data={editorData}
-                onChange={setEditorData}
-                submitEnabled={submitEnabled}
-              />
-            </a.div>
-          )
-      ))}
-      <EditorBar
-        color={editorData.color}
-        onColor={(color) => {
-          setEditorData((data) => ({ ...data, color }));
-          setPreview(true);
-        }}
-        onPreviewToggle={() => {
-          setPreview(v => !v);
-        }}
-        preview={preview}
-      />
-    </div>
+    <>
+      <Header />
+      <div css={{ padding: "16px 0 0" }}>
+        {previewTransitions((styles, { preview }) => (
+          preview
+            ? (
+              <a.div
+                style={styles}
+                css={{ transformOrigin: "50% 50%" }}
+              >
+                <PinkyPromise
+                  body={editorData.body}
+                  color={editorData.color}
+                  signees={editorData.signees.map(([address]) => address).filter(isAddress)}
+                  title={editorData.title || "Pinky Promise"}
+                />
+              </a.div>
+            )
+            : (
+              <a.div style={styles} css={{ transformOrigin: "50% 50%" }}>
+                <Editor
+                  data={editorData}
+                  onChange={setEditorData}
+                  submitEnabled={submitEnabled}
+                />
+              </a.div>
+            )
+        ))}
+        <EditorBar
+          color={editorData.color}
+          onColor={(color) => {
+            setEditorData((data) => ({ ...data, color }));
+            setPreview(true);
+          }}
+          onPreviewToggle={() => {
+            setPreview(v => !v);
+          }}
+          preview={preview}
+        />
+      </div>
+    </>
   );
 
   // return txMode

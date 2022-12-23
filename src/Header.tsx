@@ -30,7 +30,12 @@ export function Header() {
             },
           }}
         >
-          <h1 css={{ fontSize: "32px" }}>
+          <h1
+            css={{
+              fontSize: "32px",
+              whiteSpace: "nowrap",
+            }}
+          >
             Pinky Promise
           </h1>
         </a>
@@ -40,7 +45,7 @@ export function Header() {
           display: "flex",
           alignItems: "center",
           justifyContent: "flex-end",
-          padding: "20px 20px 0 0",
+          paddingRight: "20px",
           gap: "20px",
         }}
       >

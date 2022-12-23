@@ -49,7 +49,6 @@ export function GlobalStyles({ children }: { children: ReactNode }) {
           },
           "html": {
             scrollBehavior: "smooth",
-            overflowX: "hidden",
           },
           "body": {
             font: "500 18px/1.5 monospace",
