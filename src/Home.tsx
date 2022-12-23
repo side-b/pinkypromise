@@ -7,7 +7,6 @@ export function Home() {
     <div
       css={{
         position: "fixed",
-        zIndex: "-1",
         inset: "0",
         display: "grid",
         placeItems: "center",

@@ -10,7 +10,7 @@ import { Pacts } from "./Pacts";
 export function App() {
   return (
     <GlobalStyles>
-      <div>
+      <div css={{ minHeight: "100vh" }}>
         <Header />
         <Router>
           <Switch>
