@@ -2,6 +2,7 @@ import type { ColorId } from "./types";
 
 import { useEffect, useMemo, useState } from "react";
 import { a, useTransition } from "react-spring";
+import { AddressInput } from "./AddressInput";
 import { Button } from "./Button";
 import { COLORS, PLACEHOLDER_BODY, PLACEHOLDER_TITLE } from "./constants";
 import { Container } from "./Container";
@@ -145,28 +146,15 @@ export function Editor({
                     paddingTop: "6px",
                   }}
                 >
-                  <input
-                    className="signee"
-                    type="text"
-                    onChange={(event) => {
-                      updateFormSignee(id, event.target.value);
+                  <AddressInput
+                    accentColor={data.color}
+                    onChange={(value) => {
+                      updateFormSignee(id, value);
                     }}
-                    value={address}
-                    placeholder="0x…"
-                    css={{
-                      height: "64px",
-                      padding: "14px 24px",
-                    }}
-                  />
-                  <Remove
-                    accentColor={COLORS[data.color]}
-                    onClick={() => {
+                    onRemove={() => {
                       removeFormSignee(id);
                     }}
-                    css={{
-                      position: "absolute",
-                      inset: "20px 12px auto auto",
-                    }}
+                    value={address}
                   />
                 </div>
               </a.div>
@@ -209,53 +197,5 @@ export function Editor({
         </Container>
       </div>
     </div>
-  );
-}
-
-function Remove({
-  accentColor,
-  className,
-  onClick,
-}: {
-  accentColor: string;
-  className?: string;
-  onClick?: () => void;
-}) {
-  return (
-    <button
-      className={className}
-      onClick={onClick}
-      title="Remove"
-      type="button"
-      css={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        width: "40px",
-        height: "40px",
-        color: COLORS.white,
-        background: accentColor,
-        border: "0",
-        borderRadius: "50%",
-        cursor: "pointer",
-        "&:focus-visible": {
-          outline: `2px solid ${COLORS.pink}`,
-          outlineOffset: "3px",
-        },
-        "&:active": {
-          transform: "translate(1px, 1px)",
-        },
-      }}
-    >
-      <svg width="40" height="40" fill="none" viewBox="0 0 40 40">
-        <path
-          stroke={COLORS.white}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="M9 20 h22"
-        />
-      </svg>
-    </button>
   );
 }

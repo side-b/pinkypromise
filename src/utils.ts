@@ -1,10 +1,14 @@
-import type { Address } from "./types";
+import type { Address, EnsName } from "./types";
 
 import { match } from "ts-pattern";
 
 export const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
-export function isAddress(address: string): address is Address {
-  return ADDRESS_RE.test(address);
+export function isAddress(value: string): value is Address {
+  return ADDRESS_RE.test(value);
+}
+
+export function isEnsName(value: string): value is EnsName {
+  return value.endsWith(".eth") && value.length > 4;
 }
 
 export const ADDRESS_NULL = "0x0000000000000000000000000000000000000000" as const;
@@ -75,4 +79,8 @@ export function shortenAddress(address: string, charsLength = 4): string {
     + "…"
     + address.slice(-charsLength)
   ).toLowerCase();
+}
+
+export function uid(prefix = "uid"): string {
+  return `${prefix}-${Math.round(Math.random() * 10 ** 8)}`;
 }

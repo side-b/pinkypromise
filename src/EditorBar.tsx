@@ -1,10 +1,49 @@
+import type { SpringConfig } from "react-spring";
 import type { ColorId } from "./types";
 
-import { useMemo } from "react";
-import { a, to, useResize, useScroll, useSpring } from "react-spring";
+import { useCallback, useMemo, useRef } from "react";
+import { a, useResize, useScroll, useSpring, useSpringValue } from "react-spring";
 import { match } from "ts-pattern";
 import { COLORS, PROMISE_COLORS_BY_ID } from "./constants";
 import { IconEye } from "./IconEye";
+
+function useBarTopSpring(config?: SpringConfig) {
+  const scrollY = useRef(0);
+  const winHeight = useRef(window.innerHeight);
+  const topSpring = useSpringValue(360, { config });
+
+  const getBarTop = useCallback(() => {
+    return Math.max(
+      120 - Math.min(scrollY.current, 120) + 16, // prevent overlaping the header + 16px
+      360 // desired top
+        - scrollY.current
+        + Math.min( // prevent going lower than viewport
+          0,
+          winHeight.current - (
+            360 // desired top
+            + 304 // buttons height
+            + 24 // extra spacing
+          ),
+        ),
+    );
+  }, []);
+
+  useScroll({
+    onChange({ value }) {
+      scrollY.current = value.scrollY;
+      topSpring.start(getBarTop());
+    },
+  });
+
+  useResize({
+    onChange({ value }) {
+      winHeight.current = value.height;
+      topSpring.start(getBarTop());
+    },
+  });
+
+  return topSpring;
+}
 
 export function EditorBar({
   color,
@@ -36,33 +75,16 @@ export function EditorBar({
     ["preview", "Preview promise"],
   ], []);
 
-  const { scrollY } = useScroll();
-  const windowResize = useResize({});
+  const topSpring = useBarTopSpring({
+    mass: 1,
+    friction: 50,
+    tension: 800,
+  });
 
   return (
     <div css={{ paddingLeft: "64px" }}>
       <a.div
-        style={{
-          top: to(
-            [scrollY, windowResize.height],
-            (scrollY, winHeight) => {
-              const wh = winHeight || window.innerHeight;
-              return Math.max(
-                120 - Math.min(scrollY, 120) + 16, // prevent overlaping the header + 16px
-                360 // desired top
-                  - scrollY
-                  + Math.min( // prevent going lower than viewport
-                    0,
-                    wh - (
-                      360 // desired top
-                      + 304 // buttons height
-                      + 24 // extra spacing
-                    ),
-                  ),
-              );
-            },
-          ),
-        }}
+        style={{ top: topSpring }}
         css={{
           position: "fixed",
           left: "64px",

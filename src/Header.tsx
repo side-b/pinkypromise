@@ -20,6 +20,7 @@ export function Header() {
             textTransform: "lowercase",
             color: COLORS.white,
             textDecoration: "none",
+            borderRadius: "8px",
             "&:focus-visible": {
               outline: `2px solid ${COLORS.white}`,
               outlineOffset: "8px",

@@ -1,5 +1,6 @@
 import { connectorsForWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { injectedWallet, metaMaskWallet, walletConnectWallet } from "@rainbow-me/rainbowkit/wallets";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { match } from "ts-pattern";
@@ -12,6 +13,8 @@ import { App } from "./App";
 import { INFURA_KEY, NETWORKS } from "./environment";
 
 import "@rainbow-me/rainbowkit/styles.css";
+
+const queryClient = new QueryClient();
 
 const { chains, provider, webSocketProvider } = configureChains(
   NETWORKS.map((name: string) =>
@@ -55,10 +58,12 @@ const wagmiClient = createClient({
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <WagmiConfig client={wagmiClient}>
-      <RainbowKitProvider chains={chains} modalSize="compact">
-        <App />
-      </RainbowKitProvider>
-    </WagmiConfig>
+    <QueryClientProvider client={queryClient}>
+      <WagmiConfig client={wagmiClient}>
+        <RainbowKitProvider chains={chains} modalSize="compact">
+          <App />
+        </RainbowKitProvider>
+      </WagmiConfig>
+    </QueryClientProvider>
   </React.StrictMode>,
 );

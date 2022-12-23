@@ -1,4 +1,5 @@
 export type Address = `0x${string}`;
+export type EnsName = `${string}.eth`;
 
 export type ColorId =
   | "black"

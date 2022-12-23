@@ -115,7 +115,6 @@ export function CreatePromise() {
       mass: 1,
       friction: 60,
       tension: 400,
-      precision: 0.01,
     },
   });
 
