@@ -10,7 +10,7 @@ import { infuraProvider } from "wagmi/providers/infura";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 import { publicProvider } from "wagmi/providers/public";
 import { App } from "./App";
-import { INFURA_KEY, NETWORKS } from "./environment";
+import { INFURA_KEY, NETWORKS, REACT_STRICT } from "./environment";
 
 import "@rainbow-me/rainbowkit/styles.css";
 
@@ -56,14 +56,16 @@ const wagmiClient = createClient({
   webSocketProvider,
 });
 
-ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <WagmiConfig client={wagmiClient}>
-        <RainbowKitProvider chains={chains} modalSize="compact">
-          <App />
-        </RainbowKitProvider>
-      </WagmiConfig>
-    </QueryClientProvider>
-  </React.StrictMode>,
+const tree = (
+  <QueryClientProvider client={queryClient}>
+    <WagmiConfig client={wagmiClient}>
+      <RainbowKitProvider chains={chains} modalSize="compact">
+        <App />
+      </RainbowKitProvider>
+    </WagmiConfig>
+  </QueryClientProvider>
 );
+
+ReactDOM
+  .createRoot(document.getElementById("root") as HTMLElement)
+  .render(REACT_STRICT ? <React.StrictMode>{tree}</React.StrictMode> : tree);
