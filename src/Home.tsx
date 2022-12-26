@@ -53,8 +53,8 @@ export function Home() {
         <a.div
           style={{
             transform: springs.reveal.progress.to((p: number) => `
-              scale(${lerp(p, 1, 140 / (dimensions.height * 1.8))})
               translateY(${lerp(p, -120, 40)}px)
+              scale(${lerp(p, 1, 140 / (dimensions.height * 1.8))})
             `),
           }}
           css={{
