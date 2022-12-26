@@ -49,6 +49,30 @@ export function Header() {
           gap: "20px",
         }}
       >
+        <Link href="/">
+          <a
+            css={{
+              display: "flex",
+              alignItems: "center",
+              textTransform: "lowercase",
+              height: "40px",
+              padding: "0 24px",
+              color: COLORS.white,
+              textDecoration: "none",
+              borderRadius: "32px",
+              border: `2px solid ${COLORS.white}`,
+              "&:focus-visible": {
+                outline: `2px solid ${COLORS.white}`,
+                outlineOffset: "8px",
+              },
+              "&:active": {
+                transform: "translate(1px, 1px)",
+              },
+            }}
+          >
+            About
+          </a>
+        </Link>
         <ConnectButton />
       </div>
     </div>

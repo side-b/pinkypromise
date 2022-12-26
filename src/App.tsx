@@ -2,9 +2,10 @@ import { Route, Router, Switch } from "wouter";
 import { CreatePromise } from "./CreatePromise";
 import { Dev } from "./Dev";
 import { GlobalStyles } from "./GlobalStyles";
+import { Header } from "./Header";
 import { Home } from "./Home";
 import { Pact } from "./Pact";
-import { Pacts } from "./Pacts";
+import { Promises } from "./Promises";
 
 export function App() {
   return (
@@ -19,9 +20,18 @@ export function App() {
       >
         <div
           css={{
+            position: "relative",
+            zIndex: 2,
+          }}
+        >
+          <Header />
+        </div>
+        <div
+          css={{
+            position: "relative",
+            zIndex: 1,
             display: "flex",
             flexDirection: "column",
-            flexGrow: 1,
           }}
         >
           <Router>
@@ -36,7 +46,7 @@ export function App() {
                 <CreatePromise />
               </Route>
               <Route path="/promises/:address">
-                {({ address }: { address: string }) => <Pacts address={address} />}
+                {({ address }: { address: string }) => <Promises address={address} />}
               </Route>
               <Route path="/promise/:pactId">
                 {({ pactId }: { pactId: string }) => <Pact pactId={pactId} />}

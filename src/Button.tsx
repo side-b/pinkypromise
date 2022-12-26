@@ -4,6 +4,7 @@ import { COLORS } from "./constants";
 
 export function Button({
   accentColor,
+  className,
   disabled,
   label,
   mode = "secondary",
@@ -11,6 +12,7 @@ export function Button({
   size = "regular",
 }: {
   accentColor?: string;
+  className?: string;
   disabled?: boolean;
   label: string;
   mode?: "secondary" | "primary";
@@ -35,6 +37,7 @@ export function Button({
 
   return (
     <button
+      className={className}
       disabled={disabled}
       onClick={onClick}
       css={{

@@ -1,5 +1,6 @@
 import { ConnectButton as RKConnectButton } from "@rainbow-me/rainbowkit";
 import { Button } from "./Button";
+import { COLORS } from "./constants";
 import { shortenAddress } from "./utils";
 
 export function ConnectButton() {
@@ -21,7 +22,7 @@ export function ConnectButton() {
         if (!connected) {
           return (
             <Button
-              accentColor="white"
+              accentColor={COLORS.white}
               onClick={openConnectModal}
               label="Connect"
             />
@@ -31,7 +32,7 @@ export function ConnectButton() {
         if (chain.unsupported) {
           return (
             <Button
-              accentColor="white"
+              accentColor={COLORS.white}
               onClick={openChainModal}
               label="Wrong network"
             />
@@ -40,7 +41,7 @@ export function ConnectButton() {
 
         return (
           <Button
-            accentColor="white"
+            accentColor={COLORS.white}
             onClick={openAccountModal}
             label={shortenAddress(account.address)}
           />

@@ -5,7 +5,6 @@ import { AnimatableFingers } from "./AnimatableFingers";
 import { ButtonLink } from "./ButtonLink";
 import { COLORS, PROMISE_SYNONYMS } from "./constants";
 import { Footer } from "./Footer";
-import { Header } from "./Header";
 import { useChainedProgress, useWindowDimensions } from "./react-utils";
 import { lerp } from "./utils";
 import { WordsLoop } from "./WordsLoop";
@@ -19,12 +18,10 @@ export function Home() {
       [0.1, "rightFinger", { config: { mass: 2, friction: 70, tension: 1200 } }],
       [0.5, "closeFingers", { config: { mass: 2, friction: 70, tension: 1200 } }],
       [0.9, "reveal", { config: { mass: 1, friction: 80, tension: 1400 } }],
-      [1, "pause", { config: { duration: 800 } }],
+      [1, "pause", { config: { duration: 600 } }],
     ],
     1200,
-    () => {
-      setAnimateWords(true);
-    },
+    () => setAnimateWords(true),
   );
 
   const dimensions = useWindowDimensions();
@@ -39,16 +36,6 @@ export function Home() {
         flexDirection: "column",
       }}
     >
-      <div
-        css={{
-          flexGrow: "0",
-          flexShrink: "0",
-          position: "relative",
-          zIndex: "2",
-        }}
-      >
-        <Header />
-      </div>
       <div
         css={{
           overflow: "hidden",
@@ -143,9 +130,6 @@ export function Home() {
           </div>
           <div
             css={{
-              flexGrow: "0",
-              flexShrink: "0",
-              overflow: "hidden",
               display: "flex",
               justifyContent: "center",
               height: "104px",
