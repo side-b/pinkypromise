@@ -1,89 +1,34 @@
-import { useEffect } from "react";
-import { a, useChain, useSpring, useSpringRef } from "react-spring";
+import { useEffect, useState } from "react";
+import { a } from "react-spring";
 import { Link } from "wouter";
 import { AnimatableFingers } from "./AnimatableFingers";
 import { ButtonLink } from "./ButtonLink";
-import { COLORS } from "./constants";
+import { COLORS, PROMISE_SYNONYMS } from "./constants";
 import { Footer } from "./Footer";
 import { Header } from "./Header";
-import { useWindowDimensions } from "./react-utils";
+import { useChainedProgress, useWindowDimensions } from "./react-utils";
 import { lerp } from "./utils";
-
-const bouncyConfig = {
-  mass: 2,
-  friction: 70,
-  tension: 1200,
-};
+import { WordsLoop } from "./WordsLoop";
 
 export function Home() {
+  const [animateWords, setAnimateWords] = useState(false);
+
+  const springs = useChainedProgress([
+    [0, "leftFinger", { config: { mass: 2, friction: 70, tension: 1200 } }],
+    [0.1, "rightFinger", { config: { mass: 2, friction: 70, tension: 1200 } }],
+    [0.5, "closeFingers", { config: { mass: 2, friction: 70, tension: 1200 } }],
+    [0.9, "reveal", {
+      config: { mass: 1, friction: 80, tension: 1400 },
+    }],
+    [1, "footer", {
+      config: { mass: 1, friction: 80, tension: 800 },
+      onRest: () => setAnimateWords(true),
+    }],
+  ], 1200);
+
   const dimensions = useWindowDimensions();
 
-  const springRefs = {
-    leftFingerAppear: useSpringRef(),
-    rightFingerAppear: useSpringRef(),
-    closeFingers: useSpringRef(),
-    reveal: useSpringRef(),
-    footer: useSpringRef(),
-  };
-
-  const leftFingerAppear = useSpring({
-    ref: springRefs.leftFingerAppear,
-    from: { progress: 0 },
-    to: { progress: 1 },
-    config: bouncyConfig,
-  });
-
-  const rightFingerAppear = useSpring({
-    ref: springRefs.rightFingerAppear,
-    from: { progress: 0 },
-    to: { progress: 1 },
-    config: bouncyConfig,
-  });
-
-  const closeFingers = useSpring({
-    ref: springRefs.closeFingers,
-    from: { progress: 0 },
-    to: { progress: 1 },
-    config: bouncyConfig,
-  });
-
-  const reveal = useSpring({
-    ref: springRefs.reveal,
-    from: { progress: 0 },
-    to: { progress: 1 },
-    config: {
-      mass: 1,
-      friction: 80,
-      tension: 1400,
-    },
-  });
-
-  const footer = useSpring({
-    ref: springRefs.footer,
-    from: { progress: 0 },
-    to: { progress: 1 },
-    config: {
-      mass: 1,
-      friction: 80,
-      tension: 800,
-    },
-  });
-
-  useChain(
-    [
-      springRefs.leftFingerAppear,
-      springRefs.rightFingerAppear,
-      springRefs.closeFingers,
-      springRefs.reveal,
-      springRefs.footer,
-    ],
-    [0, 0.1, 0.5, 0.9, 1],
-    1200,
-  );
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+  useEffect(() => window.scrollTo(0, 0), []);
 
   return (
     <div css={{ flexGrow: "1", display: "flex", flexDirection: "column" }}>
@@ -109,7 +54,7 @@ export function Home() {
       >
         <a.div
           style={{
-            transform: reveal.progress.to((p) => `
+            transform: springs.reveal.progress.to((p: number) => `
               scale(${lerp(p, 1, 140 / (dimensions.height * 1.8))})
               translateY(${lerp(p, -120, 40)}px)
             `),
@@ -131,9 +76,9 @@ export function Home() {
           >
             <AnimatableFingers
               springValues={{
-                closeFingers: closeFingers.progress,
-                leftFingerAppear: leftFingerAppear.progress,
-                rightFingerAppear: rightFingerAppear.progress,
+                closeFingers: springs.closeFingers.progress,
+                leftFingerAppear: springs.leftFinger.progress,
+                rightFingerAppear: springs.rightFinger.progress,
               }}
               openDistance={dimensions.width / 3}
               size={dimensions.height * 1.8}
@@ -149,13 +94,13 @@ export function Home() {
             paddingBottom: "60px",
           }}
           style={{
-            opacity: reveal.progress.to([0, 0.2, 1], [0, 1, 1]),
-            transform: reveal.progress.to([0, 0.8, 1], [0, 0, 1]).to((p) => `
-              translateY(${lerp(p, dimensions.height, 0)}px)
-            `),
+            opacity: springs.reveal.progress.to([0, 0.2, 1], [0, 1, 1]),
+            transform: springs.reveal.progress
+              .to([0, 0.8, 1], [0, 0, 1])
+              .to((p: number) => `translateY(${lerp(p, dimensions.height, 0)}px)`),
           }}
         >
-          <h1
+          <div
             css={{
               paddingBottom: "48px",
               textAlign: "center",
@@ -170,9 +115,13 @@ export function Home() {
               },
             }}
           >
-            <span>On-chain</span>
-            <span>promises</span>
-          </h1>
+            <div>On-chain</div>
+            <WordsLoop
+              animate={animateWords}
+              word="Promises"
+              words={PROMISE_SYNONYMS}
+            />
+          </div>
           <Link href="/new">
             <ButtonLink label="Cool, cool" size="big" color={COLORS.blue} />
           </Link>
@@ -191,8 +140,8 @@ export function Home() {
         <a.div
           css={{ height: "100%" }}
           style={{
-            opacity: footer.progress,
-            transform: footer.progress.to((v) => (
+            opacity: springs.footer.progress,
+            transform: springs.footer.progress.to((v: number) => (
               `translateY(${lerp(v, 100, 0)}px)`
             )),
           }}

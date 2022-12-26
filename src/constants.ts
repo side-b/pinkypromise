@@ -1,5 +1,15 @@
 import type { ColorId } from "./types";
 
+export const PROMISE_SYNONYMS = [
+  "Pacts",
+  "Treaties",
+  "Agreements",
+  "Covenants",
+  "Accords",
+  "Guarantees",
+  "Pledges",
+];
+
 export const COLORS = {
   black: "#1E1E1E",
   blue: "#0007B0",
