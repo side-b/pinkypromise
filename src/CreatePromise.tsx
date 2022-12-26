@@ -109,20 +109,25 @@ export function CreatePromise() {
 
   const previewTransitions = useTransition({ preview, editorColor }, {
     keys: ({ preview, editorColor }) => String(preview + editorColor),
-    from: { transform: "scale(0.8) translateY(80px)" },
+    from: { transform: "scale(0.85) translateY(0)" },
     enter: { transform: "scale(1) translateY(0)" },
     leave: { immediate: true },
     config: {
-      mass: 1.5,
+      mass: 2,
       friction: 80,
-      tension: 800,
+      tension: 1200,
     },
   });
 
   return (
     <>
       <Header />
-      <div css={{ padding: "16px 0 0" }}>
+      <div
+        css={{
+          overflowX: "hidden",
+          padding: "16px 0 0",
+        }}
+      >
         {previewTransitions((styles, { preview }) => (
           preview
             ? (
@@ -139,7 +144,10 @@ export function CreatePromise() {
               </a.div>
             )
             : (
-              <a.div style={styles} css={{ transformOrigin: "50% 50%" }}>
+              <a.div
+                style={styles}
+                css={{ transformOrigin: "50% 50%" }}
+              >
                 <Editor
                   data={editorData}
                   onChange={setEditorData}

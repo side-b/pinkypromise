@@ -6,8 +6,6 @@ export function Container({ children }: { children: ReactNode }) {
   return (
     <div
       css={{
-        position: "absolute",
-        inset: "0 0 auto",
         paddingBottom: "80px",
       }}
     >
