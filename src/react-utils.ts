@@ -1,7 +1,7 @@
 import type { UseSpringProps } from "react-spring";
 
 import { useEffect, useRef, useState } from "react";
-import { a, useChain, useSpring, useSpringRef } from "react-spring";
+import { useChain, useSpring, useSpringRef } from "react-spring";
 
 export function useWindowDimensions() {
   const latest = useRef(() => ({
@@ -35,12 +35,20 @@ export function useProgress(springProps?: UseSpringProps) {
   };
 }
 
-export function useChainedProgress(steps: Array<[number, string, UseSpringProps?]>, duration: number) {
+export function useChainedProgress(
+  steps: Array<[number, string, UseSpringProps?]>,
+  duration: number,
+  onComplete?: () => void,
+) {
   const springs = steps.reduce<
     Record<string, ReturnType<typeof useProgress>>
-  >((springs, step) => ({
+  >((springs, step, index) => ({
     ...springs,
-    [step[1]]: useProgress(step[2]),
+    [step[1]]: useProgress(
+      index === steps.length - 1
+        ? { ...step[2], onRest: () => onComplete?.() }
+        : step[2],
+    ),
   }), {});
 
   useChain(

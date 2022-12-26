@@ -13,23 +13,30 @@ import { WordsLoop } from "./WordsLoop";
 export function Home() {
   const [animateWords, setAnimateWords] = useState(false);
 
-  const springs = useChainedProgress([
-    [0, "leftFinger", { config: { mass: 2, friction: 70, tension: 1200 } }],
-    [0.1, "rightFinger", { config: { mass: 2, friction: 70, tension: 1200 } }],
-    [0.5, "closeFingers", { config: { mass: 2, friction: 70, tension: 1200 } }],
-    [0.9, "reveal", { config: { mass: 1, friction: 80, tension: 1400 } }],
-    [1, "footer", {
-      config: { mass: 1, friction: 80, tension: 800 },
-      onRest: () => setAnimateWords(true),
-    }],
-  ], 1200);
+  const springs = useChainedProgress(
+    [
+      [0, "leftFinger", { config: { mass: 2, friction: 70, tension: 1200 } }],
+      [0.1, "rightFinger", { config: { mass: 2, friction: 70, tension: 1200 } }],
+      [0.5, "closeFingers", { config: { mass: 2, friction: 70, tension: 1200 } }],
+      [0.9, "reveal", { config: { mass: 1, friction: 80, tension: 1400 } }],
+      [1, "pause", { config: { duration: 600 } }],
+    ],
+    1200,
+    () => setAnimateWords(true),
+  );
 
   const dimensions = useWindowDimensions();
 
   useEffect(() => window.scrollTo(0, 0), []);
 
   return (
-    <div css={{ flexGrow: "1", display: "flex", flexDirection: "column" }}>
+    <div
+      css={{
+        flexGrow: "1",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       <div
         css={{
           flexGrow: "0",
@@ -42,12 +49,13 @@ export function Home() {
       </div>
       <div
         css={{
-          overflowX: "hidden",
+          overflow: "hidden",
           flexGrow: "1",
           flexShrink: "0",
           position: "relative",
           marginTop: "-120px",
           zIndex: "1",
+          height: "988px",
         }}
       >
         <a.div
@@ -83,13 +91,12 @@ export function Home() {
             />
           </div>
         </a.div>
-        <a.main
+        <a.div
           css={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             marginTop: "240px",
-            paddingBottom: "60px",
           }}
           style={{
             opacity: springs.reveal.progress.to([0, 0.2, 1], [0, 1, 1]),
@@ -100,51 +107,50 @@ export function Home() {
         >
           <div
             css={{
-              paddingBottom: "48px",
-              textAlign: "center",
-              fontSize: "200px",
-              fontWeight: "500",
-              lineHeight: "1",
-              textTransform: "uppercase",
-              color: "#FFF",
-              userSelect: "none",
-              "span": {
-                display: "block",
-              },
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              paddingBottom: "60px",
             }}
           >
-            <div>On-chain</div>
-            <WordsLoop
-              animate={animateWords}
-              word="Promises"
-              words={PROMISE_SYNONYMS}
-            />
+            <div
+              css={{
+                paddingBottom: "48px",
+                textAlign: "center",
+                fontSize: "200px",
+                fontWeight: "500",
+                lineHeight: "1",
+                textTransform: "uppercase",
+                color: "#FFF",
+                userSelect: "none",
+                "span": {
+                  display: "block",
+                },
+              }}
+            >
+              <div>On-chain</div>
+              <WordsLoop
+                animate={animateWords}
+                word="Promises"
+                words={PROMISE_SYNONYMS}
+              />
+            </div>
+            <Link href="/new">
+              <ButtonLink label="Cool, cool" size="big" color={COLORS.blue} />
+            </Link>
           </div>
-          <Link href="/new">
-            <ButtonLink label="Cool, cool" size="big" color={COLORS.blue} />
-          </Link>
-        </a.main>
-      </div>
-      <div
-        css={{
-          flexGrow: "0",
-          flexShrink: "0",
-          overflow: "hidden",
-          display: "flex",
-          justifyContent: "center",
-          height: "104px",
-        }}
-      >
-        <a.div
-          css={{ height: "100%" }}
-          style={{
-            opacity: springs.footer.progress,
-            transform: springs.footer.progress.to((v: number) => (
-              `translateY(${lerp(v, 100, 0)}px)`
-            )),
-          }}
-        >
-          <Footer />
+          <div
+            css={{
+              flexGrow: "0",
+              flexShrink: "0",
+              overflow: "hidden",
+              display: "flex",
+              justifyContent: "center",
+              height: "104px",
+            }}
+          >
+            <Footer />
+          </div>
         </a.div>
       </div>
     </div>
