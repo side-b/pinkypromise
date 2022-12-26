@@ -33,6 +33,7 @@ function useBarTopSpring(config?: SpringConfig) {
       scrollY.current = value.scrollY;
       topSpring.start(getBarTop());
     },
+    config,
   });
 
   useResize({
@@ -40,6 +41,7 @@ function useBarTopSpring(config?: SpringConfig) {
       winHeight.current = value.height;
       topSpring.start(getBarTop());
     },
+    config,
   });
 
   return topSpring;
@@ -77,8 +79,8 @@ export function EditorBar({
 
   const topSpring = useBarTopSpring({
     mass: 1,
-    friction: 50,
-    tension: 800,
+    friction: 80,
+    tension: 1600,
   });
 
   return (
@@ -160,7 +162,7 @@ function ColorButton({
   selected: boolean;
   title: string;
 }) {
-  const springStyle = useSpring({
+  const selectedSpring = useSpring({
     to: {
       opacity: Number(selected),
       transform: `scale(${selected ? 1 : 0.5})`,
@@ -195,7 +197,7 @@ function ColorButton({
       }}
     >
       <a.div
-        style={springStyle}
+        style={selectedSpring}
         css={{
           position: "absolute",
           inset: "0",

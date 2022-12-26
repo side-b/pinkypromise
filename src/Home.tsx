@@ -17,9 +17,7 @@ export function Home() {
     [0, "leftFinger", { config: { mass: 2, friction: 70, tension: 1200 } }],
     [0.1, "rightFinger", { config: { mass: 2, friction: 70, tension: 1200 } }],
     [0.5, "closeFingers", { config: { mass: 2, friction: 70, tension: 1200 } }],
-    [0.9, "reveal", {
-      config: { mass: 1, friction: 80, tension: 1400 },
-    }],
+    [0.9, "reveal", { config: { mass: 1, friction: 80, tension: 1400 } }],
     [1, "footer", {
       config: { mass: 1, friction: 80, tension: 800 },
       onRest: () => setAnimateWords(true),
