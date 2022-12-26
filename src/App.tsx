@@ -35,10 +35,10 @@ export function App() {
               <Route path="/new">
                 <CreatePromise />
               </Route>
-              <Route path="/pacts/:address">
+              <Route path="/promises/:address">
                 {({ address }: { address: string }) => <Pacts address={address} />}
               </Route>
-              <Route path="/pact/:pactId">
+              <Route path="/promise/:pactId">
                 {({ pactId }: { pactId: string }) => <Pact pactId={pactId} />}
               </Route>
               <Route>

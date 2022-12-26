@@ -97,7 +97,6 @@ export function EditorBar({
           css={{
             display: "flex",
             flexDirection: "column",
-            gap: "18px",
             alignItems: "center",
             width: "64px",
             padding: "16px 0",
@@ -108,30 +107,11 @@ export function EditorBar({
           {buttons.map(([id, background, label]) => (
             id === "preview"
               ? (
-                <button
+                <PreviewButton
                   key={id}
                   onClick={() => onPreviewToggle()}
-                  css={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: "40px",
-                    height: "40px",
-                    background: "transparent",
-                    border: "0",
-                    borderRadius: "50%",
-                    cursor: "pointer",
-                    "&:active": {
-                      transform: "translate(1px, 1px)",
-                    },
-                    "&:focus-visible": {
-                      outline: `2px solid ${COLORS.pink}`,
-                      outlineOffset: "3px",
-                    },
-                  }}
-                >
-                  <IconEye opened={preview} />
-                </button>
+                  preview={preview}
+                />
               )
               : (
                 <ColorButton
@@ -175,37 +155,102 @@ function ColorButton({
   });
 
   return (
-    <a.button
+    <button
       type="button"
       title={title}
       onClick={onClick}
       css={{
         position: "relative",
-        background: color,
-        width: "40px",
-        height: "40px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "64px",
+        height: "56px",
+        padding: "0",
         border: "0",
-        borderRadius: "50%",
+        background: "none",
         cursor: "pointer",
-        "&:active": {
+        "&:active > div": {
           transform: "translate(1px, 1px)",
         },
         "&:focus-visible": {
+          outline: "0",
+        },
+        "&:focus-visible > div": {
           outline: `2px solid ${COLORS.pink}`,
           outlineOffset: "3px",
         },
       }}
     >
-      <a.div
-        style={selectedSpring}
+      <div
         css={{
-          position: "absolute",
-          inset: "0",
-          outline: selected ? `6px solid ${COLORS.grey}` : "0",
-          outlineOffset: "-8px",
+          position: "relative",
+          width: "40px",
+          height: "40px",
+          background: color,
           borderRadius: "50%",
         }}
-      />
-    </a.button>
+      >
+        <a.div
+          style={selectedSpring}
+          css={{
+            position: "absolute",
+            inset: "0",
+            outline: selected ? `6px solid ${COLORS.grey}` : "0",
+            outlineOffset: "-8px",
+            borderRadius: "50%",
+          }}
+        />
+      </div>
+    </button>
+  );
+}
+
+function PreviewButton({
+  onClick,
+  preview,
+}: {
+  onClick: () => void;
+  preview: boolean;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      css={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "64px",
+        height: "56px",
+        padding: "0",
+        background: "transparent",
+        border: "0",
+        borderRadius: "50%",
+        cursor: "pointer",
+        "&:active > div": {
+          transform: "translate(1px, 1px)",
+        },
+        "&:focus-visible": {
+          outline: "0",
+        },
+        "&:focus-visible > div": {
+          outline: `2px solid ${COLORS.pink}`,
+          outlineOffset: "3px",
+        },
+      }}
+    >
+      <div
+        css={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: "40px",
+          height: "40px",
+          borderRadius: "50%",
+        }}
+      >
+        <IconEye opened={preview} />
+      </div>
+    </button>
   );
 }

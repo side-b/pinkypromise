@@ -160,7 +160,6 @@ export function CreatePromise() {
           color={editorData.color}
           onColor={(color) => {
             setEditorData((data) => ({ ...data, color }));
-            setPreview(true);
           }}
           onPreviewToggle={() => {
             setPreview(v => !v);
