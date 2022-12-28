@@ -16,7 +16,7 @@ contract CreateDemoPromisesScript is Script {
     function run() external {
         uint256 pk1 = vm.envUint("SIGNEE1_PK");
         uint256 pk2 = vm.envUint("SIGNEE2_PK");
-        uint256 pk3 = vm.envUint("SIGNEE3_PK");
+        // uint256 pk3 = vm.envUint("SIGNEE3_PK");
         address ppAddr = vm.envAddress("PINKY_PROMISE_ADDRESS");
 
         PinkyPromise pp = PinkyPromise(ppAddr);

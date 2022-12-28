@@ -4,7 +4,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { SvgDoc } from "../src/SvgDoc";
 
-const SOURCE_PATH = new URL("../contracts/src/PinkySwearPactsSvg.tpl.sol", import.meta.url).pathname;
+const SOURCE_PATH = new URL("../contracts/PinkyPromiseSvg.tpl.sol", import.meta.url).pathname;
 const SOURCE_REPLACER_MARK = /<SVG_WRAPPER>/;
 
 function getPactSvgInnerCode() {
@@ -12,7 +12,7 @@ function getPactSvgInnerCode() {
     createElement(SvgDoc, {
       height: 9999,
       html: "CONTENT_HTML",
-      signees: "SIGNERS_HTML",
+      signees: "SIGNEES_HTML",
     }),
   ).replace(/&quot;/g, "\"");
 
@@ -34,7 +34,7 @@ function getPactSvgInnerCode() {
     .replace(/'/g, "'")
     .replace(/9999/g, "', _height ,'")
     .replace(/CONTENT_HTML/g, "', contentHtml ,'")
-    .replace(/SIGNERS_HTML/g, "', signersHtml ,'")
+    .replace(/SIGNEES_HTML/g, "', signeesHtml ,'")
     + "');";
 }
 

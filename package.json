@@ -1,5 +1,5 @@
 {
-  "name": "pinkyswearpacts",
+  "name": "pinkypromise",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -8,7 +8,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "update-abi": "./scripts/update-abi.sh",
-    "update-svg-contract": "tsx scripts/codegen-PinkySwearPactsSvg.sol.tsx > contracts/src/PinkySwearPactsSvg.sol && forge fmt contracts/src/PinkySwearPactsSvg.sol"
+    "update-svg-contract": "tsx scripts/codegen-PinkyPromiseSvg.sol.tsx > contracts/src/PinkyPromiseSvg.sol && forge fmt contracts/src/PinkyPromiseSvg.sol"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",

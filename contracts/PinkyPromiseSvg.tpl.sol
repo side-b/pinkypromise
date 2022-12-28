@@ -10,7 +10,7 @@ library PinkyPromiseSvg {
     using LibString for uint16;
     using AddressToString for address;
 
-    function promiseSvgWrapper(uint16 height, string calldata contentHtml, string calldata signersHtml)
+    function promiseSvgWrapper(uint16 height, string calldata contentHtml, string calldata signeesHtml)
         public
         pure
         returns (string memory)
@@ -50,7 +50,7 @@ library PinkyPromiseSvg {
         return string.concat(html, remaining.toString());
     }
 
-    function promiseSignersToHtml(address[] calldata signees, PinkyPromise.SigningState[] calldata signingStates)
+    function promiseSigneesToHtml(address[] calldata signees, PinkyPromise.SigningState[] calldata signingStates)
         public
         pure
         returns (string memory)

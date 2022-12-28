@@ -2,6 +2,7 @@
   "trailingSlash": false,
   "rewrites": [
     { "source": "/new", "destination": "/" },
-    { "source": "/pact/:pactId", "destination": "/" }
+    { "source": "/promise/:promiseId", "destination": "/" }
+    { "source": "/promises/:promiseId", "destination": "/" }
   ]
 }

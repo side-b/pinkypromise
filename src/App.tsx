@@ -48,8 +48,8 @@ export function App() {
               <Route path="/promises">
                 {({ address }: { address: string }) => <Promises address={address} />}
               </Route>
-              <Route path="/promise/:pactId">
-                {({ pactId }: { pactId: string }) => <Pact pactId={pactId} />}
+              <Route path="/promise/:id">
+                {({ id }: { id: string }) => <Pact pactId={id} />}
               </Route>
               <Route>
                 <div>
