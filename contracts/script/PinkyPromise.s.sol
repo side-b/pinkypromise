@@ -2,12 +2,12 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Script.sol";
-import "../src/PinkySwearPacts.sol";
+import "../src/PinkyPromise.sol";
 
-contract PinkySwearPactsScript is Script {
+contract PinkyPromiseScript is Script {
     function run() external {
         vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
-        new PinkySwearPacts("Pinky Swear Pacts", "PSP");
+        new PinkyPromise("Pinky Promise", "PSP");
         vm.stopBroadcast();
     }
 }

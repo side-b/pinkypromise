@@ -33,7 +33,7 @@ if [[ -z $SIGNEE3_PK ]]; then
     exit 1
 fi
 
-CONTRACT_ADDRESS=$(cat broadcast/PinkySwearPacts.s.sol/$CHAIN_ID/run-latest.json | jq '.transactions[] | select(.contractName == "PinkySwearPacts" and .transactionType == "CREATE") .contractAddress' --raw-output)
+CONTRACT_ADDRESS=$(cat broadcast/PinkyPromise.s.sol/$CHAIN_ID/run-latest.json | jq '.transactions[] | select(.contractName == "PinkyPromise" and .transactionType == "CREATE") .contractAddress' --raw-output)
 
 if [[ -z $CONTRACT_ADDRESS ]]; then
     echo "Could not find the latest deployment address" 1>&2

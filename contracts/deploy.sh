@@ -22,9 +22,9 @@ else
     exit 1
 fi
 
-forge script script/PinkySwearPacts.s.sol:PinkySwearPactsScript --rpc-url $RPC_URL --broadcast $VERIFY
+forge script script/PinkyPromise.s.sol:PinkyPromiseScript --rpc-url $RPC_URL --broadcast $VERIFY
 
-CONTRACT_ADDRESS=$(cat broadcast/PinkySwearPacts.s.sol/$CHAIN_ID/run-latest.json | jq '.transactions[] | select(.contractName == "PinkySwearPacts" and .transactionType == "CREATE") .contractAddress' --raw-output)
+CONTRACT_ADDRESS=$(cat broadcast/PinkyPromise.s.sol/$CHAIN_ID/run-latest.json | jq '.transactions[] | select(.contractName == "PinkyPromise" and .transactionType == "CREATE") .contractAddress' --raw-output)
 
 echo ""
 echo "    Contract address: ${CONTRACT_ADDRESS}"
