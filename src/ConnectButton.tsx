@@ -1,9 +1,11 @@
+import type { ComponentPropsWithoutRef } from "react";
+
 import { ConnectButton as RKConnectButton } from "@rainbow-me/rainbowkit";
 import { Button } from "./Button";
 import { COLORS } from "./constants";
 import { shortenAddress } from "./utils";
 
-export function ConnectButton() {
+export function ConnectButton(props: Partial<ComponentPropsWithoutRef<typeof Button>>) {
   return (
     <RKConnectButton.Custom>
       {({
@@ -22,9 +24,10 @@ export function ConnectButton() {
         if (!connected) {
           return (
             <Button
-              accentColor={COLORS.white}
+              color={COLORS.white}
               onClick={openConnectModal}
               label="Connect"
+              {...props}
             />
           );
         }
@@ -32,18 +35,20 @@ export function ConnectButton() {
         if (chain.unsupported) {
           return (
             <Button
-              accentColor={COLORS.white}
+              color={COLORS.white}
               onClick={openChainModal}
               label="Wrong network"
+              {...props}
             />
           );
         }
 
         return (
           <Button
-            accentColor={COLORS.white}
+            color={COLORS.white}
             onClick={openAccountModal}
             label={shortenAddress(account.address)}
+            {...props}
           />
         );
       }}

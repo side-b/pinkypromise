@@ -1,4 +1,4 @@
-import { ButtonLink } from "./ButtonLink";
+import { Button } from "./Button";
 import { COLORS } from "./constants";
 
 export function Footer() {
@@ -12,17 +12,17 @@ export function Footer() {
         height: "100%",
       }}
     >
-      <ButtonLink
+      <Button
         label="Contact"
         href="https://github.com/bpierre/pinkyswearpacts"
         color={COLORS.white}
       />
-      <ButtonLink
+      <Button
         label="side-b"
         href="https://github.com/bpierre/pinkyswearpacts"
         color={COLORS.white}
       />
-      <ButtonLink
+      <Button
         color={COLORS.white}
         external={true}
         href="https://github.com/bpierre/pinkyswearpacts"

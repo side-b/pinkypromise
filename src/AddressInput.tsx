@@ -45,6 +45,7 @@ export function AddressInput({
   return (
     <div css={{ position: "relative", height: "64px" }}>
       <input
+        name="ethereum-account"
         className="signee"
         type="text"
         placeholder="0x…"

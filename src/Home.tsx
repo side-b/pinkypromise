@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { a } from "react-spring";
 import { Link } from "wouter";
 import { AnimatableFingers } from "./AnimatableFingers";
-import { ButtonLink } from "./ButtonLink";
+import { Button } from "./Button";
 import { COLORS, PROMISE_SYNONYMS } from "./constants";
 import { Footer } from "./Footer";
 import { useChainedProgress, useWindowDimensions } from "./react-utils";
@@ -12,17 +12,17 @@ import { WordsLoop } from "./WordsLoop";
 export function Home() {
   const [animateWords, setAnimateWords] = useState(false);
 
-  const springs = useChainedProgress(
-    [
-      [0, "leftFinger", { config: { mass: 2, friction: 70, tension: 1200 } }],
-      [0.1, "rightFinger", { config: { mass: 2, friction: 70, tension: 1200 } }],
-      [0.5, "closeFingers", { config: { mass: 2, friction: 70, tension: 1200 } }],
-      [0.9, "reveal", { config: { mass: 1, friction: 80, tension: 1400 } }],
-      [1, "pause", { config: { duration: 600 } }],
-    ],
-    1200,
-    () => setAnimateWords(true),
-  );
+  const springs = useChainedProgress([
+    [0, "leftFinger"],
+    [0.1, "rightFinger"],
+    [0.5, "closeFingers"],
+    [0.9, "reveal", { config: { mass: 1, friction: 80, tension: 1400 } }],
+    [1, "pause", { config: { duration: 600 } }],
+  ], {
+    duration: 1200,
+    onComplete: () => setAnimateWords(true),
+    props: { config: { mass: 2, friction: 70, tension: 1200 } },
+  });
 
   const dimensions = useWindowDimensions();
 
@@ -125,7 +125,11 @@ export function Home() {
               />
             </div>
             <Link href="/new">
-              <ButtonLink label="Cool, cool" size="big" color={COLORS.blue} />
+              <Button
+                label="Cool, cool"
+                size="giant"
+                color={COLORS.blue}
+              />
             </Link>
           </div>
           <div

@@ -45,7 +45,7 @@ export function App() {
               <Route path="/new">
                 <CreatePromise />
               </Route>
-              <Route path="/promises/:address">
+              <Route path="/promises">
                 {({ address }: { address: string }) => <Promises address={address} />}
               </Route>
               <Route path="/promise/:pactId">

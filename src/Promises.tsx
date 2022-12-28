@@ -34,7 +34,7 @@ export function Promises({ address }: { address: string }) {
         {["All", "Signed", "Nullified", "Discarded"].map((label, index) => (
           <Button
             key={label}
-            accentColor={COLORS.white}
+            color={COLORS.white}
             label={label}
             mode={index === 0 ? "primary" : "secondary"}
             css={{ color: index === 0 ? COLORS.pink : COLORS.white }}

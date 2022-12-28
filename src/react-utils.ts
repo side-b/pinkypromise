@@ -1,7 +1,8 @@
 import type { UseSpringProps } from "react-spring";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useChain, useSpring, useSpringRef } from "react-spring";
+import { useNetwork } from "wagmi";
 
 export function useWindowDimensions() {
   const latest = useRef(() => ({
@@ -37,25 +38,41 @@ export function useProgress(springProps?: UseSpringProps) {
 
 export function useChainedProgress(
   steps: Array<[number, string, UseSpringProps?]>,
-  duration: number,
-  onComplete?: () => void,
+  options: {
+    duration?: number;
+    onComplete?: () => void;
+    props?: Parameters<typeof useProgress>[0];
+  } = {},
 ) {
+  options.duration ??= 1000;
+
   const springs = steps.reduce<
     Record<string, ReturnType<typeof useProgress>>
-  >((springs, step, index) => ({
-    ...springs,
-    [step[1]]: useProgress(
-      index === steps.length - 1
-        ? { ...step[2], onRest: () => onComplete?.() }
-        : step[2],
-    ),
-  }), {});
+  >((springs, [, name, props = {}], index) => {
+    const props_ = { ...options.props, ...props };
+    return ({
+      ...springs,
+      [name]: useProgress(
+        index === steps.length - 1
+          ? { ...props_, onRest: () => options.onComplete?.() }
+          : props_,
+      ),
+    });
+  }, {});
 
   useChain(
     steps.map(([, name]) => springs[name].ref),
     steps.map(([value]) => value),
-    duration,
+    options.duration,
   );
 
   return springs;
+}
+
+export function useTxUrl() {
+  const { chain } = useNetwork();
+  return useCallback((hash: string) => {
+    const base = chain?.blockExplorers?.etherscan.url;
+    return base ? `${base}/tx/${hash}` : null;
+  }, [chain]);
 }
