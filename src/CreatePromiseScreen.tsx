@@ -6,7 +6,7 @@ import { useMemo, useState } from "react";
 import { a, useTransition } from "react-spring";
 import { match } from "ts-pattern";
 import { useAccount } from "wagmi";
-import { PinkySwearPactsAbi } from "./abis";
+import { PinkyPromiseAbi } from "./abis";
 import { Editor } from "./Editor";
 import { EditorBar } from "./EditorBar";
 import { CONTRACT_ADDRESS } from "./environment";
@@ -16,7 +16,7 @@ import { SvgDoc } from "./SvgDoc";
 import { Transaction } from "./Transaction";
 import { blocksToHtml, isAddress, textToBlocks } from "./utils";
 
-export function CreatePromise() {
+export function CreatePromiseScreen() {
   const account = useAccount();
   const [mode, setMode] = useState<"editor" | "preview" | "transaction">("editor");
   const [svgHeight, setSvgHeight] = useState(0);
@@ -128,8 +128,8 @@ export function CreatePromise() {
           .with("transaction", () => (
             <Transaction
               contract={CONTRACT_ADDRESS}
-              abi={PinkySwearPactsAbi}
-              functionName={"newPact"}
+              abi={PinkyPromiseAbi}
+              functionName={"newPromise"}
               args={[
                 {
                   color: 1,

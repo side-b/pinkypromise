@@ -14,18 +14,18 @@ export function Footer() {
     >
       <Button
         label="Contact"
-        href="https://github.com/bpierre/pinkyswearpacts"
+        href="https://github.com/bpierre/pinkypromise"
         color={COLORS.white}
       />
       <Button
         label="side-b"
-        href="https://github.com/bpierre/pinkyswearpacts"
+        href="https://github.com/bpierre/pinkypromise"
         color={COLORS.white}
       />
       <Button
         color={COLORS.white}
         external={true}
-        href="https://github.com/bpierre/pinkyswearpacts"
+        href="https://github.com/bpierre/pinkypromise"
         label="GitHub"
       />
     </footer>

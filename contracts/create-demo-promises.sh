@@ -40,4 +40,4 @@ if [[ -z $CONTRACT_ADDRESS ]]; then
     exit 1
 fi
 
-PINKY_SWEAR_PACTS_ADDRESS=$CONTRACT_ADDRESS forge script script/CreateDemoPacts.s.sol:CreateDemoPactsScript --rpc-url $RPC_URL --broadcast -vvvv
+PINKY_PROMISE_ADDRESS=$CONTRACT_ADDRESS forge script script/CreateDemoPromises.s.sol:CreateDemoPromisesScript --rpc-url $RPC_URL --broadcast -vvvv

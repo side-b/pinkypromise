@@ -5,7 +5,7 @@ import { COLORS, PLACEHOLDER_BODY, PLACEHOLDER_TITLE } from "./constants";
 import { SvgDoc } from "./SvgDoc";
 import { blocksToHtml, isAddress, textToBlocks } from "./utils";
 
-export function Dev() {
+export function DevScreen() {
   const [docHeight, setDocHeight] = useState(0);
   const [body] = useState<string>(PLACEHOLDER_BODY);
   const [title] = useState<string>(PLACEHOLDER_TITLE);

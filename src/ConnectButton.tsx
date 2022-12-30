@@ -16,10 +16,9 @@ export function ConnectButton(props: Partial<ComponentPropsWithoutRef<typeof But
         openConnectModal,
         mounted,
       }) => {
-        const ready = mounted;
-        const connected = ready && account && chain;
+        const connected = mounted && account && chain;
 
-        if (!ready) return null;
+        if (!mounted) return null;
 
         if (!connected) {
           return (

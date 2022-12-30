@@ -1,11 +1,11 @@
 import { Route, Router, Switch } from "wouter";
-import { CreatePromise } from "./CreatePromise";
-import { Dev } from "./Dev";
+import { CreatePromiseScreen } from "./CreatePromiseScreen";
+import { DevScreen } from "./DevScreen";
 import { GlobalStyles } from "./GlobalStyles";
 import { Header } from "./Header";
-import { Home } from "./Home";
-import { Pact } from "./Pact";
-import { Promises } from "./Promises";
+import { HomeScreen } from "./HomeScreen";
+import { PromiseScreen } from "./PromiseScreen";
+import { PromisesScreen } from "./PromisesScreen";
 
 export function App() {
   return (
@@ -37,19 +37,19 @@ export function App() {
           <Router>
             <Switch>
               <Route path="/dev">
-                <Dev />
+                <DevScreen />
               </Route>
               <Route path="/">
-                <Home />
+                <HomeScreen />
               </Route>
               <Route path="/new">
-                <CreatePromise />
+                <CreatePromiseScreen />
               </Route>
               <Route path="/promise/:id">
-                {({ id }: { id: string }) => <Pact pactId={id} />}
+                {({ id }: { id: string }) => <PromiseScreen id={id} />}
               </Route>
               <Route path="/promises">
-                {({ address }: { address: string }) => <Promises address={address} />}
+                <PromisesScreen />
               </Route>
               <Route>
                 <div>

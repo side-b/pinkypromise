@@ -9,7 +9,7 @@ import { useChainedProgress, useWindowDimensions } from "./react-utils";
 import { lerp } from "./utils";
 import { WordsLoop } from "./WordsLoop";
 
-export function Home() {
+export function HomeScreen() {
   const [animateWords, setAnimateWords] = useState(false);
 
   const springs = useChainedProgress([

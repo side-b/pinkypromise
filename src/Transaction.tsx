@@ -1,9 +1,9 @@
 import type { Abi } from "abitype";
 import type { Address } from "./types";
 
-import { createElement } from "react";
+import { useChainModal } from "@rainbow-me/rainbowkit";
 import { match, P } from "ts-pattern";
-import { useAccount, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import { useAccount, useContractWrite, useNetwork, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import { AnimatableFingers } from "./AnimatableFingers";
 import { Button } from "./Button";
 import { ConnectButton } from "./ConnectButton";
@@ -26,7 +26,9 @@ export function Transaction({
   onCancel: () => void;
   title: string;
 }) {
+  const { chain } = useNetwork();
   const { address } = useAccount();
+  const { openChainModal } = useChainModal();
   const txPrepare = usePrepareContractWrite({ address: contract, abi, functionName, args });
   const txWrite = useContractWrite(txPrepare.config);
   const txResult = useWaitForTransaction({
@@ -85,18 +87,27 @@ export function Transaction({
         <div css={{ flexGrow: "0", textAlign: "center" }}>
           <h1 css={{ fontSize: "40px" }}>{title}</h1>
           {match({
+            unsupported: chain?.unsupported,
             connected: Boolean(address),
             prepare: txPrepare.status,
             write: txWrite.status,
             result: txResult.status,
           })
+            .with({ unsupported: true }, () => (
+              <TxControls
+                main="switch-network"
+                onMain={openChainModal}
+                message="Please switch to a supported network."
+                onSecondary={onCancel}
+                secondary="cancel"
+              />
+            ))
             .with({ connected: false }, () => (
               <TxControls
                 main="connect"
                 message="Please connect your wallet."
                 onSecondary={onCancel}
                 secondary="cancel"
-                onMain=""
               />
             ))
             .with({ prepare: P.union("idle", "loading") }, () => (
@@ -183,7 +194,7 @@ function TxControls({
   onSecondary,
   secondary,
 }: {
-  main: "connect" | "sign" | "retry" | "view-nft";
+  main: "switch-network" | "connect" | "sign" | "retry" | "view-nft";
   message: string;
   onMain?: string | (() => void);
   onSecondary?: string | (() => void);
@@ -224,6 +235,7 @@ function TxControls({
                 .with("sign", () => "Sign")
                 .with("retry", () => "Retry")
                 .with("view-nft", () => "View NFT")
+                .with("switch-network", () => "Switch network")
                 .exhaustive()}
               labelColor={COLORS.pink}
               mode="primary"
