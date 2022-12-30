@@ -10,7 +10,8 @@ contract PinkyPromise is ERC721, IERC5192 {
     struct PromiseData {
         PromiseColor color;
         uint16 height;
-        string text;
+        string title;
+        string body;
     }
 
     struct Promise {
@@ -32,7 +33,6 @@ contract PinkyPromise is ERC721, IERC5192 {
     enum PromiseColor {
         BubbleGum,
         BlueberryCake,
-        PlainNoodles,
         TomatoSauce,
         BurntToast
     }
@@ -294,12 +294,6 @@ contract PinkyPromise is ERC721, IERC5192 {
         Promise storage promise_ = _promises[promiseId];
         require(_promiseState(promise_) != PromiseState.None, "PinkyPromise: non existant promise");
 
-        (address[] memory signees, SigningState[] memory signingStates) = signeesStates(promiseId);
-
-        return PinkyPromiseSvg.promiseSvgWrapper(
-            promise_.data.height,
-            PinkyPromiseSvg.promiseTextToHtml(promise_.data.text),
-            PinkyPromiseSvg.promiseSigneesToHtml(signees, signingStates)
-        );
+        return PinkyPromiseSvg.promiseAsSvg(promise_.data, promise_.signees);
     }
 }

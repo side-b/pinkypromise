@@ -30,7 +30,6 @@ export const PROMISE_COLORS: Record<ColorId, string> = {
 export const PROMISE_COLORS_BY_ID = Object.entries(PROMISE_COLORS) as [ColorId, string][];
 
 export const DOC_WIDTH = 800;
-export const DOC_SHADOW_OFFSET = 4; // offset-x + offset-y
 
 export const PLACEHOLDER_TITLE = "Pinky Promise";
 export const PLACEHOLDER_BODY = `Pinky, pinky bow-bell,

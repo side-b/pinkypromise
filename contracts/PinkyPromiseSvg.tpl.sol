@@ -10,13 +10,61 @@ library PinkyPromiseSvg {
     using LibString for uint16;
     using AddressToString for address;
 
-    function promiseSvgWrapper(uint16 height, string calldata contentHtml, string calldata signeesHtml)
+    // avoid the 16 vars limit in promiseAsSvg()
+    struct SvgValues {
+        string height;
+        string title;
+        string body;
+        string color;
+        string signees;
+    }
+
+    function promiseAsSvg(PinkyPromise.PromiseData storage data, address[] calldata signees)
         public
-        pure
+        view
         returns (string memory)
     {
-        string memory _height = height.toString();
-        return "<SVG_WRAPPER>";
+        SvgValues memory values;
+        values.height = data.height.toString();
+        values.title = data.title;
+        values.body = promiseTextToHtml(data.body);
+        values.color = promiseColor(data.color);
+        values.signees = signeesAsHtml(signees);
+
+        string memory html;
+        {
+            html = "<PROMISE_SVG>";
+        }
+        return html;
+    }
+
+    function signeesAsHtml(address[] calldata signees) public pure returns (string memory) {
+        string memory html = "";
+        for (uint256 i = 0; i < signees.length; i++) {
+            html = string.concat(html, signeeAsHtml(signees[i]));
+        }
+        return html;
+    }
+
+    function signeeAsHtml(address signee) public pure returns (string memory) {
+        string memory addressHtml = signee.toString();
+        return "<SIGNEE_LINE_HTML>";
+    }
+
+    function promiseColor(PinkyPromise.PromiseColor color) public pure returns (string memory) {
+        if (color == PinkyPromise.PromiseColor.BubbleGum) {
+            return "#ED9AC9";
+        }
+        if (color == PinkyPromise.PromiseColor.BlueberryCake) {
+            return "#0007B0";
+        }
+        if (color == PinkyPromise.PromiseColor.TomatoSauce) {
+            return "#FF5262";
+        }
+        if (color == PinkyPromise.PromiseColor.BurntToast) {
+            return "#1E1E1E";
+        }
+        revert("PromiseColor value missing from promiseColor()");
     }
 
     function textBlockToHtml(StrSlice textBlock) public view returns (string memory) {
@@ -48,25 +96,5 @@ library PinkyPromiseSvg {
         }
 
         return string.concat(html, remaining.toString());
-    }
-
-    function promiseSigneesToHtml(address[] calldata signees, PinkyPromise.SigningState[] calldata signingStates)
-        public
-        pure
-        returns (string memory)
-    {
-        string memory html = "";
-
-        for (uint256 i = 0; i < signees.length; i++) {
-            html = string.concat(
-                html,
-                "\n<div>",
-                signees[i].toString(),
-                string.concat(" (", signingStates[i] == PinkyPromise.SigningState.Signed ? "Signed" : "Not signed", ")"),
-                "</div>"
-            );
-        }
-
-        return html;
     }
 }

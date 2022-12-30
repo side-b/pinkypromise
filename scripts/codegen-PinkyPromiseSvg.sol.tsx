@@ -2,20 +2,28 @@ import fs from "fs";
 import * as css from "lightningcss";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { SvgDoc } from "../src/SvgDoc";
+import { SvgDoc, SvgDocSignee } from "../src/SvgDoc";
 
-const SOURCE_PATH = new URL("../contracts/PinkyPromiseSvg.tpl.sol", import.meta.url).pathname;
-const SOURCE_REPLACER_MARK = /<SVG_WRAPPER>/;
+const SOURCE_PATH = new URL(
+  "../contracts/PinkyPromiseSvg.tpl.sol",
+  import.meta.url,
+).pathname;
 
-function getPactSvgInnerCode() {
+const PROMISE_SVG_MARKER = /"<PROMISE_SVG>"/;
+const SIGNEE_LINE_MARKER = /"<SIGNEE_LINE_HTML>"/;
+
+function getPromiseSvgCode() {
   const svg = renderToStaticMarkup(
     createElement(SvgDoc, {
+      bodyHtml: "_BODY_",
       height: 9999,
-      html: "CONTENT_HTML",
-      signees: "SIGNEES_HTML",
+      signees: "_SIGNEES_",
+      title: "_TITLE_",
+      color: "_COLOR_",
     }),
   ).replace(/&quot;/g, "\"");
 
+  // compress css
   const styleStart = svg.indexOf("<style>");
   const styleEnd = svg.indexOf("</style>");
   const styles = css.transform({
@@ -24,27 +32,52 @@ function getPactSvgInnerCode() {
     minify: true,
   }).code;
 
-  return `
-        // generated, do not edit directly
-        return string.concat('` + (
+  return `string.concat('` + (
     svg.slice(0, styleStart + "<style>".length)
     + styles
     + svg.slice(styleEnd)
   )
-    .replace(/'/g, "'")
-    .replace(/9999/g, "', _height ,'")
-    .replace(/CONTENT_HTML/g, "', contentHtml ,'")
-    .replace(/SIGNEES_HTML/g, "', signeesHtml ,'")
-    + "');";
+    .replace(/_BODY_/g, "', values.body ,'")
+    .replace(/9999/g, "', values.height ,'")
+    .replace(/_SIGNEES_/g, "', values.signees ,'")
+    .replace(/_TITLE_/g, "', values.title ,'")
+    .replace(/_COLOR_/g, "', values.color ,'")
+    + "')";
 }
 
-function addPactSvgWrapperCode(code: string) {
-  const source = fs.readFileSync(SOURCE_PATH, "utf8");
+function getSigneeLineHtmlCode() {
+  const svg = renderToStaticMarkup(
+    createElement(SvgDocSignee, {
+      address: "_ADDRESS_",
+    }),
+  );
+  return `string.concat('`
+    + svg.replace(/_ADDRESS_/g, "', addressHtml ,'")
+    + "')";
+}
+
+function insertCode(source: string, marker: RegExp, code: string) {
   const lines = source.split("\n");
-  const markerLine = lines.findIndex(line => SOURCE_REPLACER_MARK.test(line));
-  return `${lines.slice(0, markerLine).join("\n")}\n${code}\n${lines.slice(markerLine + 1).join("\n")}`.trim();
+  const lineIndex = lines.findIndex(line => marker.test(line));
+  if (lineIndex === -1) {
+    throw new Error(`Couldn’t find the marker: ${marker}`);
+  }
+  return (
+    lines.slice(0, lineIndex).join("\n") + "\n"
+    + lines[lineIndex].replace(marker, code) + "\n"
+    + lines.slice(lineIndex + 1).join("\n")
+  ).trim();
+}
+
+function updateTemplate(source: string) {
+  source = insertCode(source, PROMISE_SVG_MARKER, getPromiseSvgCode());
+  source = insertCode(source, SIGNEE_LINE_MARKER, getSigneeLineHtmlCode());
+  source = "// FILE GENERATED, DO NOT EDIT DIRECTLY\n\n" + source;
+  return source;
 }
 
 console.log(
-  addPactSvgWrapperCode(getPactSvgInnerCode()),
+  updateTemplate(
+    fs.readFileSync(SOURCE_PATH, "utf8"),
+  ),
 );

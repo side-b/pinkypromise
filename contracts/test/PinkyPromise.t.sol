@@ -9,7 +9,7 @@ import "../src/PinkyPromise.sol";
 bytes4 constant ERC5192ID = 0xb45a3c0e;
 
 // forgefmt: disable-start
-string constant text1 = 
+string constant body1 = 
     unicode"Pinky, pinky bow-bell,\n"
     unicode"Whoever tells a lie\n"
     unicode"Will sink down to the bad place\n"
@@ -34,7 +34,8 @@ contract PinkyPromiseTest is Test {
 
         PinkyPromise.PromiseData memory promiseData;
         promiseData.height = height1;
-        promiseData.text = text1;
+        promiseData.title = "Pinky Promise";
+        promiseData.body = body1;
         promiseData.color = PinkyPromise.PromiseColor.BubbleGum;
 
         promises.newPromise(promiseData, signees);

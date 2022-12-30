@@ -5,7 +5,7 @@ import "forge-std/Script.sol";
 import "../src/PinkyPromise.sol";
 
 // forgefmt: disable-start
-string constant text1 = 
+string constant body1 = 
     unicode"Pinky, pinky bow-bell,\n"
     unicode"Whoever tells a lie\n"
     unicode"Will sink down to the bad place\n"
@@ -24,7 +24,8 @@ contract CreateDemoPromisesScript is Script {
         PinkyPromise.PromiseData memory promiseData;
         promiseData.height = 900;
         promiseData.color = PinkyPromise.PromiseColor.BubbleGum;
-        promiseData.text = text1;
+        promiseData.title = "Pinky Promise";
+        promiseData.body = body1;
 
         address[] memory signees = new address[](2);
         signees[0] = vm.addr(pk1);

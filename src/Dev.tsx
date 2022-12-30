@@ -1,68 +1,46 @@
-import type { FormEventHandler } from "react";
 import type { Address, Log } from "./types";
 
-import { useCallback, useMemo, useState } from "react";
-import { placeholder } from "./placeholder";
+import { useMemo, useState } from "react";
+import { COLORS, PLACEHOLDER_BODY, PLACEHOLDER_TITLE } from "./constants";
 import { SvgDoc } from "./SvgDoc";
-import { SvgDocImg } from "./SvgDocImg";
 import { blocksToHtml, isAddress, textToBlocks } from "./utils";
-
-const placeholderData = placeholder();
 
 export function Dev() {
   const [docHeight, setDocHeight] = useState(0);
-  const [text, setText] = useState<string>(placeholderData.text);
-  const [signees, setSignees] = useState<string[]>(placeholderData.signees);
+  const [body] = useState<string>(PLACEHOLDER_BODY);
+  const [title] = useState<string>(PLACEHOLDER_TITLE);
+  const [signees] = useState<string[]>([
+    "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "0x8F6F4ce6aB8827279cffFb92266f39Fd6e51aad8",
+    "0xB8827279cffFb92266f39Fd6e51aad88F6F4ce6a",
+  ]);
 
   const validSignees = useMemo<Address[]>(() => (
     signees.filter(isAddress)
   ), [signees]);
 
-  const html = useMemo(() => blocksToHtml(textToBlocks(text)), [text]);
+  const bodyHtml = useMemo(() => (
+    blocksToHtml(textToBlocks(body))
+  ), [body]);
 
   return (
     <div>
-      <div css={{ position: "relative" }}>
+      <div
+        css={{
+          position: "relative",
+          display: "flex",
+          justifyContent: "center",
+          padding: "16px 0 64px",
+        }}
+      >
         <SvgDoc
+          bodyHtml={bodyHtml}
+          color={COLORS.blue}
           height={docHeight}
-          html={html}
           onHeight={setDocHeight}
           signees={validSignees}
+          title={title}
         />
-        <div css={{ position: "relative", overflow: "hidden" }}>
-          <div
-            css={{
-              position: "absolute",
-              top: "0",
-              left: "0",
-              visibility: "hidden",
-            }}
-          >
-            <SvgDoc
-              height={docHeight}
-              html={html}
-              onHeight={setDocHeight}
-              signees={validSignees}
-            />
-          </div>
-        </div>
-        <SvgDocImg
-          alt={text}
-          height={docHeight}
-          html={html}
-          signees={validSignees}
-        />
-        <div
-          css={{
-            display: "flex",
-            justifyContent: "flex-end",
-            paddingTop: "20px",
-          }}
-        >
-          <button type="submit">
-            go
-          </button>
-        </div>
       </div>
     </div>
   );
