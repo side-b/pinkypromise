@@ -7,6 +7,8 @@ import { a, useTransition } from "react-spring";
 import { match } from "ts-pattern";
 import { useAccount } from "wagmi";
 import { PinkyPromiseAbi } from "./abis";
+import { COLORS } from "./constants";
+import { promiseIdFromTxLogs } from "./contract-utils";
 import { Editor } from "./Editor";
 import { EditorBar } from "./EditorBar";
 import { CONTRACT_ADDRESS } from "./environment";
@@ -31,21 +33,25 @@ export function CreatePromiseScreen() {
 
   // Valid version of the data to be used in the tx
   const newPromiseData = useMemo<{
+    body: string;
     color: ColorId;
     signees: Address[];
-    text: string;
+    title: string;
   }>(() => ({
+    body: editorData.body.trim(),
     color: editorData.color,
     signees: editorData.signees.map(signee => signee[0]).filter(isAddress),
-    text: `# ${editorData.title.trim()}\n\n${editorData.body.trim()}`,
+    title: editorData.title.trim(),
   }), [editorData]);
 
   const bodyHtml = useMemo(() => (
-    blocksToHtml(textToBlocks(newPromiseData.text))
-  ), [newPromiseData.text]);
+    blocksToHtml(textToBlocks(newPromiseData.body))
+  ), [newPromiseData.body]);
 
   const submitEnabled = Boolean(
-    editorData.title && editorData.body && newPromiseData.signees.length > 0,
+    newPromiseData.title.length > 0
+      && newPromiseData.body.length > 0
+      && newPromiseData.signees.length > 0,
   );
 
   const editorColor = editorData.color;
@@ -65,8 +71,6 @@ export function CreatePromiseScreen() {
     },
   });
 
-  const debugPreview = false;
-
   return (
     <div
       css={{
@@ -74,25 +78,6 @@ export function CreatePromiseScreen() {
         padding: "16px 0 0",
       }}
     >
-      {debugPreview && (
-        <div
-          css={{
-            position: "fixed",
-            zIndex: 2,
-            top: "180px",
-            right: "0",
-            transform: "translateX(50%) scale(0.5)",
-            transformOrigin: "0 0",
-          }}
-        >
-          <SvgDoc
-            height={svgHeight}
-            html={bodyHtml}
-            onHeight={setSvgHeight}
-            signees={newPromiseData.signees}
-          />
-        </div>
-      )}
       {modeTransitions((styles, { mode }) =>
         match(mode)
           .with("preview", () => (
@@ -125,25 +110,33 @@ export function CreatePromiseScreen() {
               />
             </a.div>
           ))
-          .with("transaction", () => (
-            <Transaction
-              contract={CONTRACT_ADDRESS}
-              abi={PinkyPromiseAbi}
-              functionName={"newPromise"}
-              args={[
-                {
-                  color: 1,
-                  height: svgHeight ?? 0,
-                  text: newPromiseData?.text ?? "",
-                },
-                newPromiseData?.signees ?? [],
-              ]}
-              title="Creating pinky promise"
-              onCancel={() => {
-                setMode("editor");
-              }}
-            />
-          )).exhaustive()
+          .with(
+            "transaction",
+            () => (
+              <Transaction
+                config={{
+                  address: CONTRACT_ADDRESS,
+                  abi: PinkyPromiseAbi,
+                  functionName: "newPromise",
+                  args: [
+                    {
+                      color: 1,
+                      height: svgHeight ?? 0,
+                      title: newPromiseData.title,
+                      body: newPromiseData.body,
+                    },
+                    newPromiseData?.signees ?? [],
+                  ],
+                }}
+                title="Creating pinky promise"
+                successLabel="View NFT"
+                successAction={({ logs }) => `/promise/${promiseIdFromTxLogs(logs)}`}
+                onCancel={() => {
+                  setMode("editor");
+                }}
+              />
+            ),
+          ).exhaustive()
       )}
       {mode !== "transaction" && (
         <EditorBar
@@ -157,6 +150,25 @@ export function CreatePromiseScreen() {
           preview={mode === "preview"}
         />
       )}
+      <div
+        css={{
+          position: "fixed",
+          zIndex: 2,
+          top: "180px",
+          left: "100vw",
+          opacity: "0",
+          userSelect: "none",
+        }}
+      >
+        <SvgDoc
+          bodyHtml={bodyHtml}
+          color={COLORS[newPromiseData.color]}
+          height={svgHeight}
+          onHeight={setSvgHeight}
+          signees={newPromiseData.signees}
+          title={newPromiseData.title}
+        />
+      </div>
     </div>
   );
 }

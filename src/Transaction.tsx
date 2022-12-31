@@ -1,6 +1,3 @@
-import type { Abi } from "abitype";
-import type { Address } from "./types";
-
 import { useChainModal } from "@rainbow-me/rainbowkit";
 import { match, P } from "ts-pattern";
 import { useAccount, useContractWrite, useNetwork, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
@@ -12,24 +9,27 @@ import { Container } from "./Container";
 import { useChainedProgress, useTxUrl } from "./react-utils";
 
 export function Transaction({
-  abi,
-  contract,
-  args,
-  functionName,
+  config,
   onCancel,
+  successAction,
+  successLabel,
   title,
 }: {
-  abi: Abi;
-  contract: Address;
-  args: unknown[];
-  functionName: string;
+  config: NonNullable<Parameters<typeof usePrepareContractWrite>[0]>;
   onCancel: () => void;
+  successAction: (data: NonNullable<ReturnType<typeof useWaitForTransaction>["data"]>) => string | (() => void);
+  successLabel: string;
   title: string;
 }) {
   const { chain } = useNetwork();
-  const { address } = useAccount();
+  const account = useAccount();
   const { openChainModal } = useChainModal();
-  const txPrepare = usePrepareContractWrite({ address: contract, abi, functionName, args });
+  const txPrepare = usePrepareContractWrite({
+    address: config.address,
+    abi: config.abi,
+    functionName: config.functionName,
+    args: config.args,
+  });
   const txWrite = useContractWrite(txPrepare.config);
   const txResult = useWaitForTransaction({
     hash: txWrite.data?.hash,
@@ -88,7 +88,7 @@ export function Transaction({
           <h1 css={{ fontSize: "40px" }}>{title}</h1>
           {match({
             unsupported: chain?.unsupported,
-            connected: Boolean(address),
+            connected: Boolean(account.address),
             prepare: txPrepare.status,
             write: txWrite.status,
             result: txResult.status,
@@ -156,7 +156,7 @@ export function Transaction({
             ))
             .with({ result: P.union("loading", "idle") }, () => (
               <TxControls
-                main="view-nft"
+                main={successLabel}
                 message="Waiting for transaction confirmation…"
                 onSecondary={txUrl(txWrite.data?.hash ?? "") ?? undefined}
                 secondary="tx"
@@ -173,9 +173,9 @@ export function Transaction({
             ))
             .with({ result: "success" }, () => (
               <TxControls
-                main="view-nft"
+                main={successLabel}
                 message="Transaction confirmed."
-                onMain={"/promises/1"}
+                onMain={txResult.data ? successAction(txResult.data) : undefined}
                 onSecondary={txUrl(txWrite.data?.hash ?? "") ?? undefined}
                 secondary="tx"
               />
@@ -194,7 +194,7 @@ function TxControls({
   onSecondary,
   secondary,
 }: {
-  main: "switch-network" | "connect" | "sign" | "retry" | "view-nft";
+  main: "switch-network" | "connect" | "sign" | "retry" | string;
   message: string;
   onMain?: string | (() => void);
   onSecondary?: string | (() => void);
@@ -234,9 +234,8 @@ function TxControls({
               label={match(main)
                 .with("sign", () => "Sign")
                 .with("retry", () => "Retry")
-                .with("view-nft", () => "View NFT")
                 .with("switch-network", () => "Switch network")
-                .exhaustive()}
+                .otherwise(() => main ?? "OK")}
               labelColor={COLORS.pink}
               mode="primary"
               onClick={typeof onMain !== "string" ? onMain : undefined}

@@ -2,6 +2,7 @@ import type { ComponentPropsWithoutRef } from "react";
 
 import { useMemo } from "react";
 import { match } from "ts-pattern";
+import { Link } from "wouter";
 import { COLORS } from "./constants";
 
 export function Button({
@@ -80,7 +81,7 @@ export function Button({
     ...modeStyles,
   };
 
-  return href
+  const button = href
     ? (
       <a
         className={className}
@@ -104,4 +105,6 @@ export function Button({
         {label}
       </button>
     );
+
+  return href && href.startsWith("/") ? <Link href={href}>{button}</Link> : button;
 }

@@ -8,7 +8,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "update-abi": "./scripts/update-abi.sh",
-    "update-svg-contract": "tsx scripts/codegen-PinkyPromiseSvg.sol.tsx > contracts/src/PinkyPromiseSvg.sol && forge fmt contracts/src/PinkyPromiseSvg.sol"
+    "update-svg-contract": "tsx scripts/codegen-PinkyPromiseSvg.sol.tsx > contracts/src/PinkyPromiseSvg.sol && forge fmt contracts/src/PinkyPromiseSvg.sol",
+    "dev-node": "anvil --state ./anvil.state"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",

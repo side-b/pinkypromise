@@ -124,13 +124,12 @@ export function HomeScreen() {
                 words={PROMISE_SYNONYMS}
               />
             </div>
-            <Link href="/new">
-              <Button
-                label="Cool, cool"
-                size="giant"
-                color={COLORS.blue}
-              />
-            </Link>
+            <Button
+              href="/new"
+              label="Cool, cool"
+              size="giant"
+              color={COLORS.blue}
+            />
           </div>
           <div
             css={{

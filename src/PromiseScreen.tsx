@@ -28,15 +28,14 @@ export function PromiseScreen({ id }: { id: string }) {
         display: "grid",
         width: "100%",
         placeItems: "center",
+        padding: "40px 0 80px",
       }}
     >
-      <h1 css={{ padding: "40px 0", fontSize: "40px" }}>Promise #{id}</h1>
+      <h1 css={{ paddingBottom: "40px", fontSize: "40px" }}>Promise #{id}</h1>
       <img
         alt=""
         src={`data:image/svg+xml,${encodeURIComponent(reads.data?.[0] ?? "")}`}
       />
-
-      <Link href="/">home</Link>
     </div>
   );
 }

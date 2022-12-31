@@ -1,36 +1,17 @@
-import type { Address } from "./types";
+import type { ComponentPropsWithoutRef } from "react";
 
 import { renderToStaticMarkup } from "react-dom/server";
 import { DOC_WIDTH } from "./constants";
 import { SvgDoc } from "./SvgDoc";
 
-export function SvgDocImg(
-  {
-    alt,
-    height,
-    html,
-    signees,
-  }: {
-    alt: string;
-    height: number;
-    html: string;
-    signees: Address[];
-  },
-) {
+export function SvgDocImg({ alt, ...props }: { alt: string } & ComponentPropsWithoutRef<typeof SvgDoc>) {
+  const src = "data:image/svg+xml" + encodeURIComponent(
+    renderToStaticMarkup(<SvgDoc {...props} />),
+  );
   return (
     <img
       alt={alt}
-      src={`data:image/svg+xml,${
-        encodeURIComponent(
-          renderToStaticMarkup(
-            <SvgDoc
-              height={height}
-              html={html}
-              signees={signees}
-            />,
-          ),
-        )
-      }`}
+      src={src}
       width={DOC_WIDTH}
       css={{
         display: "block",

@@ -25,3 +25,4 @@ dist-ssr
 *.sw?
 
 contracts/broadcast/*
+anvil.state
