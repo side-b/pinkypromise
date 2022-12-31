@@ -4,10 +4,12 @@ export type Address = `0x${string}`;
 export type EnsName = `${string}.eth`;
 
 export type ColorId =
-  | "black"
-  | "blue"
   | "pink"
-  | "red";
+  | "blue"
+  | "red"
+  | "black";
+
+export type ColorEnumKey = 0 | 1 | 2 | 3;
 
 // from ethers https://github.com/ethers-io/ethers.js/blob/c80fcddf50a9023486e9f9acb1848aba4c19f7b6/packages/abstract-provider/lib.esm/index.d.ts#L54-L64
 // export interface Log {
