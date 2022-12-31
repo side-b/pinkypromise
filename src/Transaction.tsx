@@ -215,7 +215,7 @@ function TxControls({
           color={COLORS.white}
           disabled={!onSecondary}
           href={typeof onSecondary === "string" ? onSecondary : undefined}
-          external={secondary === "tx"}
+          external={typeof onSecondary === "string"}
           label={secondary === "tx" ? "Etherscan" : "Abandon"}
           onClick={typeof onSecondary !== "string" ? onSecondary : undefined}
         />
