@@ -11,6 +11,7 @@ specifiers:
   '@vitejs/plugin-react': ^3.0.0
   '@wagmi/core': ^0.8.8
   abitype: ^0.2.5
+  colord: ^2.9.3
   ethereum-blockies-base64: ^1.0.2
   ethers: ^5.7.2
   lightningcss: ^1.17.1
@@ -32,6 +33,7 @@ dependencies:
   '@tanstack/react-query': 4.20.4_biqbaboplfbrettd7655fr4n2y
   '@wagmi/core': 0.8.8_doyaxlk2we36etcdeuupgozsne
   abitype: 0.2.5_4umapwpw55xijlh2mknjgcn4rq
+  colord: 2.9.3
   ethereum-blockies-base64: 1.0.2
   ethers: 5.7.2
   masonic: 3.7.0_react@18.2.0
@@ -2522,6 +2524,10 @@ packages:
 
   /color-name/1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
+    dev: false
+
+  /colord/2.9.3:
+    resolution: {integrity: sha512-jeC1axXpnb0/2nn/Y1LPuLdgXBLH7aDcHu4KEKfqw3CUhX7ZpfBSlPKyqXE6btIgEzfWtrX3/tyBCaCvXvMkOw==}
     dev: false
 
   /commander/2.20.3:

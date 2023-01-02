@@ -27,9 +27,20 @@ export function CreatePromiseScreen() {
   const [editorData, setEditorData] = useState<EditorData>({
     body: "",
     color: "pink",
-    signees: [[account.address ?? "", ""]],
+    signees: [["", ""]],
     title: "",
   });
+
+  // Fill the signees with the account on connect or account change
+  useEffect(() => {
+    if (account.address) {
+      setEditorData(data => (
+        (data.signees.length === 1 && data.signees[0][0] === "")
+          ? { ...data, signees: [[account.address ?? "", ""]] }
+          : data
+      ));
+    }
+  }, [account.address]);
 
   // Valid version of the data to be used in the tx
   const newPromiseData = useMemo<{

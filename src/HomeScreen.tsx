@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { a } from "react-spring";
-import { Link } from "wouter";
 import { AnimatableFingers } from "./AnimatableFingers";
 import { Button } from "./Button";
 import { COLORS, PROMISE_SYNONYMS } from "./constants";
@@ -125,10 +124,10 @@ export function HomeScreen() {
               />
             </div>
             <Button
+              color={COLORS.blue}
               href="/new"
               label="Cool, cool"
               size="giant"
-              color={COLORS.blue}
             />
           </div>
           <div

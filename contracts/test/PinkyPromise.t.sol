@@ -26,6 +26,16 @@ contract PinkyPromiseTest is Test {
 
     function setUp() public {}
 
+    function test_total() public {
+        address[] memory signees_ = new address[](1);
+        signees_[0] = address(this);
+        PinkyPromise.PromiseData memory promiseData;
+
+        assertEq(promises.total(), 0);
+        promises.newPromise(promiseData, signees_);
+        assertEq(promises.total(), 1);
+    }
+
     function test_newPromise() public {
         address[] memory signees = new address[](3);
         signees[0] = address(this);

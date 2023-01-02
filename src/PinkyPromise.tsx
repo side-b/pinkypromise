@@ -42,10 +42,14 @@ export function PinkyPromise({
         </h1>
         <div
           css={{
+            overflow: "hidden",
             flexGrow: "1",
             flexShrink: "0",
-            paddingTop: "46px",
+            paddingTop: "24px",
             fontSize: "18px",
+            "p, h1, h2, h3": {
+              margin: "24px 0",
+            },
           }}
         >
           <div dangerouslySetInnerHTML={{ __html: bodyHtml }} />

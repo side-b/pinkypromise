@@ -96,6 +96,10 @@ contract PinkyPromise is ERC721, IERC5192 {
         return string.concat("data:image/svg+xml;base64,", Base64.encode(bytes(promiseAsSvg(promiseId))));
     }
 
+    function total() public view returns (uint256) {
+        return _latestPromiseId;
+    }
+
     // Get the promise state, based on promise.signees and promise.state
     function _promiseState(Promise storage promise_) private view returns (PromiseState) {
         // signees cannot be empty except when the promise does not exist (default value)

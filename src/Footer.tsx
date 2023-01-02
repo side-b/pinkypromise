@@ -13,14 +13,14 @@ export function Footer() {
       }}
     >
       <Button
-        label="Contact"
-        href="https://github.com/bpierre/pinkypromise"
         color={COLORS.white}
+        href="https://github.com/bpierre/pinkypromise"
+        label="Contact"
       />
       <Button
-        label="side-b"
-        href="https://github.com/bpierre/pinkypromise"
         color={COLORS.white}
+        href="https://github.com/bpierre/pinkypromise"
+        label="side-b"
       />
       <Button
         color={COLORS.white}

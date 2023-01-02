@@ -1,4 +1,4 @@
-import type { ComponentPropsWithoutRef } from "react";
+import type { ComponentPropsWithoutRef, ReactNode } from "react";
 
 import { useMemo } from "react";
 import { match } from "ts-pattern";
@@ -10,7 +10,9 @@ export function Button({
   color,
   disabled,
   external,
+  focusColor,
   href,
+  icon,
   label,
   labelColor,
   mode = "secondary",
@@ -22,11 +24,13 @@ export function Button({
   color?: string;
   disabled?: boolean;
   external?: boolean;
+  focusColor?: string;
+  href?: string;
+  icon?: ReactNode;
   label: string;
   labelColor?: string;
   mode?: "secondary" | "primary";
   onClick?: () => void;
-  href?: string;
   size?: "regular" | "large" | "giant";
   type?: ComponentPropsWithoutRef<"button">["type"];
 }) {
@@ -69,7 +73,7 @@ export function Button({
     borderStyle: "solid",
     cursor: "pointer",
     "&:focus-visible": {
-      outline: `2px solid ${COLORS.pink}`,
+      outline: `2px solid ${focusColor ?? color ?? COLORS.pink}`,
       outlineOffset: "3px",
     },
     "&:active:not(:disabled)": {
@@ -81,16 +85,30 @@ export function Button({
     ...modeStyles,
   };
 
+  icon = icon && (
+    <div
+      css={{
+        display: "flex",
+        alignItems: "center",
+        marginRight: -8,
+        transform: "translateX(-16px) scale(0.8)",
+      }}
+    >
+      {icon}
+    </div>
+  );
+
   const button = href
     ? (
       <a
         className={className}
-        css={css}
         href={href}
         onClick={onClick}
         rel={external ? "nofollow" : undefined}
         target={external ? "_blank" : undefined}
+        css={css}
       >
+        {icon}
         {label}
       </a>
     )
@@ -102,6 +120,7 @@ export function Button({
         type={type ?? "button"}
         css={css}
       >
+        {icon}
         {label}
       </button>
     );

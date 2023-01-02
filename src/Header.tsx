@@ -1,8 +1,10 @@
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
+import { Button } from "./Button";
 import { ConnectButton } from "./ConnectButton";
 import { COLORS } from "./constants";
 
 export function Header() {
+  const [location] = useLocation();
   return (
     <div
       css={{
@@ -20,10 +22,10 @@ export function Header() {
             textTransform: "lowercase",
             color: COLORS.white,
             textDecoration: "none",
-            borderRadius: "8px",
+            borderRadius: "48px",
             "&:focus-visible": {
               outline: `2px solid ${COLORS.white}`,
-              outlineOffset: "8px",
+              outlineOffset: "16px",
             },
             "&:active": {
               transform: "translate(1px, 1px)",
@@ -49,30 +51,13 @@ export function Header() {
           gap: "20px",
         }}
       >
-        <Link href="/">
-          <a
-            css={{
-              display: "flex",
-              alignItems: "center",
-              textTransform: "lowercase",
-              height: "40px",
-              padding: "0 24px",
-              color: COLORS.white,
-              textDecoration: "none",
-              borderRadius: "32px",
-              border: `2px solid ${COLORS.white}`,
-              "&:focus-visible": {
-                outline: `2px solid ${COLORS.white}`,
-                outlineOffset: "8px",
-              },
-              "&:active": {
-                transform: "translate(1px, 1px)",
-              },
-            }}
-          >
-            About
-          </a>
-        </Link>
+        <Button
+          href="/promises"
+          label="Promises"
+          color={COLORS.white}
+          labelColor={location.startsWith("/promises") ? COLORS.pink : undefined}
+          mode={location.startsWith("/promises") ? "primary" : "secondary"}
+        />
         <ConnectButton />
       </div>
     </div>

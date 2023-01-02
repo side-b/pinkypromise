@@ -3,6 +3,7 @@ import type { UseSpringProps } from "react-spring";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useChain, useSpring, useSpringRef } from "react-spring";
 import { useNetwork } from "wagmi";
+import { uid } from "./utils";
 
 export function useWindowDimensions() {
   const latest = useRef(() => ({
@@ -75,4 +76,8 @@ export function useTxUrl() {
     const base = chain?.blockExplorers?.etherscan.url;
     return base ? `${base}/tx/${hash}` : null;
   }, [chain]);
+}
+
+export function useUid(prefix = "uid"): string {
+  return useRef(uid(prefix)).current;
 }

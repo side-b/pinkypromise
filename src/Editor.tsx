@@ -1,12 +1,11 @@
 import type { ColorId } from "./types";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { a, useTransition } from "react-spring";
 import { AddressInput } from "./AddressInput";
 import { Button } from "./Button";
 import { COLORS, EDITOR_CONFIRM_NOTICE, PLACEHOLDER_BODY, PLACEHOLDER_TITLE } from "./constants";
 import { Container } from "./Container";
-import { isAddress } from "./utils";
 
 export type EditorData = {
   body: string;

@@ -2,11 +2,13 @@ import type { ColorId } from "./types";
 
 import { COLORS } from "./constants";
 
-export function RemoveButton({
-  accentColor,
+export function AddRemoveButton({
+  color,
+  mode,
   onClick,
 }: {
-  accentColor?: ColorId;
+  color?: ColorId;
+  mode: "add" | "remove";
   onClick?: () => void;
 }) {
   return (
@@ -21,7 +23,7 @@ export function RemoveButton({
         width: "40px",
         height: "40px",
         color: COLORS.white,
-        background: COLORS[accentColor ?? "pink"],
+        background: COLORS[color ?? "pink"],
         border: "0",
         borderRadius: "50%",
         cursor: "pointer",
@@ -35,13 +37,25 @@ export function RemoveButton({
       }}
     >
       <svg width="40" height="40" fill="none" viewBox="0 0 40 40">
-        <path
-          stroke={COLORS.white}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="M9 20 h22"
-        />
+        {mode === "add"
+          ? (
+            <path
+              d="M9 20h22M20 31V9"
+              stroke={COLORS.white}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+            />
+          )
+          : (
+            <path
+              d="M9 20 h22"
+              stroke={COLORS.white}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+            />
+          )}
       </svg>
     </button>
   );
