@@ -12,6 +12,11 @@ if [[ "$1" == "local" ]]; then
 elif [[ "$1" == "sepolia" ]]; then
     RPC_URL=$RPC_URL_SEPOLIA
     CHAIN_ID="11155111"
+
+elif [[ "$1" == "goerli" ]]; then
+    RPC_URL=$RPC_URL_SEPOLIA
+    CHAIN_ID="5"
+
 else
     echo "Must provide a network:" 1>&2
     echo "  " 1>&2

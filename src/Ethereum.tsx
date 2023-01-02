@@ -4,7 +4,7 @@ import { connectorsForWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit
 import { injectedWallet, metaMaskWallet, walletConnectWallet } from "@rainbow-me/rainbowkit/wallets";
 import { match } from "ts-pattern";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
-import { hardhat, mainnet, polygon, sepolia } from "wagmi/chains";
+import { hardhat, mainnet, polygon, sepolia, goerli } from "wagmi/chains";
 import { infuraProvider } from "wagmi/providers/infura";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 import { publicProvider } from "wagmi/providers/public";
@@ -18,6 +18,7 @@ const { chains, provider, webSocketProvider } = configureChains(
       .with("mainnet", () => mainnet)
       .with("polygon", () => polygon)
       .with("sepolia", () => sepolia)
+      .with("goerli", () => goerli)
       .with("local", () => hardhat)
       .otherwise(() => "")
   ).filter(Boolean),
