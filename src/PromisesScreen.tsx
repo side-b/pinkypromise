@@ -7,7 +7,7 @@ import { useContractRead, useContractReads } from "wagmi";
 import { Link } from "wouter";
 import { PinkyPromiseAbi } from "./abis";
 import { COLORS } from "./constants";
-import { CONTRACT_ADDRESS } from "./environment";
+import { usePinkyPromiseContractAddress } from "./contract-utils";
 import { blocksToHtml, textToBlocks } from "./utils";
 import { ViewButton } from "./ViewButton";
 
@@ -16,8 +16,9 @@ const EMPTY_CARDS_HEIGHTS = [400, 568, 400, 680, 400, 680];
 export function PromisesScreen() {
   const width = 400 * 3 + 40 * 2;
 
+  const contractAddress = usePinkyPromiseContractAddress();
   const totalRead = useContractRead({
-    address: CONTRACT_ADDRESS,
+    address: contractAddress,
     abi: PinkyPromiseAbi,
     functionName: "total",
   });
@@ -116,16 +117,17 @@ function PromiseCard({
   promiseId: number;
   width: number;
 }) {
+  const contractAddress = usePinkyPromiseContractAddress();
   const reads = useContractReads({
     contracts: [
       {
-        address: CONTRACT_ADDRESS,
+        address: contractAddress,
         abi: PinkyPromiseAbi,
         functionName: "promiseInfo",
         args: [BigNumber.from(promiseId)],
       },
       {
-        address: CONTRACT_ADDRESS,
+        address: contractAddress,
         abi: PinkyPromiseAbi,
         functionName: "tokenURI",
         args: [BigNumber.from(promiseId)],

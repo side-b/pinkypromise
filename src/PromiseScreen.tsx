@@ -1,13 +1,13 @@
 import { BigNumber } from "ethers";
 import { useContractReads } from "wagmi";
-import { Link } from "wouter";
 import { PinkyPromiseAbi } from "./abis";
-import { CONTRACT_ADDRESS } from "./environment";
+import { usePinkyPromiseContractAddress } from "./contract-utils";
 
 export function PromiseScreen({ id }: { id: string }) {
+  const contractAddress = usePinkyPromiseContractAddress();
   const reads = useContractReads({
     contracts: [{
-      address: CONTRACT_ADDRESS,
+      address: contractAddress,
       abi: PinkyPromiseAbi,
       functionName: "promiseAsSvg",
       args: [BigNumber.from(id)],

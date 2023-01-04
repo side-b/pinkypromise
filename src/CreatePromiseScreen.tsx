@@ -8,10 +8,9 @@ import { match } from "ts-pattern";
 import { useAccount } from "wagmi";
 import { PinkyPromiseAbi } from "./abis";
 import { COLORS } from "./constants";
-import { colorEnumKey, promiseIdFromTxLogs } from "./contract-utils";
+import { colorEnumKey, promiseIdFromTxLogs, usePinkyPromiseContractAddress } from "./contract-utils";
 import { Editor } from "./Editor";
 import { EditorBar } from "./EditorBar";
-import { CONTRACT_ADDRESS } from "./environment";
 import { useBackground } from "./GlobalStyles";
 import { PinkyPromise } from "./PinkyPromise";
 import { SvgDoc } from "./SvgDoc";
@@ -83,6 +82,8 @@ export function CreatePromiseScreen() {
     },
   });
 
+  const contractAddress = usePinkyPromiseContractAddress();
+
   return (
     <div
       css={{
@@ -127,7 +128,7 @@ export function CreatePromiseScreen() {
             () => (
               <Transaction
                 config={{
-                  address: CONTRACT_ADDRESS,
+                  address: contractAddress,
                   abi: PinkyPromiseAbi,
                   functionName: "newPromise",
                   args: [{

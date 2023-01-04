@@ -1,27 +1,31 @@
 import type { ReactNode } from "react";
+import type { NetworkName } from "./types";
 
 import { connectorsForWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { injectedWallet, metaMaskWallet, walletConnectWallet } from "@rainbow-me/rainbowkit/wallets";
 import { match } from "ts-pattern";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
-import { hardhat, mainnet, polygon, sepolia, goerli } from "wagmi/chains";
+import { goerli, hardhat, mainnet, polygon, sepolia } from "wagmi/chains";
 import { infuraProvider } from "wagmi/providers/infura";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 import { publicProvider } from "wagmi/providers/public";
 import { INFURA_KEY, NETWORKS } from "./environment";
+import { isNetworkName } from "./types";
 
 import "@rainbow-me/rainbowkit/styles.css";
 
 const { chains, provider, webSocketProvider } = configureChains(
-  NETWORKS.map((name: string) =>
-    match(name)
-      .with("mainnet", () => mainnet)
-      .with("polygon", () => polygon)
-      .with("sepolia", () => sepolia)
-      .with("goerli", () => goerli)
-      .with("local", () => hardhat)
-      .otherwise(() => "")
-  ).filter(Boolean),
+  Object.keys(NETWORKS)
+    .filter(isNetworkName)
+    .map((name: NetworkName) => (
+      match(name)
+        .with("mainnet", () => mainnet)
+        .with("polygon", () => polygon)
+        .with("sepolia", () => sepolia)
+        .with("goerli", () => goerli)
+        .with("local", () => hardhat)
+        .exhaustive()
+    )),
   [
     infuraProvider({ priority: 1, apiKey: INFURA_KEY }),
     publicProvider({ priority: 2 }),

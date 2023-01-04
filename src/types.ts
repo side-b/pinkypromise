@@ -1,7 +1,25 @@
 import { useWaitForTransaction } from "wagmi";
 
-export type Address = `0x${string}`;
 export type EnsName = `${string}.eth`;
+export type Address = `0x${string}`;
+
+export const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
+export function isAddress(address: string): address is Address {
+  return ADDRESS_RE.test(address);
+}
+
+export type NetworkName = "mainnet" | "polygon" | "sepolia" | "goerli" | "local";
+export type Networks = {
+  [k in NetworkName]?: { contract: Address };
+};
+
+export function isNetworkName(value: string): value is NetworkName {
+  return value === "mainnet"
+    || value === "polygon"
+    || value === "sepolia"
+    || value === "goerli"
+    || value === "local";
+}
 
 export type ColorId =
   | "pink"

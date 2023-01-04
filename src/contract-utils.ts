@@ -2,7 +2,10 @@ import type { ColorEnumKey, ColorId, Log } from "./types";
 
 import { utils as ethersUtils } from "ethers";
 import { match } from "ts-pattern";
+import { Address, useContractRead, useContractReads, useNetwork } from "wagmi";
 import { PinkyPromiseAbi } from "./abis";
+import { NETWORKS } from "./environment";
+import { isNetworkName } from "./types";
 
 export function promiseIdFromTxLogs(logs: Log[]): string | null {
   const PinkyPromiseInterface = new ethersUtils.Interface(PinkyPromiseAbi);
@@ -20,4 +23,13 @@ export function colorEnumKey(color: ColorId): ColorEnumKey {
     .with("red", () => 2)
     .with("black", () => 3)
     .exhaustive();
+}
+
+export function usePinkyPromiseContractAddress() {
+  const { chain } = useNetwork();
+  let network = chain?.network;
+  if (network === "hardhat") network = "local";
+  return typeof network === "string" && isNetworkName(network)
+    ? NETWORKS[network]?.contract
+    : undefined;
 }
