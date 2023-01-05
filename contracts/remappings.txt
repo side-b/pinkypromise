@@ -1,5 +1,4 @@
-forge-std/=lib/forge-std/src/
-@openzeppelin/=lib/openzeppelin-contracts/
 base64/=lib/base64/
-solmate/=lib/solmate/src/
 dk1a-stringutils/=lib/dk1a-stringutils/src/
+forge-std/=lib/forge-std/src/
+solmate/=lib/solmate/src/

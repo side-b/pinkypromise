@@ -2,11 +2,12 @@
 pragma solidity ^0.8.13;
 
 import "base64/base64.sol";
+import "solmate/auth/Owned.sol";
 import "solmate/tokens/ERC721.sol";
 import "./IERC5192.sol";
 import "./PinkyPromiseSvg.sol";
 
-contract PinkyPromise is ERC721, IERC5192 {
+contract PinkyPromise is ERC721, IERC5192, Owned {
     struct PromiseData {
         PromiseColor color;
         uint16 height;
@@ -65,6 +66,8 @@ contract PinkyPromise is ERC721, IERC5192 {
     // Promise.signees only contain unique signatures (see newPromise()).
     mapping(uint256 => mapping(address => SigningState)) private _signingStates;
 
+    address private _ensRegistry;
+
     // promise state change
     event PromiseUpdate(uint256 promiseId, PromiseState state);
 
@@ -77,7 +80,7 @@ contract PinkyPromise is ERC721, IERC5192 {
 
     error InvalidPromiseState();
 
-    constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) {}
+    constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) Owned(msg.sender) {}
 
     function supportsInterface(bytes4 interfaceId) public view override (ERC721) returns (bool) {
         return interfaceId == type(IERC5192).interfaceId || super.supportsInterface(interfaceId);
@@ -94,6 +97,10 @@ contract PinkyPromise is ERC721, IERC5192 {
 
     function promiseURI(uint256 promiseId) public view returns (string memory) {
         return string.concat("data:image/svg+xml;base64,", Base64.encode(bytes(promiseAsSvg(promiseId))));
+    }
+
+    function setEnsRegistry(address ensRegistry) public onlyOwner {
+        _ensRegistry = ensRegistry;
     }
 
     function total() public view returns (uint256) {
@@ -297,7 +304,6 @@ contract PinkyPromise is ERC721, IERC5192 {
     function promiseAsSvg(uint256 promiseId) public view returns (string memory) {
         Promise storage promise_ = _promises[promiseId];
         require(_promiseState(promise_) != PromiseState.None, "PinkyPromise: non existant promise");
-
-        return PinkyPromiseSvg.promiseAsSvg(promise_.data, promise_.signees);
+        return PinkyPromiseSvg.promiseAsSvg(_ensRegistry, promise_.data, promise_.signees);
     }
 }

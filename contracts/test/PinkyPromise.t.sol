@@ -3,7 +3,7 @@ pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
 import "solmate/utils/LibString.sol";
-import "../src/AddressToString.sol";
+import "../src/AddressUtils.sol";
 import "../src/PinkyPromise.sol";
 
 bytes4 constant ERC5192ID = 0xb45a3c0e;
@@ -18,11 +18,17 @@ string constant body1 =
 
 uint16 constant height1 = 936;
 
-contract PinkyPromiseTest is Test {
-    using LibString for uint256;
-    using AddressToString for address;
+abstract contract PPInitialized {
+    PinkyPromise pp;
 
-    PinkyPromise promises = new PinkyPromise("Pinky Promise", "PSP");
+    constructor() {
+        pp = new PinkyPromise("Pinky Promise", "PSP");
+    }
+}
+
+contract PinkyPromiseTest is Test, PPInitialized {
+    using LibString for uint256;
+    using AddressUtils for address;
 
     function setUp() public {}
 
@@ -31,9 +37,9 @@ contract PinkyPromiseTest is Test {
         signees_[0] = address(this);
         PinkyPromise.PromiseData memory promiseData;
 
-        assertEq(promises.total(), 0);
-        promises.newPromise(promiseData, signees_);
-        assertEq(promises.total(), 1);
+        assertEq(pp.total(), 0);
+        pp.newPromise(promiseData, signees_);
+        assertEq(pp.total(), 1);
     }
 
     function test_newPromise() public {
@@ -48,7 +54,7 @@ contract PinkyPromiseTest is Test {
         promiseData.body = body1;
         promiseData.color = PinkyPromise.PromiseColor.BubbleGum;
 
-        promises.newPromise(promiseData, signees);
+        pp.newPromise(promiseData, signees);
     }
 
     function test_signPromise() public {
@@ -58,14 +64,14 @@ contract PinkyPromiseTest is Test {
         signees_[2] = makeAddr("bob");
 
         PinkyPromise.PromiseData memory promiseData;
-        uint256 promiseId = promises.newPromise(promiseData, signees_);
+        uint256 promiseId = pp.newPromise(promiseData, signees_);
 
         PinkyPromise.PromiseState state;
 
         address[] memory signees;
         PinkyPromise.SigningState[] memory signingStates;
 
-        (signees, signingStates) = promises.signeesStates(promiseId);
+        (signees, signingStates) = pp.signeesStates(promiseId);
         assertEq(signees.length, 3);
         assertEq(signees[0], signees_[0]);
         assertEq(signees[1], signees_[1]);
@@ -74,24 +80,24 @@ contract PinkyPromiseTest is Test {
         assertEq(uint256(signingStates[1]), uint256(PinkyPromise.SigningState.Pending));
         assertEq(uint256(signingStates[2]), uint256(PinkyPromise.SigningState.Pending));
 
-        state = promises.promiseState(promiseId);
+        state = pp.promiseState(promiseId);
         assertEq(uint256(state), uint256(PinkyPromise.PromiseState.Draft));
 
         vm.prank(makeAddr("bob"));
-        promises.sign(promiseId);
+        pp.sign(promiseId);
 
-        (signees, signingStates) = promises.signeesStates(promiseId);
+        (signees, signingStates) = pp.signeesStates(promiseId);
         assertEq(uint256(signingStates[0]), uint256(PinkyPromise.SigningState.Signed));
         assertEq(uint256(signingStates[1]), uint256(PinkyPromise.SigningState.Pending));
         assertEq(uint256(signingStates[2]), uint256(PinkyPromise.SigningState.Signed));
 
         vm.prank(makeAddr("alice"));
-        promises.sign(promiseId);
+        pp.sign(promiseId);
 
-        state = promises.promiseState(promiseId);
+        state = pp.promiseState(promiseId);
         assertEq(uint256(state), uint256(PinkyPromise.PromiseState.Final));
 
-        (signees, signingStates) = promises.signeesStates(promiseId);
+        (signees, signingStates) = pp.signeesStates(promiseId);
         assertEq(uint256(signingStates[0]), uint256(PinkyPromise.SigningState.Signed));
         assertEq(uint256(signingStates[1]), uint256(PinkyPromise.SigningState.Signed));
         assertEq(uint256(signingStates[2]), uint256(PinkyPromise.SigningState.Signed));
@@ -104,29 +110,29 @@ contract PinkyPromiseTest is Test {
         signees_[2] = makeAddr("bob");
 
         PinkyPromise.PromiseData memory promiseData;
-        uint256 promiseId = promises.newPromise(promiseData, signees_);
+        uint256 promiseId = pp.newPromise(promiseData, signees_);
 
-        assertEq(uint256(promises.promiseState(promiseId)), uint256(PinkyPromise.PromiseState.Draft));
+        assertEq(uint256(pp.promiseState(promiseId)), uint256(PinkyPromise.PromiseState.Draft));
 
         vm.prank(makeAddr("bob"));
-        promises.sign(promiseId);
+        pp.sign(promiseId);
 
         vm.prank(makeAddr("alice"));
-        promises.discard(promiseId);
+        pp.discard(promiseId);
 
-        assertEq(uint256(promises.promiseState(promiseId)), uint256(PinkyPromise.PromiseState.Discarded));
+        assertEq(uint256(pp.promiseState(promiseId)), uint256(PinkyPromise.PromiseState.Discarded));
 
         vm.prank(makeAddr("alice"));
         vm.expectRevert("PinkyPromise: only non-discarded drafts can receive signatures");
-        promises.sign(promiseId);
+        pp.sign(promiseId);
 
         vm.prank(makeAddr("alice"));
         vm.expectRevert("PinkyPromise: only drafts can get discarded");
-        promises.discard(promiseId);
+        pp.discard(promiseId);
 
         vm.prank(makeAddr("bob"));
         vm.expectRevert("PinkyPromise: only drafts can get discarded");
-        promises.discard(promiseId);
+        pp.discard(promiseId);
     }
 
     function test_nullify() public {
@@ -137,58 +143,58 @@ contract PinkyPromiseTest is Test {
 
         PinkyPromise.PromiseData memory promiseData;
 
-        uint256 promiseId = promises.newPromise(promiseData, signees_);
+        uint256 promiseId = pp.newPromise(promiseData, signees_);
 
         PinkyPromise.SigningState[] memory signingStates;
 
         vm.prank(makeAddr("alice"));
-        promises.sign(promiseId);
+        pp.sign(promiseId);
         vm.prank(makeAddr("bob"));
-        promises.sign(promiseId);
+        pp.sign(promiseId);
 
-        assertEq(uint256(promises.promiseState(promiseId)), uint256(PinkyPromise.PromiseState.Final));
+        assertEq(uint256(pp.promiseState(promiseId)), uint256(PinkyPromise.PromiseState.Final));
 
         vm.prank(makeAddr("alice"));
-        promises.nullify(promiseId);
+        pp.nullify(promiseId);
 
-        (, signingStates) = promises.signeesStates(promiseId);
+        (, signingStates) = pp.signeesStates(promiseId);
 
         assertEq(uint256(signingStates[0]), uint256(PinkyPromise.SigningState.Signed));
         assertEq(uint256(signingStates[1]), uint256(PinkyPromise.SigningState.NullRequest));
         assertEq(uint256(signingStates[2]), uint256(PinkyPromise.SigningState.Signed));
-        assertEq(uint256(promises.promiseState(promiseId)), uint256(PinkyPromise.PromiseState.Final));
+        assertEq(uint256(pp.promiseState(promiseId)), uint256(PinkyPromise.PromiseState.Final));
 
         vm.prank(makeAddr("bob"));
-        promises.nullify(promiseId);
+        pp.nullify(promiseId);
 
-        (, signingStates) = promises.signeesStates(promiseId);
+        (, signingStates) = pp.signeesStates(promiseId);
 
         assertEq(uint256(signingStates[0]), uint256(PinkyPromise.SigningState.Signed));
         assertEq(uint256(signingStates[1]), uint256(PinkyPromise.SigningState.NullRequest));
         assertEq(uint256(signingStates[2]), uint256(PinkyPromise.SigningState.NullRequest));
-        assertEq(uint256(promises.promiseState(promiseId)), uint256(PinkyPromise.PromiseState.Final));
+        assertEq(uint256(pp.promiseState(promiseId)), uint256(PinkyPromise.PromiseState.Final));
 
         vm.prank(makeAddr("bob"));
-        promises.cancelNullify(promiseId);
+        pp.cancelNullify(promiseId);
 
-        (, signingStates) = promises.signeesStates(promiseId);
+        (, signingStates) = pp.signeesStates(promiseId);
 
         assertEq(uint256(signingStates[0]), uint256(PinkyPromise.SigningState.Signed));
         assertEq(uint256(signingStates[1]), uint256(PinkyPromise.SigningState.NullRequest));
         assertEq(uint256(signingStates[2]), uint256(PinkyPromise.SigningState.Signed));
-        assertEq(uint256(promises.promiseState(promiseId)), uint256(PinkyPromise.PromiseState.Final));
+        assertEq(uint256(pp.promiseState(promiseId)), uint256(PinkyPromise.PromiseState.Final));
 
         vm.prank(makeAddr("bob"));
-        promises.nullify(promiseId);
+        pp.nullify(promiseId);
         vm.prank(address(this));
-        promises.nullify(promiseId);
+        pp.nullify(promiseId);
 
-        (, signingStates) = promises.signeesStates(promiseId);
+        (, signingStates) = pp.signeesStates(promiseId);
 
         assertEq(uint256(signingStates[0]), uint256(PinkyPromise.SigningState.NullRequest));
         assertEq(uint256(signingStates[1]), uint256(PinkyPromise.SigningState.NullRequest));
         assertEq(uint256(signingStates[2]), uint256(PinkyPromise.SigningState.NullRequest));
-        assertEq(uint256(promises.promiseState(promiseId)), uint256(PinkyPromise.PromiseState.Nullified));
+        assertEq(uint256(pp.promiseState(promiseId)), uint256(PinkyPromise.PromiseState.Nullified));
     }
 
     // Duplicated signees should trigger a revert
@@ -201,7 +207,7 @@ contract PinkyPromiseTest is Test {
         PinkyPromise.PromiseData memory promiseData;
 
         vm.expectRevert("PinkyPromise: each signee must be unique");
-        promises.newPromise(promiseData, signees);
+        pp.newPromise(promiseData, signees);
     }
 
     function test_signeePromises() public {
@@ -212,33 +218,33 @@ contract PinkyPromiseTest is Test {
         PinkyPromise.PromiseData memory promiseData;
 
         // promise1: draft
-        promises.newPromise(promiseData, signees);
+        pp.newPromise(promiseData, signees);
 
         // promise2: discarded
-        uint256 promise2 = promises.newPromise(promiseData, signees);
-        promises.discard(promise2);
+        uint256 promise2 = pp.newPromise(promiseData, signees);
+        pp.discard(promise2);
 
         // promise3: final
-        uint256 promise3 = promises.newPromise(promiseData, signees);
+        uint256 promise3 = pp.newPromise(promiseData, signees);
         vm.prank(makeAddr("alice"));
-        promises.sign(promise3);
+        pp.sign(promise3);
 
         // promise4: nullified
-        uint256 promise4 = promises.newPromise(promiseData, signees);
+        uint256 promise4 = pp.newPromise(promiseData, signees);
         vm.prank(makeAddr("alice"));
-        promises.sign(promise4);
+        pp.sign(promise4);
         vm.prank(makeAddr("alice"));
-        promises.nullify(promise4);
+        pp.nullify(promise4);
         vm.prank(address(this));
-        promises.nullify(promise4);
+        pp.nullify(promise4);
 
         // promise5: only one signee
         delete signees[1];
-        promises.newPromise(promiseData, signees);
+        pp.newPromise(promiseData, signees);
 
-        uint256[] memory thisPromises = promises.signeePromises(address(this));
-        uint256[] memory alicePromises = promises.signeePromises(makeAddr("alice"));
-        uint256[] memory bobPromises = promises.signeePromises(makeAddr("bob"));
+        uint256[] memory thisPromises = pp.signeePromises(address(this));
+        uint256[] memory alicePromises = pp.signeePromises(makeAddr("alice"));
+        uint256[] memory bobPromises = pp.signeePromises(makeAddr("bob"));
 
         assertEq(thisPromises.length, 5);
         assertEq(alicePromises.length, 4);
@@ -262,26 +268,26 @@ contract PinkyPromiseTest is Test {
         signees_[1] = makeAddr("alice");
 
         PinkyPromise.PromiseData memory promiseData;
-        uint256 promiseId = promises.newPromise(promiseData, signees_);
+        uint256 promiseId = pp.newPromise(promiseData, signees_);
 
         vm.expectRevert("PinkyPromise: tokenId not assigned");
-        promises.locked(0x1);
+        pp.locked(0x1);
 
         vm.prank(makeAddr("alice"));
-        promises.sign(promiseId);
+        pp.sign(promiseId);
 
-        assertTrue(promises.locked(0x1));
-        assertTrue(promises.locked(0x2));
+        assertTrue(pp.locked(0x1));
+        assertTrue(pp.locked(0x2));
 
         vm.expectRevert("PinkyPromise: tokenId not assigned");
-        promises.locked(0x3);
+        pp.locked(0x3);
 
         // 0x0 is never assigned
         vm.expectRevert("PinkyPromise: tokenId not assigned");
-        promises.locked(0x0);
+        pp.locked(0x0);
     }
 
     function test_erc5192Interface() public {
-        assertTrue(promises.supportsInterface(ERC5192ID));
+        assertTrue(pp.supportsInterface(ERC5192ID));
     }
 }

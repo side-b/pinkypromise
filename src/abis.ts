@@ -145,6 +145,25 @@ export const PinkyPromiseAbi = [
     "anonymous": false,
     "inputs": [
       {
+        "indexed": true,
+        "internalType": "address",
+        "name": "user",
+        "type": "address",
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address",
+      },
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event",
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": false,
         "internalType": "uint256",
         "name": "promiseId",
@@ -396,6 +415,19 @@ export const PinkyPromiseAbi = [
     "type": "function",
   },
   {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address",
+      },
+    ],
+    "stateMutability": "view",
+    "type": "function",
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -599,6 +631,19 @@ export const PinkyPromiseAbi = [
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "ensRegistry",
+        "type": "address",
+      },
+    ],
+    "name": "setEnsRegistry",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function",
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint256",
         "name": "promiseId",
         "type": "uint256",
@@ -735,6 +780,19 @@ export const PinkyPromiseAbi = [
       },
     ],
     "name": "transferFrom",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function",
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address",
+      },
+    ],
+    "name": "transferOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function",

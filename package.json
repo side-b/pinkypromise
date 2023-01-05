@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "update-abi": "./scripts/update-abi.sh",
     "update-svg-contract": "tsx scripts/codegen-PinkyPromiseSvg.sol.tsx > contracts/src/PinkyPromiseSvg.sol && forge fmt contracts/src/PinkyPromiseSvg.sol",
-    "dev-node": "anvil --state ./anvil.state"
+    "dev-node": "source ./.env && anvil --chain-id 31337 --fork-url https://mainnet.infura.io/v3/$VITE_INFURA_KEY --state ./anvil.state"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",

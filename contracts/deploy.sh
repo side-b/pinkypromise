@@ -2,23 +2,27 @@
 
 source ./.env
 
+CHAIN_ID=
+ENS_REGISTRY=
 RPC_URL=""
 VERIFY=""
-CHAIN_ID=
 
 if [[ "$1" == "local" ]]; then
-    RPC_URL=$RPC_URL_LOCAL
     CHAIN_ID="31337"
+    ENS_REGISTRY=$ENS_REGISTRY_LOCAL
+    RPC_URL=$RPC_URL_LOCAL
 
 elif [[ "$1" == "sepolia" ]]; then
+    CHAIN_ID="11155111"
+    ENS_REGISTRY=$ENS_REGISTRY_SEPOLIA
     RPC_URL=$RPC_URL_SEPOLIA
     VERIFY="--verify"
-    CHAIN_ID="11155111"
 
 elif [[ "$1" == "goerli" ]]; then
+    CHAIN_ID="5"
+    ENS_REGISTRY=$ENS_REGISTRY_GOERLI
     RPC_URL=$RPC_URL_GOERLI
     VERIFY=""
-    CHAIN_ID="5"
 
 else
     echo "Must provide a network:" 1>&2
@@ -27,6 +31,8 @@ else
     echo "  " 1>&2
     exit 1
 fi
+
+export ENS_REGISTRY
 
 forge script script/PinkyPromise.s.sol:PinkyPromiseScript --rpc-url $RPC_URL --broadcast $VERIFY
 

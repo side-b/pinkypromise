@@ -7,7 +7,10 @@ import "../src/PinkyPromise.sol";
 contract PinkyPromiseScript is Script {
     function run() external {
         vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
-        new PinkyPromise("Pinky Promise", "PSP");
+
+        PinkyPromise pp = new PinkyPromise("Pinky Promise", "PSP");
+        pp.setEnsRegistry(vm.envAddress("ENS_REGISTRY"));
+
         vm.stopBroadcast();
     }
 }

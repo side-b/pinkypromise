@@ -3,14 +3,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
+import "./EnsUtils.sol";
 import {StrSlice, toSlice} from "dk1a-stringutils/StrSlice.sol";
 import "solmate/utils/LibString.sol";
-import "./AddressToString.sol";
+import "./AddressUtils.sol";
 import "./PinkyPromise.sol";
 
 library PinkyPromiseSvg {
     using LibString for uint16;
-    using AddressToString for address;
+    using AddressUtils for address;
 
     // avoid the 16 vars limit in promiseAsSvg()
     struct SvgValues {
@@ -21,7 +22,7 @@ library PinkyPromiseSvg {
         string signees;
     }
 
-    function promiseAsSvg(PinkyPromise.PromiseData storage data, address[] calldata signees)
+    function promiseAsSvg(address ensRegistry, PinkyPromise.PromiseData storage data, address[] calldata signees)
         public
         view
         returns (string memory)
@@ -31,7 +32,7 @@ library PinkyPromiseSvg {
         values.title = data.title;
         values.body = promiseTextToHtml(data.body);
         values.color = promiseColor(data.color);
-        values.signees = signeesAsHtml(signees);
+        values.signees = signeesAsHtml(ensRegistry, signees);
 
         string memory html;
         {
@@ -56,16 +57,16 @@ library PinkyPromiseSvg {
         return html;
     }
 
-    function signeesAsHtml(address[] calldata signees) public pure returns (string memory) {
+    function signeesAsHtml(address ensRegistry, address[] calldata signees) public view returns (string memory) {
         string memory html = "";
         for (uint256 i = 0; i < signees.length; i++) {
-            html = string.concat(html, signeeAsHtml(signees[i]));
+            html = string.concat(html, signeeAsHtml(ensRegistry, signees[i]));
         }
         return html;
     }
 
-    function signeeAsHtml(address signee) public pure returns (string memory) {
-        string memory addressHtml = signee.toString();
+    function signeeAsHtml(address ensRegistry, address signee) public view returns (string memory) {
+        string memory addressHtml = EnsUtils.nameOrAddress(ensRegistry, signee);
         return string.concat(
             '<div class="signee"><div>',
             addressHtml,
