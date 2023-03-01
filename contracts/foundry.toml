@@ -2,6 +2,10 @@
 src = 'src'
 out = 'out'
 libs = ['lib']
+optimizer = true
+optimizer_runs = 100000
+# Latest solidity version recommended by slither
+solc_version = "0.8.17"
 
 [rpc_endpoints]
 goerli = "${RPC_URL_GOERLI}"
