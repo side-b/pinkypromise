@@ -76,6 +76,9 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
     // should point to https://github.com/bokkypoobah/BokkyPooBahsDateTimeLibrary
     address private _bpbDateTime;
 
+    // Creation of new promises can be stopped, making it possible to deploy a new version of the contract without ID conflicts.
+    bool private _stopped = false;
+
     // promise state change
     event PromiseUpdate(uint256 indexed promiseId, PromiseState state);
 
@@ -166,6 +169,10 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         _bpbDateTime = bpbDateTime;
     }
 
+    function stop() public onlyOwner {
+        _stopped = true;
+    }
+
     function total() public view returns (uint256) {
         return _latestPromiseId;
     }
@@ -193,6 +200,7 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         external
         returns (uint256 promiseId)
     {
+        require(!_stopped, "PinkyPromise: the contract has been stopped and promises cannot be created anymore");
         require(signees.length > 0, "PinkyPromise: a promise requires at least one signee");
 
         promiseId = ++_latestPromiseId;
