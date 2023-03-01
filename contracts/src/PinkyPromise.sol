@@ -5,7 +5,7 @@ import "base64/base64.sol";
 import "solmate/auth/Owned.sol";
 import "solmate/tokens/ERC721.sol";
 import "solmate/utils/LibString.sol";
-import "./IERC5192.sol";
+import {IERC5192} from "src/interfaces/IERC5192.sol";
 import "./PinkyPromiseSvg.sol";
 
 contract PinkyPromise is ERC721, IERC5192, Owned {
@@ -91,7 +91,7 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
     // ERC721 + ERC5192 related methods
     // ================================
 
-    function supportsInterface(bytes4 interfaceId) public view override (ERC721) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721) returns (bool) {
         return interfaceId == type(IERC5192).interfaceId || super.supportsInterface(interfaceId);
     }
 

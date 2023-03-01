@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
-import "./AddressUtils.sol";
+import {AddressUtils} from "src/lib/AddressUtils.sol";
 
 abstract contract ENS {
     function resolver(bytes32 node) external view virtual returns (address);

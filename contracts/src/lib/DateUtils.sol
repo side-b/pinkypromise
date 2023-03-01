@@ -2,8 +2,9 @@
 pragma solidity ^0.8.13;
 
 import "solmate/utils/LibString.sol";
-import "./StringPad.sol";
+import {StringPad} from "src/lib/StringPad.sol";
 
+// This could be an interface--
 abstract contract BokkyPooBahsDateTimeContract {
     function getYear(uint256 timestamp) public pure virtual returns (uint256 year);
     function getMonth(uint256 timestamp) public pure virtual returns (uint256 month);

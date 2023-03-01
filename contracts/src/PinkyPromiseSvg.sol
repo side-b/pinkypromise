@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
-import "./DateUtils.sol";
-import "./EnsUtils.sol";
-import {StrSlice, toSlice} from "dk1a-stringutils/StrSlice.sol";
 import "solmate/utils/LibString.sol";
-import "./AddressUtils.sol";
-import "./PinkyPromise.sol";
+import {StrSlice, toSlice} from "dk1a-stringutils/StrSlice.sol";
+import {DateUtils} from "src/lib/DateUtils.sol";
+import {EnsUtils} from "src/lib/EnsUtils.sol";
+import {AddressUtils} from "src/lib/AddressUtils.sol";
+import {PinkyPromise} from "./PinkyPromise.sol";
 
 library PinkyPromiseSvg {
     using LibString for uint16;
