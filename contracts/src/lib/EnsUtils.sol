@@ -3,12 +3,12 @@ pragma solidity ^0.8.13;
 
 import {AddressUtils} from "src/lib/AddressUtils.sol";
 
-abstract contract ENS {
-    function resolver(bytes32 node) external view virtual returns (address);
+interface IENS {
+    function resolver(bytes32 node) external view returns (address);
 }
 
-abstract contract ENSReverseResolver {
-    mapping(bytes32 => string) public name;
+interface IENSReverseResolver {
+    function name(bytes32 node) external view returns (string memory name);
 }
 
 library EnsUtils {
@@ -22,7 +22,7 @@ library EnsUtils {
         bytes32 node = reverseResolveNameHash(address_);
 
         address resolverAddress;
-        try ENS(registry).resolver(node) returns (address resolverAddress_) {
+        try IENS(registry).resolver(node) returns (address resolverAddress_) {
             if (resolverAddress_.code.length == 0) {
                 return address_.toString();
             }
@@ -31,7 +31,7 @@ library EnsUtils {
             return address_.toString();
         }
 
-        try ENSReverseResolver(resolverAddress).name(node) returns (string memory name) {
+        try IENSReverseResolver(resolverAddress).name(node) returns (string memory name) {
             return name;
         } catch {
             return address_.toString();
