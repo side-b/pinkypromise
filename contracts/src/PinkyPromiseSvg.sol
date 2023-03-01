@@ -1,7 +1,7 @@
 // FILE GENERATED, DO NOT EDIT DIRECTLY
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.13;
+pragma solidity 0.8.17;
 
 import "solmate/utils/LibString.sol";
 import {StrSlice, toSlice} from "dk1a-stringutils/StrSlice.sol";
