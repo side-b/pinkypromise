@@ -380,7 +380,15 @@ function usePromiseData(id: string, contractAddress?: Address) {
       signingStates,
       signeesWithStates: signees.map((signee, index) => ([
         signee,
-        signingStateFromEnumKey(signingStates[index]) === "Signed",
+        match(signingStateFromEnumKey(signingStates[index]))
+          .with("None", () => "")
+          .with("Signed", () => true)
+          .with("Pending", () => "awaiting")
+          .with(
+            "NullRequest",
+            () => signee === accountAddress ? "break request" : true,
+          )
+          .exhaustive(),
       ] as const)),
       state: promiseStateFromEnumKey(
         info?.state && isPromiseStateEnumKey(info?.state) ? info?.state : 0,

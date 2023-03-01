@@ -23,8 +23,9 @@ export function SplitButton({
           position: "relative",
           zIndex: 1,
           borderLeft: `2px solid ${first.color ?? COLORS.white}`,
-          "&:active + button": {
-            background: COLORS.pink,
+          borderRight: `2px solid transparent`,
+          "&:active": {
+            borderRightColor: `2px solid ${first.color ?? COLORS.white}`,
           },
         }}
       />
