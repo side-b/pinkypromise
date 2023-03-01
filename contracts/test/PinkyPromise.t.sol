@@ -3,8 +3,8 @@ pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
 import "solmate/utils/LibString.sol";
-import "../src/AddressUtils.sol";
-import "../src/PinkyPromise.sol";
+import {AddressUtils} from "src/lib/AddressUtils.sol";
+import {PinkyPromise} from "src/PinkyPromise.sol";
 
 bytes4 constant ERC5192ID = 0xb45a3c0e;
 

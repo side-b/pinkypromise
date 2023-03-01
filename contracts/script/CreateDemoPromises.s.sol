@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Script.sol";
-import "../src/PinkyPromise.sol";
+import {PinkyPromise} from "src/PinkyPromise.sol";
 
 uint16 constant signeeHeight = 40;
 

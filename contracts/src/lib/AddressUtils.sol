@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
-import "./HexStrings.sol";
+import {HexStrings} from "src/lib/HexStrings.sol";
 
 library AddressUtils {
     using HexStrings for uint160;
