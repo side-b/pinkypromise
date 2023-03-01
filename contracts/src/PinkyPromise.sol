@@ -6,10 +6,32 @@ import "solmate/auth/Owned.sol";
 import "solmate/tokens/ERC721.sol";
 import "solmate/utils/LibString.sol";
 import {IERC5192} from "src/interfaces/IERC5192.sol";
-import "./PinkyPromiseSvg.sol";
+import {PinkyPromiseSvg} from "./PinkyPromiseSvg.sol";
 
 contract PinkyPromise is ERC721, IERC5192, Owned {
     using LibString for uint256;
+
+    /*//////////////////////////////////////////////////////////////
+                                STATE
+    //////////////////////////////////////////////////////////////*/
+
+    uint256 private _latestPromiseId; // 0
+    uint256 private _latestTokenId; // 0
+
+    mapping(uint256 => Promise) private _promises;
+    mapping(uint256 => uint256) private _promiseIdsByTokenId;
+    mapping(address => uint256[]) private _promiseIdsBySignee;
+
+    // promiseId => signer => SigningState
+    // We use SigningState rather than a boolean in this mapping,
+    // so we can rely on SigningState.None (the default) to ensure that
+    // Promise.signees only contain unique signatures (see newPromise()).
+    mapping(uint256 => mapping(address => SigningState)) private _signingStates;
+
+    address private _ensRegistry;
+
+    // should point to https://github.com/bokkypoobah/BokkyPooBahsDateTimeLibrary
+    address private _bpbDateTime;
 
     struct PromiseData {
         PromiseColor color;
@@ -58,23 +80,9 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         NullRequest // nullification requested (implies signed)
     }
 
-    uint256 private _latestPromiseId; // 0
-    uint256 private _latestTokenId; // 0
-
-    mapping(uint256 => Promise) private _promises;
-    mapping(uint256 => uint256) private _promiseIdsByTokenId;
-    mapping(address => uint256[]) private _promiseIdsBySignee;
-
-    // promiseId => signer => SigningState
-    // We use SigningState rather than a boolean in this mapping,
-    // so we can rely on SigningState.None (the default) to ensure that
-    // Promise.signees only contain unique signatures (see newPromise()).
-    mapping(uint256 => mapping(address => SigningState)) private _signingStates;
-
-    address private _ensRegistry;
-
-    // should point to https://github.com/bokkypoobah/BokkyPooBahsDateTimeLibrary
-    address private _bpbDateTime;
+    /*//////////////////////////////////////////////////////////////
+                                EVENTS
+    //////////////////////////////////////////////////////////////*/
 
     // promise state change
     event PromiseUpdate(uint256 indexed promiseId, PromiseState state);
@@ -88,17 +96,159 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
 
     constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) Owned(msg.sender) {}
 
-    // ERC721 + ERC5192 related methods
-    // ================================
+    /*//////////////////////////////////////////////////////////////
+                          EXTERNAL FUNCTIONS
+    //////////////////////////////////////////////////////////////*/
 
-    function supportsInterface(bytes4 interfaceId) public view override(ERC721) returns (bool) {
-        return interfaceId == type(IERC5192).interfaceId || super.supportsInterface(interfaceId);
+    // Create a new promise
+    function newPromise(PromiseData calldata promiseData, address[] calldata signees)
+        external
+        returns (uint256 promiseId)
+    {
+        require(signees.length > 0, "PinkyPromise: a promise requires at least one signee");
+
+        promiseId = ++_latestPromiseId;
+
+        Promise storage promise_ = _promises[promiseId];
+
+        // Populate the signing states
+        for (uint256 i = 0; i < signees.length; i++) {
+            require(
+                _signingStates[promiseId][signees[i]] == SigningState.None, "PinkyPromise: each signee must be unique"
+            );
+
+            // Sign if the sender is one of the promise signees
+            if (signees[i] == msg.sender) {
+                promise_.state++;
+                _signingStates[promiseId][msg.sender] = SigningState.Signed;
+                emit AddSignature(promiseId, msg.sender);
+            } else {
+                _signingStates[promiseId][signees[i]] = SigningState.Pending;
+            }
+
+            // Used to retreive the promises where a given account is participating
+            _promiseIdsBySignee[signees[i]].push(promiseId);
+        }
+
+        promise_.data = promiseData;
+
+        if (promise_.data.height < 800) {
+            promise_.data.height = 800;
+        }
+
+        promise_.signees = signees;
+
+        emit PromiseUpdate(promiseId, PromiseState.Draft);
+
+        // If msg.sender is the sole signer, finalize the promise
+        if (_promiseState(promise_) == PromiseState.Final) {
+            promise_.tokenIds = new uint256[](1);
+            promise_.tokenIds[0] = _mintPromiseNft(promiseId, msg.sender);
+            promise_.signedOn = block.timestamp;
+            emit PromiseUpdate(promiseId, PromiseState.Final);
+        }
+    }
+
+    // Add a signature to a draft. Reverts if the signee has signed already.
+    function sign(uint256 promiseId) external {
+        Promise storage promise_ = _promises[promiseId];
+
+        require(
+            _promiseState(promise_) == PromiseState.Draft,
+            "PinkyPromise: only non-discarded drafts can receive signatures"
+        );
+        require(
+            _signingStates[promiseId][msg.sender] != SigningState.None,
+            "PinkyPromise: drafts can only get signed by signees"
+        );
+        require(_signingStates[promiseId][msg.sender] == SigningState.Pending, "PinkyPromise: already signed");
+
+        promise_.state++;
+        _signingStates[promiseId][msg.sender] = SigningState.Signed;
+        emit AddSignature(promiseId, msg.sender);
+
+        // Last signer creates the NFTs
+        if (_promiseState(promise_) == PromiseState.Final) {
+            promise_.tokenIds = new uint256[](promise_.signees.length);
+            for (uint256 i = 0; i < promise_.signees.length; i++) {
+                promise_.tokenIds[i] = _mintPromiseNft(promiseId, promise_.signees[i]);
+            }
+            promise_.signedOn = block.timestamp;
+            emit PromiseUpdate(promiseId, PromiseState.Final);
+        }
+    }
+
+    // Discard a promise. This is only possible when the promise is
+    // a draft, and it can get called by any of the signees.
+    function discard(uint256 promiseId) external {
+        Promise storage promise_ = _promises[promiseId];
+
+        require(_promiseState(promise_) == PromiseState.Draft, "PinkyPromise: only drafts can get discarded");
+        require(
+            _signingStates[promiseId][msg.sender] != SigningState.None,
+            "PinkyPromise: drafts can only get discarded by signees"
+        );
+
+        // discarded state, see Promise.state
+        promise_.state = promise_.signees.length * 2 + 1;
+        emit PromiseUpdate(promiseId, PromiseState.Discarded);
+    }
+
+    // Request to nullify a draft. Once all the signees have requested to
+    // nullify, the promise becomes nullified. This is only possible when the
+    // promise has been signed by all signees. Reverts if the signee has
+    // requested to nullify already.
+    function nullify(uint256 promiseId) external {
+        Promise storage promise_ = _promises[promiseId];
+
+        require(_promiseState(promise_) == PromiseState.Final, "PinkyPromise: only signed promises can get nullified");
+        require(
+            _signingStates[promiseId][msg.sender] == SigningState.Signed, "PinkyPromise: invalid nullification request"
+        );
+
+        _signingStates[promiseId][msg.sender] = SigningState.NullRequest;
+
+        promise_.state++;
+        emit NullifyRequest(promiseId, msg.sender);
+
+        if (_promiseState(promise_) == PromiseState.Nullified) {
+            for (uint256 i = 0; i < promise_.tokenIds.length; i++) {
+                _burn(promise_.tokenIds[i]);
+            }
+            emit PromiseUpdate(promiseId, PromiseState.Nullified);
+        }
+    }
+
+    // Cancel a single nullification request. This is so that signees having requested a
+    // nullification can change their mind before the others do it as well.
+    function cancelNullify(uint256 promiseId) external {
+        Promise storage promise_ = _promises[promiseId];
+
+        require(_promiseState(promise_) == PromiseState.Final, "PinkyPromise: only signed promises can get nullified");
+        require(
+            _signingStates[promiseId][msg.sender] == SigningState.NullRequest,
+            "PinkyPromise: nullification cancel not needed"
+        );
+
+        _signingStates[promiseId][msg.sender] = SigningState.Signed;
+
+        promise_.state--;
+        emit CancelNullifyRequest(promiseId, msg.sender);
     }
 
     function locked(uint256 tokenId) external view returns (bool) {
         require(_ownerOf[tokenId] != address(0), "PinkyPromise: tokenId not assigned");
         return true; // always locked
     }
+
+    /*//////////////////////////////////////////////////////////////
+                    ERC721/5192 FUNCTION OVERRIDES
+    //////////////////////////////////////////////////////////////*/
+
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721) returns (bool) {
+        return interfaceId == type(IERC5192).interfaceId || super.supportsInterface(interfaceId);
+    }
+
 
     function transferFrom(address, address, uint256) public pure override {
         revert("PinkyPromise: transfers disallowed");
@@ -188,54 +338,6 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         return PromiseState.Nullified;
     }
 
-    // Create a new promise
-    function newPromise(PromiseData calldata promiseData, address[] calldata signees)
-        external
-        returns (uint256 promiseId)
-    {
-        require(signees.length > 0, "PinkyPromise: a promise requires at least one signee");
-
-        promiseId = ++_latestPromiseId;
-
-        Promise storage promise_ = _promises[promiseId];
-
-        // Populate the signing states
-        for (uint256 i = 0; i < signees.length; i++) {
-            require(
-                _signingStates[promiseId][signees[i]] == SigningState.None, "PinkyPromise: each signee must be unique"
-            );
-
-            // Sign if the sender is one of the promise signees
-            if (signees[i] == msg.sender) {
-                promise_.state++;
-                _signingStates[promiseId][msg.sender] = SigningState.Signed;
-                emit AddSignature(promiseId, msg.sender);
-            } else {
-                _signingStates[promiseId][signees[i]] = SigningState.Pending;
-            }
-
-            // Used to retreive the promises where a given account is participating
-            _promiseIdsBySignee[signees[i]].push(promiseId);
-        }
-
-        promise_.data = promiseData;
-
-        if (promise_.data.height < 800) {
-            promise_.data.height = 800;
-        }
-
-        promise_.signees = signees;
-
-        emit PromiseUpdate(promiseId, PromiseState.Draft);
-
-        // If msg.sender is the sole signer, finalize the promise
-        if (_promiseState(promise_) == PromiseState.Final) {
-            promise_.tokenIds = new uint256[](1);
-            promise_.tokenIds[0] = _mintPromiseNft(promiseId, msg.sender);
-            promise_.signedOn = block.timestamp;
-            emit PromiseUpdate(promiseId, PromiseState.Final);
-        }
-    }
 
     // Mint a single promise NFT
     function _mintPromiseNft(uint256 promiseId, address signee) private returns (uint256) {
@@ -244,93 +346,6 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         _promiseIdsByTokenId[tokenId] = promiseId;
         emit Locked(tokenId);
         return tokenId;
-    }
-
-    // Discard a promise. This is only possible when the promise is
-    // a draft, and it can get called by any of the signees.
-    function discard(uint256 promiseId) external {
-        Promise storage promise_ = _promises[promiseId];
-
-        require(_promiseState(promise_) == PromiseState.Draft, "PinkyPromise: only drafts can get discarded");
-        require(
-            _signingStates[promiseId][msg.sender] != SigningState.None,
-            "PinkyPromise: drafts can only get discarded by signees"
-        );
-
-        // discarded state, see Promise.state
-        promise_.state = promise_.signees.length * 2 + 1;
-        emit PromiseUpdate(promiseId, PromiseState.Discarded);
-    }
-
-    // Add a signature to a draft. Reverts if the signee has signed already.
-    function sign(uint256 promiseId) external {
-        Promise storage promise_ = _promises[promiseId];
-
-        require(
-            _promiseState(promise_) == PromiseState.Draft,
-            "PinkyPromise: only non-discarded drafts can receive signatures"
-        );
-        require(
-            _signingStates[promiseId][msg.sender] != SigningState.None,
-            "PinkyPromise: drafts can only get signed by signees"
-        );
-        require(_signingStates[promiseId][msg.sender] == SigningState.Pending, "PinkyPromise: already signed");
-
-        promise_.state++;
-        _signingStates[promiseId][msg.sender] = SigningState.Signed;
-        emit AddSignature(promiseId, msg.sender);
-
-        // Last signer creates the NFTs
-        if (_promiseState(promise_) == PromiseState.Final) {
-            promise_.tokenIds = new uint256[](promise_.signees.length);
-            for (uint256 i = 0; i < promise_.signees.length; i++) {
-                promise_.tokenIds[i] = _mintPromiseNft(promiseId, promise_.signees[i]);
-            }
-            promise_.signedOn = block.timestamp;
-            emit PromiseUpdate(promiseId, PromiseState.Final);
-        }
-    }
-
-    // Request to nullify a draft. Once all the signees have requested to
-    // nullify, the promise becomes nullified. This is only possible when the
-    // promise has been signed by all signees. Reverts if the signee has
-    // requested to nullify already.
-    function nullify(uint256 promiseId) external {
-        Promise storage promise_ = _promises[promiseId];
-
-        require(_promiseState(promise_) == PromiseState.Final, "PinkyPromise: only signed promises can get nullified");
-        require(
-            _signingStates[promiseId][msg.sender] == SigningState.Signed, "PinkyPromise: invalid nullification request"
-        );
-
-        _signingStates[promiseId][msg.sender] = SigningState.NullRequest;
-
-        promise_.state++;
-        emit NullifyRequest(promiseId, msg.sender);
-
-        if (_promiseState(promise_) == PromiseState.Nullified) {
-            for (uint256 i = 0; i < promise_.tokenIds.length; i++) {
-                _burn(promise_.tokenIds[i]);
-            }
-            emit PromiseUpdate(promiseId, PromiseState.Nullified);
-        }
-    }
-
-    // Cancel a single nullification request. This is so that signees having requested a
-    // nullification can change their mind before the others do it as well.
-    function cancelNullify(uint256 promiseId) external {
-        Promise storage promise_ = _promises[promiseId];
-
-        require(_promiseState(promise_) == PromiseState.Final, "PinkyPromise: only signed promises can get nullified");
-        require(
-            _signingStates[promiseId][msg.sender] == SigningState.NullRequest,
-            "PinkyPromise: nullification cancel not needed"
-        );
-
-        _signingStates[promiseId][msg.sender] = SigningState.Signed;
-
-        promise_.state--;
-        emit CancelNullifyRequest(promiseId, msg.sender);
     }
 
     // Get the signees of a promise and their corresponding signing statuses.
