@@ -85,6 +85,9 @@ function Step({
         color,
         background,
         listStyle: "none",
+        "*": {
+          userSelect: "none",
+        },
       }}
     >
       <a.div
@@ -158,12 +161,7 @@ function Step({
           >
             {index + 1}
           </div>
-          <div
-            css={{
-              maxWidth: 640,
-              userSelect: "none",
-            }}
-          >
+          <div css={{ maxWidth: 640 }}>
             {description.trim()}
           </div>
         </div>

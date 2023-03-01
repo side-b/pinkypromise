@@ -36,6 +36,7 @@ export function Header() {
         alignItems: "center",
         height: "120px",
         padding: "0 60px",
+        userSelect: "none",
       }}
     >
       <div

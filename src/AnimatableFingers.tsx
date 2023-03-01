@@ -35,6 +35,7 @@ export function AnimatableFingers({
         position: "relative",
         width: size,
         height: size,
+        userSelect: "none",
       }}
     >
       <a.div
