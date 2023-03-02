@@ -341,9 +341,10 @@ contract PinkyPromiseTest is Test {
 
         PinkyPromise.PromiseData memory promiseData;
         pp.newPromise(promiseData, signees_);
+        assertTrue(!pp.stopped());
 
         pp.stop();
-
+        assertTrue(pp.stopped());
         vm.expectRevert("PinkyPromise: the contract has been stopped and promises cannot be created anymore");
         pp.newPromise(promiseData, signees_);
     }
