@@ -6,10 +6,32 @@ import "solmate/auth/Owned.sol";
 import "solmate/tokens/ERC721.sol";
 import "solmate/utils/LibString.sol";
 import {IERC5192} from "src/interfaces/IERC5192.sol";
-import "./PinkyPromiseSvg.sol";
+import {PinkyPromiseSvg} from "./PinkyPromiseSvg.sol";
 
 contract PinkyPromise is ERC721, IERC5192, Owned {
     using LibString for uint256;
+
+    /*//////////////////////////////////////////////////////////////
+                                STATE
+    //////////////////////////////////////////////////////////////*/
+
+    uint256 public _latestPromiseId; // 0
+    uint256 public _latestTokenId; // 0
+
+    mapping(uint256 => Promise) public _promises;
+    mapping(uint256 => uint256) public _promiseIdsByTokenId;
+    mapping(address => uint256[]) public _promiseIdsBySignee;
+
+    // promiseId => signer => SigningState
+    // We use SigningState rather than a boolean in this mapping,
+    // so we can rely on SigningState.None (the default) to ensure that
+    // Promise.signees only contain unique signatures (see newPromise()).
+    mapping(uint256 => mapping(address => SigningState)) public _signingStates;
+
+    address public _ensRegistry;
+
+    // should point to https://github.com/bokkypoobah/BokkyPooBahsDateTimeLibrary
+    address public _bpbDateTime;
 
     struct PromiseData {
         PromiseColor color;
@@ -58,23 +80,9 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         NullRequest // nullification requested (implies signed)
     }
 
-    uint256 private _latestPromiseId; // 0
-    uint256 private _latestTokenId; // 0
-
-    mapping(uint256 => Promise) private _promises;
-    mapping(uint256 => uint256) private _promiseIdsByTokenId;
-    mapping(address => uint256[]) private _promiseIdsBySignee;
-
-    // promiseId => signer => SigningState
-    // We use SigningState rather than a boolean in this mapping,
-    // so we can rely on SigningState.None (the default) to ensure that
-    // Promise.signees only contain unique signatures (see newPromise()).
-    mapping(uint256 => mapping(address => SigningState)) private _signingStates;
-
-    address private _ensRegistry;
-
-    // should point to https://github.com/bokkypoobah/BokkyPooBahsDateTimeLibrary
-    address private _bpbDateTime;
+    /*//////////////////////////////////////////////////////////////
+                                EVENTS
+    //////////////////////////////////////////////////////////////*/
 
     // Creation of new promises can be stopped, making it possible to deploy a new version of the contract without ID conflicts.
     bool public stopped = false;
@@ -89,116 +97,20 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
     event NullifyRequest(uint256 indexed promiseId, address indexed signer);
     event CancelNullifyRequest(uint256 indexed promiseId, address indexed signer);
 
-    constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) Owned(msg.sender) {}
+    /*//////////////////////////////////////////////////////////////
+                              MODIFIERS
+    //////////////////////////////////////////////////////////////*/
 
     modifier notStopped() {
         require(!stopped, "PinkyPromise: the contract has been stopped and promises cannot be created anymore");
         _;
     }
 
-    // ERC721 + ERC5192 related methods
-    // ================================
+    constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) Owned(msg.sender) {}
 
-    function supportsInterface(bytes4 interfaceId) public view override(ERC721) returns (bool) {
-        return interfaceId == type(IERC5192).interfaceId || super.supportsInterface(interfaceId);
-    }
-
-    function locked(uint256 tokenId) external view returns (bool) {
-        require(_ownerOf[tokenId] != address(0), "PinkyPromise: tokenId not assigned");
-        return true; // always locked
-    }
-
-    function transferFrom(address, address, uint256) public pure override {
-        revert("PinkyPromise: transfers disallowed");
-    }
-
-    function safeTransferFrom(address, address, uint256) public pure override {
-        revert("PinkyPromise: transfers disallowed");
-    }
-
-    function safeTransferFrom(address, address, uint256, bytes calldata) public pure override {
-        revert("PinkyPromise: transfers disallowed");
-    }
-
-    function tokenURI(uint256 tokenId) public view override returns (string memory) {
-        require((_ownerOf[tokenId]) != address(0), "PinkyPromise: tokenId not assigned");
-        return promiseMetadataURI(_promiseIdsByTokenId[tokenId]);
-    }
-
-    // PinkyPromise implementation
-    // ===========================
-
-    function promiseMetadataURI(uint256 promiseId) public view returns (string memory) {
-        Promise storage promise_ = _promises[promiseId];
-        string memory name = promise_.data.title;
-        string memory image = promiseImageURI(promiseId);
-        string memory description = "";
-        string memory external_url = string.concat("https://pp/promise/", promiseId.toString());
-        string memory background_color = PinkyPromiseSvg.promiseContentColor(promise_.data.color);
-        string memory flavor = PinkyPromiseSvg.promiseColorName(promise_.data.color);
-        return string.concat(
-            "data:application/json;base64,",
-            Base64.encode(
-                bytes(
-                    string.concat(
-                        "{",
-                        '"name":"',
-                        name,
-                        '", "description":"',
-                        description,
-                        '", "image":"',
-                        image,
-                        '", "external_url":"',
-                        external_url,
-                        '", "background_color":"',
-                        background_color,
-                        '", "attributes": [{ "trait_type": "Flavor", "value": "',
-                        flavor,
-                        '" }]',
-                        "}"
-                    )
-                )
-            )
-        );
-    }
-
-    function promiseImageURI(uint256 promiseId) public view returns (string memory) {
-        return string.concat("data:image/svg+xml;base64,", Base64.encode(bytes(promiseAsSvg(promiseId))));
-    }
-
-    function setEnsRegistry(address ensRegistry) public onlyOwner {
-        _ensRegistry = ensRegistry;
-    }
-
-    function setBpbDateTime(address bpbDateTime) public onlyOwner {
-        _bpbDateTime = bpbDateTime;
-    }
-
-    function stop() public onlyOwner {
-        stopped = true;
-    }
-
-    function total() public view returns (uint256) {
-        return _latestPromiseId;
-    }
-
-    // Get the promise state, based on promise.signees and promise.state
-    function _promiseState(Promise storage promise_) private view returns (PromiseState) {
-        // signees cannot be empty except when the promise does not exist (default value)
-        if (promise_.signees.length == 0) {
-            return PromiseState.None;
-        }
-        if (promise_.state < promise_.signees.length) {
-            return PromiseState.Draft;
-        }
-        if (promise_.state < promise_.signees.length * 2) {
-            return PromiseState.Final;
-        }
-        if (promise_.state == promise_.signees.length * 2 + 1) {
-            return PromiseState.Discarded;
-        }
-        return PromiseState.Nullified;
-    }
+    /*//////////////////////////////////////////////////////////////
+                          EXTERNAL FUNCTIONS
+    //////////////////////////////////////////////////////////////*/
 
     // Create a new promise
     function newPromise(PromiseData calldata promiseData, address[] calldata signees)
@@ -243,36 +155,8 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
 
         // If msg.sender is the sole signer, finalize the promise
         if (_promiseState(promise_) == PromiseState.Final) {
-            promise_.tokenIds = new uint256[](1);
-            promise_.tokenIds[0] = _mintPromiseNft(promiseId, msg.sender);
-            promise_.signedOn = block.timestamp;
-            emit PromiseUpdate(promiseId, PromiseState.Final);
+            _finalizeAndMint(promiseId, promise_.signees);
         }
-    }
-
-    // Mint a single promise NFT
-    function _mintPromiseNft(uint256 promiseId, address signee) private returns (uint256) {
-        uint256 tokenId = ++_latestTokenId;
-        _mint(signee, tokenId);
-        _promiseIdsByTokenId[tokenId] = promiseId;
-        emit Locked(tokenId);
-        return tokenId;
-    }
-
-    // Discard a promise. This is only possible when the promise is
-    // a draft, and it can get called by any of the signees.
-    function discard(uint256 promiseId) external {
-        Promise storage promise_ = _promises[promiseId];
-
-        require(_promiseState(promise_) == PromiseState.Draft, "PinkyPromise: only drafts can get discarded");
-        require(
-            _signingStates[promiseId][msg.sender] != SigningState.None,
-            "PinkyPromise: drafts can only get discarded by signees"
-        );
-
-        // discarded state, see Promise.state
-        promise_.state = promise_.signees.length * 2 + 1;
-        emit PromiseUpdate(promiseId, PromiseState.Discarded);
     }
 
     // Add a signature to a draft. Reverts if the signee has signed already.
@@ -294,14 +178,27 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         emit AddSignature(promiseId, msg.sender);
 
         // Last signer creates the NFTs
+        // on the above function as well
         if (_promiseState(promise_) == PromiseState.Final) {
-            promise_.tokenIds = new uint256[](promise_.signees.length);
-            for (uint256 i = 0; i < promise_.signees.length; i++) {
-                promise_.tokenIds[i] = _mintPromiseNft(promiseId, promise_.signees[i]);
-            }
-            promise_.signedOn = block.timestamp;
-            emit PromiseUpdate(promiseId, PromiseState.Final);
+            _finalizeAndMint(promiseId, promise_.signees);
         }
+    }
+
+
+    // Discard a promise. This is only possible when the promise is
+    // a draft, and it can get called by any of the signees.
+    function discard(uint256 promiseId) external {
+        Promise storage promise_ = _promises[promiseId];
+
+        require(_promiseState(promise_) == PromiseState.Draft, "PinkyPromise: only drafts can get discarded");
+        require(
+            _signingStates[promiseId][msg.sender] != SigningState.None,
+            "PinkyPromise: drafts can only get discarded by signees"
+        );
+
+        // discarded state, see Promise.state
+        promise_.state = promise_.signees.length * 2 + 1;
+        emit PromiseUpdate(promiseId, PromiseState.Discarded);
     }
 
     // Request to nullify a draft. Once all the signees have requested to
@@ -344,6 +241,101 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
 
         promise_.state--;
         emit CancelNullifyRequest(promiseId, msg.sender);
+    }
+
+    function locked(uint256 tokenId) external view returns (bool) {
+        require(_ownerOf[tokenId] != address(0), "PinkyPromise: tokenId not assigned");
+        return true; // always locked
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                    ERC721/5192 FUNCTION OVERRIDES
+    //////////////////////////////////////////////////////////////*/
+
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721) returns (bool) {
+        return interfaceId == type(IERC5192).interfaceId || super.supportsInterface(interfaceId);
+    }
+
+
+    function transferFrom(address, address, uint256) public pure override {
+        revert("PinkyPromise: transfers disallowed");
+    }
+
+    function safeTransferFrom(address, address, uint256) public pure override {
+        revert("PinkyPromise: transfers disallowed");
+    }
+
+    function safeTransferFrom(address, address, uint256, bytes calldata) public pure override {
+        revert("PinkyPromise: transfers disallowed");
+    }
+
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        require((_ownerOf[tokenId]) != address(0), "PinkyPromise: tokenId not assigned");
+        return promiseMetadataURI(_promiseIdsByTokenId[tokenId]);
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                   PinkyPromise SPECIFIC FUNCTIONS
+    //////////////////////////////////////////////////////////////*/
+
+    function promiseMetadataURI(uint256 promiseId) public view returns (string memory) {
+        Promise storage promise_ = _promises[promiseId];
+        string memory name = promise_.data.title;
+        string memory image = promiseImageURI(promiseId);
+        string memory description = "";
+        string memory external_url = string.concat("https://pp/promise/", promiseId.toString());
+        string memory background_color = PinkyPromiseSvg.promiseContentColor(promise_.data.color);
+        string memory flavor = PinkyPromiseSvg.promiseColorName(promise_.data.color);
+        return string.concat(
+            "data:application/json;base64,",
+            Base64.encode(
+                bytes(
+                    string.concat(
+                        "{",
+                        '"name":"',
+                        name,
+                        '", "description":"',
+                        description,
+                        '", "image":"',
+                        image,
+                        '", "external_url":"',
+                        external_url,
+                        '", "background_color":"',
+                        background_color,
+                        '", "attributes": [{ "trait_type": "Flavor", "value": "',
+                        flavor,
+                        '" }]',
+                        "}"
+                    )
+                )
+            )
+        );
+    }
+
+    // Render the promise as an svg image.
+    function promiseAsSvg(uint256 promiseId) public view returns (string memory) {
+        Promise storage promise_ = _promises[promiseId];
+        require(_promiseState(promise_) != PromiseState.None, "PinkyPromise: non existant promise");
+
+        PinkyPromiseSvg.Contracts memory contracts;
+        contracts.ensRegistry = _ensRegistry;
+        contracts.bpbDateTime = _bpbDateTime;
+
+        PinkyPromiseSvg.PinkyPromiseSvgData memory svgData;
+        svgData.promiseId = promiseId;
+        svgData.promiseState = promiseState(promiseId);
+        svgData.promiseData = promise_.data;
+        svgData.signedOn = promise_.signedOn;
+        svgData.signees = promise_.signees;
+
+        SigningState[] memory signingStates;
+        (, signingStates) = signeesStates(promiseId);
+
+        return PinkyPromiseSvg.promiseAsSvg(contracts, svgData, signingStates);
+    }
+
+    function promiseImageURI(uint256 promiseId) public view returns (string memory) {
+        return string.concat("data:image/svg+xml;base64,", Base64.encode(bytes(promiseAsSvg(promiseId))));
     }
 
     // Get the signees of a promise and their corresponding signing statuses.
@@ -391,25 +383,68 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         (signees, signingStates) = signeesStates(promiseId);
     }
 
-    // Render the promise as an svg image.
-    function promiseAsSvg(uint256 promiseId) public view returns (string memory) {
-        Promise storage promise_ = _promises[promiseId];
-        require(_promiseState(promise_) != PromiseState.None, "PinkyPromise: non existant promise");
-
-        PinkyPromiseSvg.Contracts memory contracts;
-        contracts.ensRegistry = _ensRegistry;
-        contracts.bpbDateTime = _bpbDateTime;
-
-        PinkyPromiseSvg.PinkyPromiseSvgData memory svgData;
-        svgData.promiseId = promiseId;
-        svgData.promiseState = promiseState(promiseId);
-        svgData.promiseData = promise_.data;
-        svgData.signedOn = promise_.signedOn;
-        svgData.signees = promise_.signees;
-
-        SigningState[] memory signingStates;
-        (, signingStates) = signeesStates(promiseId);
-
-        return PinkyPromiseSvg.promiseAsSvg(contracts, svgData, signingStates);
+    function total() public view returns (uint256) {
+        return _latestPromiseId;
     }
+
+    /*//////////////////////////////////////////////////////////////
+                           ADMIN FUNCTIONS
+    //////////////////////////////////////////////////////////////*/
+
+    function stop() public onlyOwner {
+        stopped = true;
+    }
+
+    function setEnsRegistry(address ensRegistry) public onlyOwner {
+        _ensRegistry = ensRegistry;
+    }
+
+    function setBpbDateTime(address bpbDateTime) public onlyOwner {
+        _bpbDateTime = bpbDateTime;
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                      INTERNAL/PRIVATE FUNCTIONS
+    //////////////////////////////////////////////////////////////*/
+
+    // Get the promise state, based on promise.signees and promise.state
+    function _promiseState(Promise storage promise_) internal view returns (PromiseState) {
+        // signees cannot be empty except when the promise does not exist (default value)
+        if (promise_.signees.length == 0) {
+            return PromiseState.None;
+        }
+        if (promise_.state < promise_.signees.length) {
+            return PromiseState.Draft;
+        }
+        if (promise_.state < promise_.signees.length * 2) {
+            return PromiseState.Final;
+        }
+        if (promise_.state == promise_.signees.length * 2 + 1) {
+            return PromiseState.Discarded;
+        }
+        return PromiseState.Nullified;
+    }
+
+    // Mint a single promise NFT
+    function _mintPromiseNft(uint256 promiseId, address signee) internal returns (uint256) {
+        uint256 tokenId = ++_latestTokenId;
+        _mint(signee, tokenId);
+        _promiseIdsByTokenId[tokenId] = promiseId;
+        emit Locked(tokenId);
+        return tokenId;
+    }
+
+    function _finalizeAndMint(uint256 promiseId, address[] storage signees) internal {
+        Promise storage promise_ = _promises[promiseId];
+
+        promise_.tokenIds = new uint256[](signees.length);
+        for (uint256 i = 0; i < signees.length; i++) {
+            promise_.tokenIds[i] = _mintPromiseNft(promiseId, signees[i]);
+        }
+
+        promise_.signedOn = block.timestamp;
+
+        emit PromiseUpdate(promiseId, PromiseState.Final);
+    }
+
 }
