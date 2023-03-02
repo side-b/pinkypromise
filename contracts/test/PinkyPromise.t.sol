@@ -71,7 +71,7 @@ contract PinkyPromiseTest is Test {
         address[] memory signees;
         PinkyPromise.SigningState[] memory signingStates;
 
-        (signees, signingStates) = pp.signeesStates(promiseId);
+        (signees, signingStates) = pp.promiseSignees(promiseId);
         assertEq(signees.length, 3);
         assertEq(signees[0], signees_[0]);
         assertEq(signees[1], signees_[1]);
@@ -86,7 +86,7 @@ contract PinkyPromiseTest is Test {
         vm.prank(signees_[2]);
         pp.sign(promiseId);
 
-        (signees, signingStates) = pp.signeesStates(promiseId);
+        (signees, signingStates) = pp.promiseSignees(promiseId);
         assertEq(uint256(signingStates[0]), uint256(PinkyPromise.SigningState.Signed));
         assertEq(uint256(signingStates[1]), uint256(PinkyPromise.SigningState.Pending));
         assertEq(uint256(signingStates[2]), uint256(PinkyPromise.SigningState.Signed));
@@ -118,7 +118,7 @@ contract PinkyPromiseTest is Test {
         state = pp.promiseState(promiseId);
         assertEq(uint256(state), uint256(PinkyPromise.PromiseState.Final));
 
-        (signees, signingStates) = pp.signeesStates(promiseId);
+        (signees, signingStates) = pp.promiseSignees(promiseId);
         assertEq(uint256(signingStates[0]), uint256(PinkyPromise.SigningState.Signed));
         assertEq(uint256(signingStates[1]), uint256(PinkyPromise.SigningState.Signed));
         assertEq(uint256(signingStates[2]), uint256(PinkyPromise.SigningState.Signed));
@@ -184,7 +184,7 @@ contract PinkyPromiseTest is Test {
         vm.prank(makeAddr("alice"));
         pp.nullify(promiseId);
 
-        (, signingStates) = pp.signeesStates(promiseId);
+        (, signingStates) = pp.promiseSignees(promiseId);
 
         assertEq(uint256(signingStates[0]), uint256(PinkyPromise.SigningState.Signed));
         assertEq(uint256(signingStates[1]), uint256(PinkyPromise.SigningState.NullRequest));
@@ -194,7 +194,7 @@ contract PinkyPromiseTest is Test {
         vm.prank(makeAddr("bob"));
         pp.nullify(promiseId);
 
-        (, signingStates) = pp.signeesStates(promiseId);
+        (, signingStates) = pp.promiseSignees(promiseId);
 
         assertEq(uint256(signingStates[0]), uint256(PinkyPromise.SigningState.Signed));
         assertEq(uint256(signingStates[1]), uint256(PinkyPromise.SigningState.NullRequest));
@@ -204,7 +204,7 @@ contract PinkyPromiseTest is Test {
         vm.prank(makeAddr("bob"));
         pp.cancelNullify(promiseId);
 
-        (, signingStates) = pp.signeesStates(promiseId);
+        (, signingStates) = pp.promiseSignees(promiseId);
 
         assertEq(uint256(signingStates[0]), uint256(PinkyPromise.SigningState.Signed));
         assertEq(uint256(signingStates[1]), uint256(PinkyPromise.SigningState.NullRequest));
@@ -237,7 +237,7 @@ contract PinkyPromiseTest is Test {
         }
         assertEq(entries[1 + signees_.length].topics[0], keccak256("PromiseUpdate(uint256,uint8)"));
 
-        (, signingStates) = pp.signeesStates(promiseId);
+        (, signingStates) = pp.promiseSignees(promiseId);
 
         assertEq(uint256(signingStates[0]), uint256(PinkyPromise.SigningState.NullRequest));
         assertEq(uint256(signingStates[1]), uint256(PinkyPromise.SigningState.NullRequest));
