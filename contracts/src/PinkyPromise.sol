@@ -97,6 +97,15 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
     event NullifyRequest(uint256 indexed promiseId, address indexed signer);
     event CancelNullifyRequest(uint256 indexed promiseId, address indexed signer);
 
+    /*//////////////////////////////////////////////////////////////
+                              MODIFIERS
+    //////////////////////////////////////////////////////////////*/
+
+    modifier notStopped() {
+        require(!stopped, "PinkyPromise: the contract has been stopped and promises cannot be created anymore");
+        _;
+    }
+
     constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) Owned(msg.sender) {}
 
     /*//////////////////////////////////////////////////////////////
@@ -376,6 +385,14 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
 
     function total() public view returns (uint256) {
         return _latestPromiseId;
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                           ADMIN FUNCTIONS
+    //////////////////////////////////////////////////////////////*/
+
+    function stop() public onlyOwner {
+        stopped = true;
     }
 
     function setEnsRegistry(address ensRegistry) public onlyOwner {
