@@ -91,6 +91,11 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
 
     constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) Owned(msg.sender) {}
 
+    modifier notStopped() {
+        require(!stopped, "PinkyPromise: the contract has been stopped and promises cannot be created anymore");
+        _;
+    }
+
     // ERC721 + ERC5192 related methods
     // ================================
 
@@ -198,9 +203,9 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
     // Create a new promise
     function newPromise(PromiseData calldata promiseData, address[] calldata signees)
         external
+        notStopped
         returns (uint256 promiseId)
     {
-        require(!_stopped, "PinkyPromise: the contract has been stopped and promises cannot be created anymore");
         require(signees.length > 0, "PinkyPromise: a promise requires at least one signee");
 
         promiseId = ++_latestPromiseId;
