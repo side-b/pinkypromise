@@ -121,6 +121,7 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
             if (signees[i] == msg.sender) {
                 promise_.state++;
                 _signingStates[promiseId][msg.sender] = SigningState.Signed;
+                // TODO: Probably could emit this event later, or just not sign at all. Mainly due to indexing concerns
                 emit AddSignature(promiseId, msg.sender);
             } else {
                 _signingStates[promiseId][signees[i]] = SigningState.Pending;
@@ -142,10 +143,7 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
 
         // If msg.sender is the sole signer, finalize the promise
         if (_promiseState(promise_) == PromiseState.Final) {
-            promise_.tokenIds = new uint256[](1);
-            promise_.tokenIds[0] = _mintPromiseNft(promiseId, msg.sender);
-            promise_.signedOn = block.timestamp;
-            emit PromiseUpdate(promiseId, PromiseState.Final);
+            _finalizeAndMint(promiseId, promise_.signees);
         }
     }
 
@@ -168,15 +166,12 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         emit AddSignature(promiseId, msg.sender);
 
         // Last signer creates the NFTs
+        // on the above function as well
         if (_promiseState(promise_) == PromiseState.Final) {
-            promise_.tokenIds = new uint256[](promise_.signees.length);
-            for (uint256 i = 0; i < promise_.signees.length; i++) {
-                promise_.tokenIds[i] = _mintPromiseNft(promiseId, promise_.signees[i]);
-            }
-            promise_.signedOn = block.timestamp;
-            emit PromiseUpdate(promiseId, PromiseState.Final);
+            _finalizeAndMint(promiseId, promise_.signees);
         }
     }
+
 
     // Discard a promise. This is only possible when the promise is
     // a draft, and it can get called by any of the signees.
@@ -267,8 +262,9 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         return promiseMetadataURI(_promiseIdsByTokenId[tokenId]);
     }
 
-    // PinkyPromise implementation
-    // ===========================
+    /*//////////////////////////////////////////////////////////////
+                   PinkyPromise SPECIFIC FUNCTIONS
+    //////////////////////////////////////////////////////////////*/
 
     function promiseMetadataURI(uint256 promiseId) public view returns (string memory) {
         Promise storage promise_ = _promises[promiseId];
@@ -304,48 +300,30 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         );
     }
 
+    // Render the promise as an svg image.
+    function promiseAsSvg(uint256 promiseId) public view returns (string memory) {
+        Promise storage promise_ = _promises[promiseId];
+        require(_promiseState(promise_) != PromiseState.None, "PinkyPromise: non existant promise");
+
+        PinkyPromiseSvg.Contracts memory contracts;
+        contracts.ensRegistry = _ensRegistry;
+        contracts.bpbDateTime = _bpbDateTime;
+
+        PinkyPromiseSvg.PinkyPromiseSvgData memory svgData;
+        svgData.promiseId = promiseId;
+        svgData.promiseState = promiseState(promiseId);
+        svgData.promiseData = promise_.data;
+        svgData.signedOn = promise_.signedOn;
+        svgData.signees = promise_.signees;
+
+        SigningState[] memory signingStates;
+        (, signingStates) = signeesStates(promiseId);
+
+        return PinkyPromiseSvg.promiseAsSvg(contracts, svgData, signingStates);
+    }
+
     function promiseImageURI(uint256 promiseId) public view returns (string memory) {
         return string.concat("data:image/svg+xml;base64,", Base64.encode(bytes(promiseAsSvg(promiseId))));
-    }
-
-    function setEnsRegistry(address ensRegistry) public onlyOwner {
-        _ensRegistry = ensRegistry;
-    }
-
-    function setBpbDateTime(address bpbDateTime) public onlyOwner {
-        _bpbDateTime = bpbDateTime;
-    }
-
-    function total() public view returns (uint256) {
-        return _latestPromiseId;
-    }
-
-    // Get the promise state, based on promise.signees and promise.state
-    function _promiseState(Promise storage promise_) private view returns (PromiseState) {
-        // signees cannot be empty except when the promise does not exist (default value)
-        if (promise_.signees.length == 0) {
-            return PromiseState.None;
-        }
-        if (promise_.state < promise_.signees.length) {
-            return PromiseState.Draft;
-        }
-        if (promise_.state < promise_.signees.length * 2) {
-            return PromiseState.Final;
-        }
-        if (promise_.state == promise_.signees.length * 2 + 1) {
-            return PromiseState.Discarded;
-        }
-        return PromiseState.Nullified;
-    }
-
-
-    // Mint a single promise NFT
-    function _mintPromiseNft(uint256 promiseId, address signee) private returns (uint256) {
-        uint256 tokenId = ++_latestTokenId;
-        _mint(signee, tokenId);
-        _promiseIdsByTokenId[tokenId] = promiseId;
-        emit Locked(tokenId);
-        return tokenId;
     }
 
     // Get the signees of a promise and their corresponding signing statuses.
@@ -393,25 +371,60 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         (signees, signingStates) = signeesStates(promiseId);
     }
 
-    // Render the promise as an svg image.
-    function promiseAsSvg(uint256 promiseId) public view returns (string memory) {
-        Promise storage promise_ = _promises[promiseId];
-        require(_promiseState(promise_) != PromiseState.None, "PinkyPromise: non existant promise");
-
-        PinkyPromiseSvg.Contracts memory contracts;
-        contracts.ensRegistry = _ensRegistry;
-        contracts.bpbDateTime = _bpbDateTime;
-
-        PinkyPromiseSvg.PinkyPromiseSvgData memory svgData;
-        svgData.promiseId = promiseId;
-        svgData.promiseState = promiseState(promiseId);
-        svgData.promiseData = promise_.data;
-        svgData.signedOn = promise_.signedOn;
-        svgData.signees = promise_.signees;
-
-        SigningState[] memory signingStates;
-        (, signingStates) = signeesStates(promiseId);
-
-        return PinkyPromiseSvg.promiseAsSvg(contracts, svgData, signingStates);
+    function total() public view returns (uint256) {
+        return _latestPromiseId;
     }
+
+    function setEnsRegistry(address ensRegistry) public onlyOwner {
+        _ensRegistry = ensRegistry;
+    }
+
+    function setBpbDateTime(address bpbDateTime) public onlyOwner {
+        _bpbDateTime = bpbDateTime;
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                      INTERNAL/PRIVATE FUNCTIONS
+    //////////////////////////////////////////////////////////////*/
+
+    // Get the promise state, based on promise.signees and promise.state
+    function _promiseState(Promise storage promise_) internal view returns (PromiseState) {
+        // signees cannot be empty except when the promise does not exist (default value)
+        if (promise_.signees.length == 0) {
+            return PromiseState.None;
+        }
+        if (promise_.state < promise_.signees.length) {
+            return PromiseState.Draft;
+        }
+        if (promise_.state < promise_.signees.length * 2) {
+            return PromiseState.Final;
+        }
+        if (promise_.state == promise_.signees.length * 2 + 1) {
+            return PromiseState.Discarded;
+        }
+        return PromiseState.Nullified;
+    }
+
+    // Mint a single promise NFT
+    function _mintPromiseNft(uint256 promiseId, address signee) internal returns (uint256) {
+        uint256 tokenId = ++_latestTokenId;
+        _mint(signee, tokenId);
+        _promiseIdsByTokenId[tokenId] = promiseId;
+        emit Locked(tokenId);
+        return tokenId;
+    }
+
+    function _finalizeAndMint(uint256 promiseId, address[] storage signees) internal {
+        Promise storage promise_ = _promises[promiseId];
+
+        promise_.tokenIds = new uint256[](signees.length);
+        for (uint256 i = 0; i < signees.length; i++) {
+            promise_.tokenIds[i] = _mintPromiseNft(promiseId, signees[i]);
+        }
+
+        promise_.signedOn = block.timestamp;
+
+        emit PromiseUpdate(promiseId, PromiseState.Final);
+    }
+
 }
