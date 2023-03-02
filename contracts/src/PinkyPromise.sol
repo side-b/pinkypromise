@@ -77,7 +77,7 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
     address private _bpbDateTime;
 
     // Creation of new promises can be stopped, making it possible to deploy a new version of the contract without ID conflicts.
-    bool private _stopped = false;
+    bool public stopped = false;
 
     // promise state change
     event PromiseUpdate(uint256 indexed promiseId, PromiseState state);
@@ -170,7 +170,7 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
     }
 
     function stop() public onlyOwner {
-        _stopped = true;
+        stopped = true;
     }
 
     function total() public view returns (uint256) {
