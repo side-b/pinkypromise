@@ -15,23 +15,23 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
                                 STATE
     //////////////////////////////////////////////////////////////*/
 
-    uint256 private _latestPromiseId; // 0
-    uint256 private _latestTokenId; // 0
+    uint256 public _latestPromiseId; // 0
+    uint256 public _latestTokenId; // 0
 
-    mapping(uint256 => Promise) private _promises;
-    mapping(uint256 => uint256) private _promiseIdsByTokenId;
-    mapping(address => uint256[]) private _promiseIdsBySignee;
+    mapping(uint256 => Promise) public _promises;
+    mapping(uint256 => uint256) public _promiseIdsByTokenId;
+    mapping(address => uint256[]) public _promiseIdsBySignee;
 
     // promiseId => signer => SigningState
     // We use SigningState rather than a boolean in this mapping,
     // so we can rely on SigningState.None (the default) to ensure that
     // Promise.signees only contain unique signatures (see newPromise()).
-    mapping(uint256 => mapping(address => SigningState)) private _signingStates;
+    mapping(uint256 => mapping(address => SigningState)) public _signingStates;
 
-    address private _ensRegistry;
+    address public _ensRegistry;
 
     // should point to https://github.com/bokkypoobah/BokkyPooBahsDateTimeLibrary
-    address private _bpbDateTime;
+    address public _bpbDateTime;
 
     struct PromiseData {
         PromiseColor color;
@@ -121,7 +121,6 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
             if (signees[i] == msg.sender) {
                 promise_.state++;
                 _signingStates[promiseId][msg.sender] = SigningState.Signed;
-                // TODO: Probably could emit this event later, or just not sign at all. Mainly due to indexing concerns
                 emit AddSignature(promiseId, msg.sender);
             } else {
                 _signingStates[promiseId][signees[i]] = SigningState.Pending;

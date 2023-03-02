@@ -5,9 +5,9 @@ import "solmate/utils/LibString.sol";
 import {StringPad} from "src/lib/StringPad.sol";
 
 interface BokkyPooBahsDateTimeContract {
-    function getYear(uint256 timestamp) pure external returns (uint256 year);
-    function getMonth(uint256 timestamp) pure external returns (uint256 month);
-    function getDay(uint256 timestamp) pure external returns (uint256 day);
+    function getYear(uint256 timestamp) external pure returns (uint256 year);
+    function getMonth(uint256 timestamp) external pure returns (uint256 month);
+    function getDay(uint256 timestamp) external pure returns (uint256 day);
 }
 
 library DateUtils {
