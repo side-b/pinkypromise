@@ -166,14 +166,16 @@ library PinkyPromiseSvg {
 
         if (textBlock.startsWith(h1Tag)) {
             // stripPrefix
-            return string.concat("<h1>", textBlock.getSubslice(2, textBlock.len()).toString(), "</h1>");
+            return
+                string.concat("<h1>", lineBreaksToHtml(textBlock.getSubslice(2, textBlock.len()).toString()), "</h1>");
         }
 
         if (textBlock.startsWith(h2Tag)) {
-            return string.concat("<h2>", textBlock.getSubslice(3, textBlock.len()).toString(), "</h2>");
+            return
+                string.concat("<h2>", lineBreaksToHtml(textBlock.getSubslice(3, textBlock.len()).toString()), "</h2>");
         }
 
-        return string.concat("<p>", textBlock.toString(), "</p>");
+        return string.concat("<p>", lineBreaksToHtml(textBlock.toString()), "</p>");
     }
 
     function lineBreaksToHtml(string memory text) public view returns (string memory) {
