@@ -335,6 +335,20 @@ contract PinkyPromiseTest is Test {
         pp.locked(0x0);
     }
 
+    function test_stopped() public {
+        address[] memory signees_ = new address[](1);
+        signees_[0] = address(this);
+
+        PinkyPromise.PromiseData memory promiseData;
+        pp.newPromise(promiseData, signees_);
+        assertTrue(!pp.stopped());
+
+        pp.stop();
+        assertTrue(pp.stopped());
+        vm.expectRevert("PinkyPromise: the contract has been stopped and promises cannot be created anymore");
+        pp.newPromise(promiseData, signees_);
+    }
+
     function test_erc5192Interface() public {
         assertTrue(pp.supportsInterface(ERC5192ID));
     }

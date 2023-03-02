@@ -84,6 +84,9 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
                                 EVENTS
     //////////////////////////////////////////////////////////////*/
 
+    // Creation of new promises can be stopped, making it possible to deploy a new version of the contract without ID conflicts.
+    bool public stopped = false;
+
     // promise state change
     event PromiseUpdate(uint256 indexed promiseId, PromiseState state);
 
@@ -103,6 +106,7 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
     // Create a new promise
     function newPromise(PromiseData calldata promiseData, address[] calldata signees)
         external
+        notStopped
         returns (uint256 promiseId)
     {
         require(signees.length > 0, "PinkyPromise: a promise requires at least one signee");
