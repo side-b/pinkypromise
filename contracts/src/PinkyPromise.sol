@@ -8,6 +8,10 @@ import "solmate/utils/LibString.sol";
 import {IERC5192} from "src/interfaces/IERC5192.sol";
 import {PinkyPromiseSvg} from "./PinkyPromiseSvg.sol";
 
+/// @title PinkyPromise
+/// @author Pierre Bertet
+/// @notice A contract to create and sign "promises", which are soulbound NFTs.
+/// @dev ERC721 & IERC5192 compliant. The NFT contract is also ownable
 contract PinkyPromise is ERC721, IERC5192, Owned {
     using LibString for uint256;
 
@@ -15,22 +19,30 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
                                 STATE
     //////////////////////////////////////////////////////////////*/
 
+    /// @notice The latest promise ID.
+    /// Note that the promise ID is NOT equivalent to a token ID, as a promise can have many signees,
+    /// and each one of them will receive a separate NFT, corresponding to the promise.
     uint256 public latestPromiseId; // 0
+    /// @notice The latest token ID.
     uint256 public latestTokenId; // 0
 
     mapping(uint256 => Promise) public promises;
+    /// @notice Mapping of a certain token ID to the promise it's associated with.
     mapping(uint256 => uint256) public promiseIdsByTokenId;
+    /// @notice Mapping of a certain signee address to the promises he's associated with.
     mapping(address => uint256[]) public promiseIdsBySignee;
 
-    // promiseId => signer => SigningState
-    // We use SigningState rather than a boolean in this mapping,
-    // so we can rely on SigningState.None (the default) to ensure that
-    // Promise.signees only contain unique signatures (see newPromise()).
+    /// @notice promiseId => signer => SigningState
+    /// We use SigningState rather than a boolean in this mapping,
+    /// so we can rely on SigningState.None (the default) to ensure that
+    /// Promise.signees only contain unique signatures (see newPromise()).
     mapping(uint256 => mapping(address => SigningState)) public signingStatesByPromise;
 
+    /// @notice The ENS registry address.
     address public ensRegistry;
 
-    // should point to https://github.com/bokkypoobah/BokkyPooBahsDateTimeLibrary
+    /// @notice The BPBDateTime library address.
+    /// See: https://github.com/bokkypoobah/BokkyPooBahsDateTimeLibrary
     address public bpbDateTime;
 
     string networkPrefix;
@@ -47,16 +59,15 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         address[] signees;
         uint256[] tokenIds;
         uint256 signedOn;
-        //
-        // Promise.state keeps track of the state of the promise by using a counter:
-        //
-        //   state <  signees.length         => contract just created
-        //   state >= signees.length         => contract signed
-        //   state == signees.length * 2     => contract nullified
-        //   state == signees.length * 2 + 1 => contract discarded
-        //
-        // See also state(promiseId).
-        //
+        /// The promise state. This works using a counter,
+        /// with several values representing different states:
+        /// state <  signees.length         => contract just created
+        /// state >= signees.length         => contract signed
+        /// state == signees.length * 2     => contract nullified
+        /// state == signees.length * 2 + 1 => contract discarded
+        ///
+        /// See also state(promiseId).
+        ///
         uint256 state;
     }
 
@@ -86,17 +97,18 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
                                 EVENTS
     //////////////////////////////////////////////////////////////*/
 
-    // Creation of new promises can be stopped, making it possible to deploy a new version of the contract without ID conflicts.
+    /// @notice Indicates if the minting has stopped.
+    /// Creation of new promises can be stopped, making it possible to deploy a new version of the contract without ID conflicts.
     bool public stopped = false;
 
-    // promise state change
+    /// @dev Emits when a promise is updated.
+    /// This event is emitted when a promise is created, finalized (all signees have signed), nullified or discarded.
     event PromiseUpdate(uint256 indexed promiseId, PromiseState state);
-
-    // single signature added
+    /// @dev Emits when a single signature is added
     event AddSignature(uint256 indexed promiseId, address indexed signer);
-
-    // request to nullify the promise
+    /// @dev Emitted when a signee requests to nullify the promise
     event NullifyRequest(uint256 indexed promiseId, address indexed signer);
+    /// @dev Emitted when a signe cancels a request to nullify the promise.
     event CancelNullifyRequest(uint256 indexed promiseId, address indexed signer);
 
     /*//////////////////////////////////////////////////////////////
@@ -124,7 +136,11 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
                           EXTERNAL FUNCTIONS
     //////////////////////////////////////////////////////////////*/
 
-    // Create a new promise
+    /// @notice Creates a new promise.
+    /// @dev If one of the signees is msg.sender, the promise is automatically signed. Each signee receives an NFT with the promise.
+    /// @param promiseData The promise metadata to put in the NFT.
+    /// @param signees The signees of the promise.
+    /// @return promiseId The promise ID.
     function newPromise(PromiseData calldata promiseData, address[] calldata signees)
         external
         notStopped
@@ -172,7 +188,9 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         }
     }
 
-    // Add a signature to a draft. Reverts if the signee has signed already.
+    /// @notice Add a signature to a promise draft.
+    /// @dev Reverts if the signee has signed already or if the promise is already discarded or nullified.
+    /// @param promiseId The promise ID.
     function sign(uint256 promiseId) external {
         Promise storage promise_ = promises[promiseId];
 
@@ -197,8 +215,9 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         }
     }
 
-    // Discard a promise. This is only possible when the promise is
-    // a draft, and it can get called by any of the signees.
+    /// @notice Discard a promise.
+    /// @dev This is only possible when the promise is a draft, and it can get called by any of the signees.
+    /// @param promiseId The promise ID.
     function discard(uint256 promiseId) external {
         Promise storage promise_ = promises[promiseId];
 
@@ -213,10 +232,11 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         emit PromiseUpdate(promiseId, PromiseState.Discarded);
     }
 
-    // Request to nullify a draft. Once all the signees have requested to
-    // nullify, the promise becomes nullified. This is only possible when the
-    // promise has been signed by all signees. Reverts if the signee has
-    // requested to nullify already.
+    /// @notice Request to nullify a promise. Once all the signees have requested to
+    /// nullify, the promise becomes nullified. This is only possible when the
+    /// promise has been signed by all signees. Reverts if the signee has
+    /// requested to nullify already.
+    /// @param promiseId The promise ID.
     function nullify(uint256 promiseId) external {
         Promise storage promise_ = promises[promiseId];
 
@@ -239,8 +259,9 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         }
     }
 
-    // Cancel a single nullification request. This is so that signees having requested a
-    // nullification can change their mind before the others do it as well.
+    /// @notice Cancel a single nullification request. This is so that signees having requested a
+    /// nullification can change their mind before the others do it as well.
+    /// @dev This is only possible if the promise is signed by all signees AND the current signee has tried to nullify the promise.
     function cancelNullify(uint256 promiseId) external {
         Promise storage promise_ = promises[promiseId];
 
@@ -256,16 +277,11 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         emit CancelNullifyRequest(promiseId, msg.sender);
     }
 
-    function locked(uint256 tokenId) external view returns (bool) {
-        require(_ownerOf[tokenId] != address(0), "PinkyPromise: tokenId not assigned");
-        return true; // always locked
-    }
-
     /*//////////////////////////////////////////////////////////////
                     ERC721/5192 FUNCTION OVERRIDES
     //////////////////////////////////////////////////////////////*/
 
-    function supportsInterface(bytes4 interfaceId) public view override (ERC721) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721) returns (bool) {
         return interfaceId == type(IERC5192).interfaceId || super.supportsInterface(interfaceId);
     }
 
@@ -286,10 +302,19 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         return promiseMetadataURI(promiseIdsByTokenId[tokenId]);
     }
 
+    /// @notice Check if the token is soulbound. In the case of Pinky Promises, they always are..
+    function locked(uint256 tokenId) external view returns (bool) {
+        require(_ownerOf[tokenId] != address(0), "PinkyPromise: tokenId not assigned");
+        return true; // always locked
+    }
+
     /*//////////////////////////////////////////////////////////////
                    PinkyPromise SPECIFIC FUNCTIONS
     //////////////////////////////////////////////////////////////*/
 
+    /// @notice Compute the metadata URI for a promise.
+    /// @param promiseId The promise ID.
+    /// @return The metadata URI.
     function promiseMetadataURI(uint256 promiseId) public view returns (string memory) {
         Promise storage promise_ = promises[promiseId];
         string memory name = promise_.data.title;
@@ -324,7 +349,9 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         );
     }
 
-    // Render the promise as an svg image.
+    /// @notice Renders the promise as an SVG.
+    /// @dev This uses the PinkyPromiseSvg library to render the promise.
+    /// @return The SVG as a string.
     function promiseAsSvg(uint256 promiseId) public view returns (string memory) {
         Promise storage promise_ = promises[promiseId];
         require(_promiseState(promise_) != PromiseState.None, "PinkyPromise: non existant promise");
@@ -347,11 +374,16 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         return PinkyPromiseSvg.promiseAsSvg(contracts, svgData, signingStates);
     }
 
+    /// @notice Renders the promise as an SVG and returns it as a data URI.
+    /// @param promiseId The promise ID.
+    /// @return The SVG as a data URI.
     function promiseImageURI(uint256 promiseId) public view returns (string memory) {
         return string.concat("data:image/svg+xml;base64,", Base64.encode(bytes(promiseAsSvg(promiseId))));
     }
 
-    // Get the signees of a promise and their signing states.
+    /// @notice Get the promise signees and their signing states.
+    /// @param promiseId The promise ID.
+    /// @return The signees and their signing states.
     function promiseSignees(uint256 promiseId)
         public
         view
@@ -367,14 +399,23 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         }
     }
 
+    /// @notice Get the promises a signee is involved in.
+    /// @param signee The signee address.
+    /// @return promiseIds The promise IDs.
     function signeePromises(address signee) public view returns (uint256[] memory promiseIds) {
         promiseIds = promiseIdsBySignee[signee];
     }
 
+    /// @notice Get the state of a promise.
+    /// @param promiseId The promise ID.
+    /// @return The promise state.
     function promiseState(uint256 promiseId) public view returns (PromiseState) {
         return _promiseState(promises[promiseId]);
     }
 
+    /// @notice Get all relevant information about a promise, including its data, state, signees, signing states and signed on date.
+    /// @param promiseId The promise ID.
+    /// @return All the promise information.
     function promiseInfo(uint256 promiseId)
         public
         view
@@ -396,6 +437,9 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         (signees, signingStates) = promiseSignees(promiseId);
     }
 
+    /// @notice Get the total number of promises.
+    /// @dev This is NOT equal to the amount of NFTs minted.
+    /// @return The total number of promises.
     function total() public view returns (uint256) {
         return latestPromiseId;
     }
