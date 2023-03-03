@@ -4,13 +4,28 @@ export const PinkyPromiseAbi = [
     "inputs": [
       {
         "internalType": "string",
-        "name": "_name",
+        "name": "name_",
         "type": "string",
       },
       {
         "internalType": "string",
-        "name": "_symbol",
+        "name": "symbol_",
         "type": "string",
+      },
+      {
+        "internalType": "string",
+        "name": "networkPrefix_",
+        "type": "string",
+      },
+      {
+        "internalType": "address",
+        "name": "ensRegistry_",
+        "type": "address",
+      },
+      {
+        "internalType": "address",
+        "name": "bpbDateTime_",
+        "type": "address",
       },
     ],
     "stateMutability": "nonpayable",
@@ -250,6 +265,19 @@ export const PinkyPromiseAbi = [
     "type": "function",
   },
   {
+    "inputs": [],
+    "name": "bpbDateTime",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address",
+      },
+    ],
+    "stateMutability": "view",
+    "type": "function",
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -273,6 +301,19 @@ export const PinkyPromiseAbi = [
     "name": "discard",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function",
+  },
+  {
+    "inputs": [],
+    "name": "ensRegistry",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address",
+      },
+    ],
+    "stateMutability": "view",
     "type": "function",
   },
   {
@@ -313,6 +354,32 @@ export const PinkyPromiseAbi = [
         "internalType": "bool",
         "name": "",
         "type": "bool",
+      },
+    ],
+    "stateMutability": "view",
+    "type": "function",
+  },
+  {
+    "inputs": [],
+    "name": "latestPromiseId",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256",
+      },
+    ],
+    "stateMutability": "view",
+    "type": "function",
+  },
+  {
+    "inputs": [],
+    "name": "latestTokenId",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256",
       },
     ],
     "stateMutability": "view",
@@ -463,6 +530,49 @@ export const PinkyPromiseAbi = [
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "",
+        "type": "address",
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256",
+      },
+    ],
+    "name": "promiseIdsBySignee",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256",
+      },
+    ],
+    "stateMutability": "view",
+    "type": "function",
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256",
+      },
+    ],
+    "name": "promiseIdsByTokenId",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256",
+      },
+    ],
+    "stateMutability": "view",
+    "type": "function",
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint256",
         "name": "promiseId",
         "type": "uint256",
@@ -567,12 +677,87 @@ export const PinkyPromiseAbi = [
         "type": "uint256",
       },
     ],
+    "name": "promiseSignees",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "signees",
+        "type": "address[]",
+      },
+      {
+        "internalType": "enum PinkyPromise.SigningState[]",
+        "name": "signingStates",
+        "type": "uint8[]",
+      },
+    ],
+    "stateMutability": "view",
+    "type": "function",
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "promiseId",
+        "type": "uint256",
+      },
+    ],
     "name": "promiseState",
     "outputs": [
       {
         "internalType": "enum PinkyPromise.PromiseState",
         "name": "",
         "type": "uint8",
+      },
+    ],
+    "stateMutability": "view",
+    "type": "function",
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256",
+      },
+    ],
+    "name": "promises",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "enum PinkyPromise.PromiseColor",
+            "name": "color",
+            "type": "uint8",
+          },
+          {
+            "internalType": "uint16",
+            "name": "height",
+            "type": "uint16",
+          },
+          {
+            "internalType": "string",
+            "name": "title",
+            "type": "string",
+          },
+          {
+            "internalType": "string",
+            "name": "body",
+            "type": "string",
+          },
+        ],
+        "internalType": "struct PinkyPromise.PromiseData",
+        "name": "data",
+        "type": "tuple",
+      },
+      {
+        "internalType": "uint256",
+        "name": "signedOn",
+        "type": "uint256",
+      },
+      {
+        "internalType": "uint256",
+        "name": "state",
+        "type": "uint256",
       },
     ],
     "stateMutability": "view",
@@ -651,7 +836,7 @@ export const PinkyPromiseAbi = [
     "inputs": [
       {
         "internalType": "address",
-        "name": "bpbDateTime",
+        "name": "bpbDateTime_",
         "type": "address",
       },
     ],
@@ -664,7 +849,7 @@ export const PinkyPromiseAbi = [
     "inputs": [
       {
         "internalType": "address",
-        "name": "ensRegistry",
+        "name": "ensRegistry_",
         "type": "address",
       },
     ],
@@ -709,21 +894,41 @@ export const PinkyPromiseAbi = [
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "promiseId",
+        "name": "",
         "type": "uint256",
       },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address",
+      },
     ],
-    "name": "signeesStates",
+    "name": "signingStatesByPromise",
     "outputs": [
       {
-        "internalType": "address[]",
-        "name": "signees",
-        "type": "address[]",
+        "internalType": "enum PinkyPromise.SigningState",
+        "name": "",
+        "type": "uint8",
       },
+    ],
+    "stateMutability": "view",
+    "type": "function",
+  },
+  {
+    "inputs": [],
+    "name": "stop",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function",
+  },
+  {
+    "inputs": [],
+    "name": "stopped",
+    "outputs": [
       {
-        "internalType": "enum PinkyPromise.SigningState[]",
-        "name": "signingStates",
-        "type": "uint8[]",
+        "internalType": "bool",
+        "name": "",
+        "type": "bool",
       },
     ],
     "stateMutability": "view",
