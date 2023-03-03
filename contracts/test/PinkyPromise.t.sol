@@ -28,6 +28,7 @@ contract PinkyPromiseTest is Test {
         pp = new PinkyPromise(
             "Pinky Promise", 
             "PP", 
+            vm.envString("NETWORK_PREFIX_MAINNET"),
             vm.envAddress("ENS_REGISTRY_MAINNET"),
             vm.envAddress("BPB_DATETIME_MAINNET")
         );
