@@ -110,22 +110,6 @@ library PinkyPromiseSvg {
         revert("Incorrect PromiseColor value in promiseColor()");
     }
 
-    function promiseColorName(PinkyPromise.PromiseColor color) public pure returns (string memory) {
-        if (color == PinkyPromise.PromiseColor.Pinky) {
-            return "Pinky";
-        }
-        if (color == PinkyPromise.PromiseColor.Electric) {
-            return "Electric";
-        }
-        if (color == PinkyPromise.PromiseColor.RedAlert) {
-            return "Red Alert";
-        }
-        if (color == PinkyPromise.PromiseColor.Solemn) {
-            return "Solemn";
-        }
-        revert("Incorrect PromiseColor value in promiseColorName()");
-    }
-
     function promiseContentColor(PinkyPromise.PromiseColor color) public pure returns (string memory) {
         if (color == PinkyPromise.PromiseColor.Pinky) {
             return "FFFFFF";
@@ -140,6 +124,22 @@ library PinkyPromiseSvg {
             return "1E1E1E";
         }
         revert("Incorrect PromiseColor value in promiseContentColor()");
+    }
+
+    function promiseColorName(PinkyPromise.PromiseColor color) public pure returns (string memory) {
+        if (color == PinkyPromise.PromiseColor.Pinky) {
+            return "Pinky";
+        }
+        if (color == PinkyPromise.PromiseColor.Electric) {
+            return "Electric";
+        }
+        if (color == PinkyPromise.PromiseColor.RedAlert) {
+            return "Red Alert";
+        }
+        if (color == PinkyPromise.PromiseColor.Solemn) {
+            return "Solemn";
+        }
+        revert("Incorrect PromiseColor value in promiseColorName()");
     }
 
     function promiseStatusLabel(PinkyPromise.PromiseState state) public pure returns (string memory) {
