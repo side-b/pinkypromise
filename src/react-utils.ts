@@ -71,20 +71,23 @@ export function useChainedProgress(
   return springs;
 }
 
-export function useTxUrl() {
+export function useExplorerBaseUrl() {
   const { chain } = useNetwork();
+  return chain?.blockExplorers?.etherscan.url ?? undefined;
+}
+
+export function useTxUrl() {
+  const baseUrl = useExplorerBaseUrl();
   return useCallback((hash: string) => {
-    const base = chain?.blockExplorers?.etherscan.url;
-    return base ? `${base}/tx/${hash}` : null;
-  }, [chain]);
+    return baseUrl ? `${baseUrl}/tx/${hash}` : null;
+  }, [baseUrl]);
 }
 
 export function useContractUrl() {
-  const { chain } = useNetwork();
+  const baseUrl = useExplorerBaseUrl();
   return useCallback((address: Address, file: number = 1, line: number = 1) => {
-    const base = chain?.blockExplorers?.etherscan.url;
-    return base ? `${base}/address/${address}#code#F${file}#L${line}` : null;
-  }, [chain]);
+    return baseUrl ? `${baseUrl}/address/${address}#code#F${file}#L${line}` : null;
+  }, [baseUrl]);
 }
 
 export function useUid(prefix = "uid"): string {

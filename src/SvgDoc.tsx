@@ -9,6 +9,7 @@ import type { Address } from "./types";
 
 import { createElement, useEffect, useMemo, useRef } from "react";
 import { PLACEHOLDER_TITLE } from "./constants";
+import { useExplorerBaseUrl } from "./react-utils";
 
 const CONTENT_WIDTH = 720;
 
@@ -353,12 +354,14 @@ export function SvgDocSignees({
 }: {
   signees: Array<readonly [Address, boolean | string]>;
 }) {
+  const explorerBaseUrl = useExplorerBaseUrl();
   return (
     <>
       {signees.map(([signee, signState]) => (
         <SvgDocSignee
           key={signee}
           address={signee}
+          explorerBaseUrl={explorerBaseUrl}
           signature={signState === true
             ? <SvgDocSignature />
             : <span className="signature">{signState}</span>}
@@ -370,21 +373,27 @@ export function SvgDocSignees({
 
 export function SvgDocSignee({
   address,
+  explorerBaseUrl,
   signature,
 }: {
   address: string;
+  explorerBaseUrl?: string;
   signature: string | ReactNode;
 }) {
   return (
     <div className="signee">
       <div>
-        <a
-          href={`https://etherscan.io/address/${address}`}
-          rel="nofollow"
-          target="_blank"
-        >
-          {address}
-        </a>
+        {explorerBaseUrl
+          ? (
+            <a
+              href={`${explorerBaseUrl}/address/${address}`}
+              rel="nofollow"
+              target="_blank"
+            >
+              {address}
+            </a>
+          )
+          : address}
       </div>
       {signature}
     </div>

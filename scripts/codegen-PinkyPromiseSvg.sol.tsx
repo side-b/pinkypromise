@@ -78,10 +78,12 @@ function getPromiseSvgCodeContent() {
 }
 
 function getSigneeHtmlCode() {
-  const svg = renderToStaticMarkup(createElement(SvgDocSignee, {
-    address: "_ADDRESS_",
-    signature: "_SIGNATURE_",
-  }));
+  const svg = renderToStaticMarkup(
+    createElement(SvgDocSignee, {
+      address: "_ADDRESS_",
+      signature: "_SIGNATURE_",
+    }),
+  );
   return `string.concat('`
     + svg
       .replace(/_ADDRESS_/g, "', addressHtml ,'")
@@ -96,7 +98,7 @@ function getSignatureHtmlCode() {
 
 function insertCode(source: string, marker: RegExp, code: string) {
   const lines = source.split("\n");
-  const lineIndex = lines.findIndex(line => marker.test(line));
+  const lineIndex = lines.findIndex((line) => marker.test(line));
   if (lineIndex === -1) {
     throw new Error(`Couldn’t find the marker: ${marker}`);
   }
@@ -108,8 +110,16 @@ function insertCode(source: string, marker: RegExp, code: string) {
 }
 
 function updateTemplate(source: string) {
-  source = insertCode(source, PROMISE_SVG_WRAPPER_MARKER, getPromiseSvgWrapperCode());
-  source = insertCode(source, PROMISE_SVG_CONTENT_MARKER, getPromiseSvgCodeContent());
+  source = insertCode(
+    source,
+    PROMISE_SVG_WRAPPER_MARKER,
+    getPromiseSvgWrapperCode(),
+  );
+  source = insertCode(
+    source,
+    PROMISE_SVG_CONTENT_MARKER,
+    getPromiseSvgCodeContent(),
+  );
   source = insertCode(source, SIGNEE_MARKER, getSigneeHtmlCode());
   source = insertCode(source, SIGNATURE_MARKER, getSignatureHtmlCode());
   source = "// FILE GENERATED, DO NOT EDIT DIRECTLY\n\n" + source;
