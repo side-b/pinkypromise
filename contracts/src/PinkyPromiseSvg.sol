@@ -226,7 +226,7 @@ library PinkyPromiseSvg {
         while (remaining.contains(brSeparator)) {
             (, StrSlice part, StrSlice _remaining) = remaining.splitOnce(brSeparator);
             remaining = _remaining;
-            html = string.concat(html, part.toString(), "<br>");
+            html = string.concat(html, part.toString(), "<br/>");
         }
 
         return string.concat(html, remaining.toString());
