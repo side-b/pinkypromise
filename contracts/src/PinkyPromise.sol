@@ -281,7 +281,7 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
                     ERC721/5192 FUNCTION OVERRIDES
     //////////////////////////////////////////////////////////////*/
 
-    function supportsInterface(bytes4 interfaceId) public view override(ERC721) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view override (ERC721) returns (bool) {
         return interfaceId == type(IERC5192).interfaceId || super.supportsInterface(interfaceId);
     }
 
@@ -383,7 +383,8 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
 
     /// @notice Get the promise signees and their signing states.
     /// @param promiseId The promise ID.
-    /// @return The signees and their signing states.
+    /// @return signees The signees addresses.
+    /// @return signingStates The signing states corresponding to the signees.
     function promiseSignees(uint256 promiseId)
         public
         view
@@ -415,7 +416,11 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
 
     /// @notice Get all relevant information about a promise, including its data, state, signees, signing states and signed on date.
     /// @param promiseId The promise ID.
-    /// @return All the promise information.
+    /// @return data The PromiseData attached to the promise.
+    /// @return state The PromiseState.
+    /// @return signees The signees.
+    /// @return signingStates The signing state of every signee.
+    /// @return signedOn The date and time the promise was signed on.
     function promiseInfo(uint256 promiseId)
         public
         view
