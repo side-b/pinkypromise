@@ -33,6 +33,8 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
     // should point to https://github.com/bokkypoobah/BokkyPooBahsDateTimeLibrary
     address public bpbDateTime;
 
+    string networkPrefix;
+
     struct PromiseData {
         PromiseColor color;
         uint16 height;
@@ -106,10 +108,14 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         _;
     }
 
-    constructor(string memory _name, string memory _symbol, address ensRegistry_, address bpbDateTime_)
-        ERC721(_name, _symbol)
-        Owned(msg.sender)
-    {
+    constructor(
+        string memory name_,
+        string memory symbol_,
+        string memory networkPrefix_,
+        address ensRegistry_,
+        address bpbDateTime_
+    ) ERC721(name_, symbol_) Owned(msg.sender) {
+        networkPrefix = networkPrefix_;
         ensRegistry = ensRegistry_;
         bpbDateTime = bpbDateTime_;
     }
@@ -328,6 +334,7 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         contracts.bpbDateTime = bpbDateTime;
 
         PinkyPromiseSvg.PinkyPromiseSvgData memory svgData;
+        svgData.networkPrefix = networkPrefix;
         svgData.promiseId = promiseId;
         svgData.promiseState = promiseState(promiseId);
         svgData.promiseData = promise_.data;

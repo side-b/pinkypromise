@@ -24,6 +24,7 @@ library PinkyPromiseSvg {
         address[] signees;
         uint256 promiseId;
         uint256 signedOn;
+        string networkPrefix;
     }
 
     function promiseAsSvg(
@@ -51,7 +52,7 @@ library PinkyPromiseSvg {
         PinkyPromise.SigningState[] calldata signingStates
     ) public view returns (string memory) {
         string memory body = promiseTextToHtml(svgData.promiseData.body);
-        string memory id = svgData.promiseId.toString();
+        string memory id = string.concat(svgData.networkPrefix, svgData.promiseId.toString());
         string memory signees = signeesAsHtml(contracts.ensRegistry, svgData.signees, signingStates);
         string memory status = promiseStatusLabel(svgData.promiseState);
         string memory title = svgData.promiseData.title;
@@ -186,7 +187,7 @@ library PinkyPromiseSvg {
         while (remaining.contains(brSeparator)) {
             (, StrSlice part, StrSlice _remaining) = remaining.splitOnce(brSeparator);
             remaining = _remaining;
-            html = string.concat(html, part.toString(), "<br>");
+            html = string.concat(html, part.toString(), "<br/>");
         }
 
         return string.concat(html, remaining.toString());

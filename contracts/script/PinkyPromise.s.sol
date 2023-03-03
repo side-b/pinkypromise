@@ -11,6 +11,7 @@ contract PinkyPromiseScript is Script {
         new PinkyPromise(
             "Pinky Promise", 
             "PP", 
+            vm.envString("NETWORK_PREFIX"),
             vm.envAddress("ENS_REGISTRY"),
             vm.envAddress("BPB_DATETIME")
         );
