@@ -59,7 +59,7 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         address[] signees;
         uint256[] tokenIds;
         uint256 signedOn;
-        /// @notice The promise state. This works using a counter,
+        /// The promise state. This works using a counter,
         /// with several values representing different states:
         /// state <  signees.length         => contract just created
         /// state >= signees.length         => contract signed
@@ -381,8 +381,9 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         return string.concat("data:image/svg+xml;base64,", Base64.encode(bytes(promiseAsSvg(promiseId))));
     }
 
-    /// @notice Get the promise signees.
+    /// @notice Get the promise signees and their signing states.
     /// @param promiseId The promise ID.
+    /// @return The signees and their signing states.
     function promiseSignees(uint256 promiseId)
         public
         view
@@ -398,14 +399,23 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         }
     }
 
+    /// @notice Get the promises a signee is involved in.
+    /// @param signee The signee address.
+    /// @return promiseIds The promise IDs.
     function signeePromises(address signee) public view returns (uint256[] memory promiseIds) {
         promiseIds = promiseIdsBySignee[signee];
     }
 
+    /// @notice Get the state of a promise.
+    /// @param promiseId The promise ID.
+    /// @return The promise state.
     function promiseState(uint256 promiseId) public view returns (PromiseState) {
         return _promiseState(promises[promiseId]);
     }
 
+    /// @notice Get all relevant information about a promise, including its data, state, signees, signing states and signed on date.
+    /// @param promiseId The promise ID.
+    /// @return All the promise information.
     function promiseInfo(uint256 promiseId)
         public
         view
@@ -427,6 +437,9 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         (signees, signingStates) = promiseSignees(promiseId);
     }
 
+    /// @notice Get the total number of promises.
+    /// @dev This is NOT equal to the amount of NFTs minted.
+    /// @return The total number of promises.
     function total() public view returns (uint256) {
         return latestPromiseId;
     }
