@@ -8,9 +8,13 @@ contract PinkyPromiseScript is Script {
     function run() external {
         vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
 
-        PinkyPromise pp = new PinkyPromise("Pinky Promise", "PSP");
-        pp.setEnsRegistry(vm.envAddress("ENS_REGISTRY"));
-        pp.setBpbDateTime(vm.envAddress("BPB_DATETIME"));
+        new PinkyPromise(
+            "Pinky Promise", 
+            "PP", 
+            vm.envString("NETWORK_PREFIX"),
+            vm.envAddress("ENS_REGISTRY"),
+            vm.envAddress("BPB_DATETIME")
+        );
 
         vm.stopBroadcast();
     }

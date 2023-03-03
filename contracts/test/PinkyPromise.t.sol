@@ -25,7 +25,13 @@ contract PinkyPromiseTest is Test {
     PinkyPromise pp;
 
     function setUp() public {
-        pp = new PinkyPromise("Pinky Promise", "PSP");
+        pp = new PinkyPromise(
+            "Pinky Promise", 
+            "PP", 
+            vm.envString("NETWORK_PREFIX_MAINNET"),
+            vm.envAddress("ENS_REGISTRY_MAINNET"),
+            vm.envAddress("BPB_DATETIME_MAINNET")
+        );
     }
 
     function test_total() public {
@@ -51,8 +57,6 @@ contract PinkyPromiseTest is Test {
 
     function test_signPromise() public {
         Vm.Log[] memory entries;
-
-        pp.setEnsRegistry(vm.envAddress("ENS_REGISTRY_MAINNET"));
 
         address[] memory signees_ = new address[](3);
         signees_[0] = address(this);

@@ -36,7 +36,7 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
     /// We use SigningState rather than a boolean in this mapping,
     /// so we can rely on SigningState.None (the default) to ensure that
     /// Promise.signees only contain unique signatures (see newPromise()).
-    mapping(uint256 => mapping(address => SigningState)) public signingStates;
+    mapping(uint256 => mapping(address => SigningState)) public signingStatesByPromise;
 
     /// @notice The ENS registry address.
     address public ensRegistry;
@@ -44,6 +44,8 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
     /// @notice The BPBDateTime library address.
     /// See: https://github.com/bokkypoobah/BokkyPooBahsDateTimeLibrary
     address public bpbDateTime;
+
+    string networkPrefix;
 
     struct PromiseData {
         PromiseColor color;
@@ -118,7 +120,17 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         _;
     }
 
-    constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) Owned(msg.sender) {}
+    constructor(
+        string memory name_,
+        string memory symbol_,
+        string memory networkPrefix_,
+        address ensRegistry_,
+        address bpbDateTime_
+    ) ERC721(name_, symbol_) Owned(msg.sender) {
+        networkPrefix = networkPrefix_;
+        ensRegistry = ensRegistry_;
+        bpbDateTime = bpbDateTime_;
+    }
 
     /*//////////////////////////////////////////////////////////////
                           EXTERNAL FUNCTIONS
@@ -143,16 +155,17 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         // Populate the signing states
         for (uint256 i = 0; i < signees.length; i++) {
             require(
-                signingStates[promiseId][signees[i]] == SigningState.None, "PinkyPromise: each signee must be unique"
+                signingStatesByPromise[promiseId][signees[i]] == SigningState.None,
+                "PinkyPromise: each signee must be unique"
             );
 
             // Sign if the sender is one of the promise signees
             if (signees[i] == msg.sender) {
                 promise_.state++;
-                signingStates[promiseId][msg.sender] = SigningState.Signed;
+                signingStatesByPromise[promiseId][msg.sender] = SigningState.Signed;
                 emit AddSignature(promiseId, msg.sender);
             } else {
-                signingStates[promiseId][signees[i]] = SigningState.Pending;
+                signingStatesByPromise[promiseId][signees[i]] = SigningState.Pending;
             }
 
             // Used to retreive the promises where a given account is participating
@@ -186,13 +199,13 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
             "PinkyPromise: only non-discarded drafts can receive signatures"
         );
         require(
-            signingStates[promiseId][msg.sender] != SigningState.None,
+            signingStatesByPromise[promiseId][msg.sender] != SigningState.None,
             "PinkyPromise: drafts can only get signed by signees"
         );
-        require(signingStates[promiseId][msg.sender] == SigningState.Pending, "PinkyPromise: already signed");
+        require(signingStatesByPromise[promiseId][msg.sender] == SigningState.Pending, "PinkyPromise: already signed");
 
         promise_.state++;
-        signingStates[promiseId][msg.sender] = SigningState.Signed;
+        signingStatesByPromise[promiseId][msg.sender] = SigningState.Signed;
         emit AddSignature(promiseId, msg.sender);
 
         // Last signer creates the NFTs
@@ -210,7 +223,7 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
 
         require(_promiseState(promise_) == PromiseState.Draft, "PinkyPromise: only drafts can get discarded");
         require(
-            signingStates[promiseId][msg.sender] != SigningState.None,
+            signingStatesByPromise[promiseId][msg.sender] != SigningState.None,
             "PinkyPromise: drafts can only get discarded by signees"
         );
 
@@ -229,10 +242,11 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
 
         require(_promiseState(promise_) == PromiseState.Final, "PinkyPromise: only signed promises can get nullified");
         require(
-            signingStates[promiseId][msg.sender] == SigningState.Signed, "PinkyPromise: invalid nullification request"
+            signingStatesByPromise[promiseId][msg.sender] == SigningState.Signed,
+            "PinkyPromise: invalid nullification request"
         );
 
-        signingStates[promiseId][msg.sender] = SigningState.NullRequest;
+        signingStatesByPromise[promiseId][msg.sender] = SigningState.NullRequest;
 
         promise_.state++;
         emit NullifyRequest(promiseId, msg.sender);
@@ -253,11 +267,11 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
 
         require(_promiseState(promise_) == PromiseState.Final, "PinkyPromise: only signed promises can get nullified");
         require(
-            signingStates[promiseId][msg.sender] == SigningState.NullRequest,
+            signingStatesByPromise[promiseId][msg.sender] == SigningState.NullRequest,
             "PinkyPromise: nullification cancel not needed"
         );
 
-        signingStates[promiseId][msg.sender] = SigningState.Signed;
+        signingStatesByPromise[promiseId][msg.sender] = SigningState.Signed;
 
         promise_.state--;
         emit CancelNullifyRequest(promiseId, msg.sender);
@@ -347,6 +361,7 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         contracts.bpbDateTime = bpbDateTime;
 
         PinkyPromiseSvg.PinkyPromiseSvgData memory svgData;
+        svgData.networkPrefix = networkPrefix;
         svgData.promiseId = promiseId;
         svgData.promiseState = promiseState(promiseId);
         svgData.promiseData = promise_.data;
@@ -371,15 +386,15 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
     function promiseSignees(uint256 promiseId)
         public
         view
-        returns (address[] memory promiseSignees, SigningState[] memory promiseSigningStates)
+        returns (address[] memory signees, SigningState[] memory signingStates)
     {
         Promise storage promise_ = promises[promiseId];
         require(_promiseState(promise_) != PromiseState.None, "PinkyPromise: non existant promise");
 
-        promiseSignees = promise_.signees;
-        promiseSigningStates = new SigningState[](promiseSignees.length);
-        for (uint256 i = 0; i < promiseSignees.length; i++) {
-            promiseSigningStates[i] = signingStates[promiseId][promiseSignees[i]];
+        signees = promise_.signees;
+        signingStates = new SigningState[](signees.length);
+        for (uint256 i = 0; i < signees.length; i++) {
+            signingStates[i] = signingStatesByPromise[promiseId][signees[i]];
         }
     }
 
