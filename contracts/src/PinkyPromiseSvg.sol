@@ -68,7 +68,7 @@ library PinkyPromiseSvg {
         PinkyPromise.SigningState[] calldata signingStates
     ) public view returns (string memory) {
         string memory body = promiseTextToHtml(svgData.promiseData.body);
-        string memory id = string.concat(svgData.networkPrefix, svgData.promiseId.toString());
+        string memory id = string.concat(svgData.networkPrefix, "-", svgData.promiseId.toString());
         string memory signees = signeesAsHtml(contracts.ensRegistry, svgData.signees, signingStates);
         string memory status = promiseStatusLabel(svgData.promiseState);
         string memory title = svgData.promiseData.title;
