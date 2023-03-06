@@ -9,6 +9,7 @@ import type { ReactNode } from "react";
 import type { Address } from "./types";
 
 import { createElement, useEffect, useMemo, useRef } from "react";
+import { useEnsName } from "wagmi";
 import { PLACEHOLDER_TITLE } from "./constants";
 import { useExplorerBaseUrl } from "./react-utils";
 
@@ -362,7 +363,7 @@ export function SvgDocSignees({
   return (
     <>
       {signees.map(([signee, signState]) => (
-        <SvgDocSignee
+        <SvgDocSigneeEns
           key={signee}
           address={signee}
           explorerBaseUrl={explorerBaseUrl}
@@ -378,12 +379,17 @@ export function SvgDocSignees({
 export function SvgDocSignee({
   address,
   explorerBaseUrl,
+  label,
   signature,
+  title,
 }: {
-  address: string;
+  address: Address;
   explorerBaseUrl?: string;
+  label?: string;
   signature: string | ReactNode;
+  title?: string;
 }) {
+  label ??= address;
   return (
     <div className="signee">
       <div>
@@ -393,14 +399,43 @@ export function SvgDocSignee({
               href={`${explorerBaseUrl}/address/${address}`}
               rel="nofollow"
               target="_blank"
+              title={title}
             >
-              {address}
+              {label}
             </a>
           )
-          : address}
+          : (
+            <span title={title}>
+              {label}
+            </span>
+          )}
       </div>
       {signature}
     </div>
+  );
+}
+
+// SvgDocSignee, but it resolves ENS names
+export function SvgDocSigneeEns({
+  address,
+  explorerBaseUrl,
+  signature,
+}: {
+  address: Address;
+  explorerBaseUrl?: string;
+  signature: string | ReactNode;
+}) {
+  const ensName = useEnsName({ address });
+  const title = `${ensName.data ? `${ensName.data} − ` : ""}${address}`;
+  const label = ensName.data ?? address;
+  return (
+    <SvgDocSignee
+      address={address}
+      explorerBaseUrl={explorerBaseUrl}
+      signature={signature}
+      title={title}
+      label={label}
+    />
   );
 }
 

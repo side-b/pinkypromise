@@ -92,7 +92,7 @@ export function AddressInput({
 function useResolveAddress(value: string, onChange: (value: string) => void) {
   const [nameToResolve, setNameToResolve] = useState<null | EnsName>(null);
 
-  // To replace with wagmi’s useEnsAddress() one day (it currently has too many reliability issues when doing quick query updates)
+  // To replace with wagmi’s useEnsAddress() eventually (it currently has too many reliability issues when doing quick query updates)
   const provider = useProvider();
   const resolvedAddress = useQuery({
     enabled: Boolean(nameToResolve),

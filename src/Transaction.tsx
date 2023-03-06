@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { Address, TxBag } from "./types";
 
 import { useChainModal } from "@rainbow-me/rainbowkit";
@@ -12,7 +13,7 @@ import {
 import { AnimatableFingers } from "./AnimatableFingers";
 import { Button } from "./Button";
 import { ConnectButton } from "./ConnectButton";
-import { COLORS, TX_STEPS } from "./constants";
+import { COLORS, TxSteps } from "./constants";
 import { Container } from "./Container";
 import { useChainedProgress, useContractUrl, useTxUrl } from "./react-utils";
 import { SplitButton } from "./SplitButton";
@@ -137,7 +138,7 @@ export function Transaction({
               <TxControls
                 main="switch-network"
                 onMain={openChainModal}
-                message={TX_STEPS.ASK_CHANGE_NETWORK}
+                message={<TxSteps.AskChangeNetwork />}
                 onSecondary={onCancel}
                 secondary="cancel"
                 contractCode={contractCode}
@@ -146,7 +147,7 @@ export function Transaction({
             .with({ connected: false }, () => (
               <TxControls
                 main="connect"
-                message={TX_STEPS.ASK_CONNECT}
+                message={<TxSteps.AskConnect />}
                 onSecondary={onCancel}
                 secondary="cancel"
                 contractCode={contractCode}
@@ -155,7 +156,7 @@ export function Transaction({
             .with({ prepare: P.union("idle", "loading") }, () => (
               <TxControls
                 main="sign"
-                message={TX_STEPS.PREPARING}
+                message={<TxSteps.Preparing />}
                 onSecondary={onCancel}
                 secondary="cancel"
                 contractCode={contractCode}
@@ -164,7 +165,7 @@ export function Transaction({
             .with({ prepare: "error" }, () => (
               <TxControls
                 main="retry"
-                message={TX_STEPS.PREPARING_ERROR}
+                message={<TxSteps.PreparingError />}
                 onMain={txPrepare.refetch}
                 onSecondary={onCancel}
                 secondary="cancel"
@@ -174,7 +175,7 @@ export function Transaction({
             .with({ write: "idle" }, () => (
               <TxControls
                 main="sign"
-                message={TX_STEPS.BEFORE_SIGN}
+                message={<TxSteps.BeforeSign />}
                 onMain={txWrite.write}
                 onSecondary={onCancel}
                 secondary="cancel"
@@ -184,7 +185,7 @@ export function Transaction({
             .with({ write: "loading" }, () => (
               <TxControls
                 main="sign"
-                message={TX_STEPS.SIGN}
+                message={<TxSteps.Sign />}
                 onMain={txWrite.write}
                 onSecondary={onCancel}
                 secondary="cancel"
@@ -194,7 +195,7 @@ export function Transaction({
             .with({ write: "error" }, () => (
               <TxControls
                 main="retry"
-                message={TX_STEPS.SIGN_ERROR}
+                message={<TxSteps.SignError />}
                 onMain={txWrite.reset}
                 onSecondary={onCancel}
                 secondary="cancel"
@@ -204,7 +205,11 @@ export function Transaction({
             .with({ result: P.union("loading", "idle") }, () => (
               <TxControls
                 main={successLabel}
-                message={TX_STEPS.CONFIRM_WAIT}
+                message={
+                  <TxSteps.ConfirmWait
+                    txUrl={txUrl(txWrite.data?.hash ?? "") ?? ""}
+                  />
+                }
                 onSecondary={txUrl(txWrite.data?.hash ?? "") ?? undefined}
                 secondary="tx"
                 contractCode={contractCode}
@@ -213,7 +218,11 @@ export function Transaction({
             .with({ result: "error" }, () => (
               <TxControls
                 main="retry"
-                message={TX_STEPS.CONFIRM_ERROR}
+                message={
+                  <TxSteps.ConfirmError
+                    txUrl={txUrl(txWrite.data?.hash ?? "") ?? ""}
+                  />
+                }
                 onMain={txWrite.reset}
                 onSecondary={txUrl(txWrite.data?.hash ?? "") ?? undefined}
                 secondary="tx"
@@ -223,7 +232,11 @@ export function Transaction({
             .with({ result: "success" }, () => (
               <TxControls
                 main={successLabel}
-                message={TX_STEPS.CONFIRM_SUCCESS}
+                message={
+                  <TxSteps.ConfirmSuccess
+                    txUrl={txUrl(txWrite.data?.hash ?? "") ?? ""}
+                  />
+                }
                 onMain={txResult.data ? successAction(txResult.data) : undefined}
                 onSecondary={txUrl(txWrite.data?.hash ?? "") ?? undefined}
                 secondary="tx"
@@ -246,7 +259,7 @@ function TxControls({
   contractCode,
 }: {
   main: "switch-network" | "connect" | "sign" | "retry" | string;
-  message: string;
+  message: ReactNode;
   onMain?: string | (() => void);
   onSecondary?: string | (() => void);
   secondary: "cancel" | "tx";
@@ -267,6 +280,9 @@ function TxControls({
           overflow: "hidden",
           height: 60,
           fontSize: 20,
+          a: {
+            color: COLORS.white,
+          },
         }}
       >
         {message}

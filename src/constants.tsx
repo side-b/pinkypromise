@@ -96,16 +96,40 @@ export const FOOTER_LINKS = [
   ["source", "https://github.com/bpierre/pinkypromise"],
 ];
 
-export const TX_STEPS = {
-  ASK_CHANGE_NETWORK: "Please switch to a supported network.",
-  ASK_CONNECT: "Please connect your wallet.",
-  PREPARING: "Preparing transaction…",
-  PREPARING_ERROR: "Error preparing the transaction.",
-  BEFORE_SIGN:
-    "Let’s sign this transaction. Get your wallet ready, then press the button (softly but firmly).",
-  SIGN: "It’s your time: sign the transaction in your wallet. You’ve got this!",
-  SIGN_ERROR: "Error signing the transaction.",
-  CONFIRM_WAIT: "Perfect! Now waiting for the transaction to be confirmed…",
-  CONFIRM_ERROR: "Error confirming the transaction.",
-  CONFIRM_SUCCESS: "And we’re done! The transaction has been confirmed.",
+function TxLink({ label, url }: { label: string; url?: string }) {
+  return url
+    ? <a href={url} rel="nofollow" target="_blank">{label}</a>
+    : <>{label}</>;
+}
+
+export const TxSteps = {
+  AskChangeNetwork: () => <>Please switch to a supported network.</>,
+  AskConnect: () => <>Please connect your wallet.</>,
+  Preparing: () => <>Preparing transaction…</>,
+  PreparingError: () => <>Error preparing the transaction.</>,
+  BeforeSign: () => (
+    <>
+      Let’s sign this transaction. Get your wallet ready, then press the button −
+      softly but firmly.
+    </>
+  ),
+  Sign: () => <>Now is your time: sign the transaction in your wallet.</>,
+  SignError: () => <>Error signing the transaction.</>,
+  ConfirmWait: ({ txUrl }: { txUrl?: string }) => (
+    <>
+      Perfect! Now waiting for <TxLink url={txUrl} label="the transaction" />{" "}
+      to be confirmed…
+    </>
+  ),
+  ConfirmError: ({ txUrl }: { txUrl?: string }) => (
+    <>
+      Error confirming <TxLink url={txUrl} label="the transaction" />.
+    </>
+  ),
+  ConfirmSuccess: ({ txUrl }: { txUrl?: string }) => (
+    <>
+      And we’re done! <TxLink url={txUrl} label="The transaction" />{" "}
+      has been confirmed.
+    </>
+  ),
 };
