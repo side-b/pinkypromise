@@ -115,21 +115,15 @@ export const TxSteps = {
   ),
   Sign: () => <>Now is your time: sign the transaction in your wallet.</>,
   SignError: () => <>Error signing the transaction.</>,
-  ConfirmWait: ({ txUrl }: { txUrl?: string }) => (
-    <>
-      Perfect! Now waiting for <TxLink url={txUrl} label="the transaction" />{" "}
-      to be confirmed…
-    </>
-  ),
+  ConfirmWait: () => <>Perfect! Now waiting for the transaction to be confirmed…</>,
   ConfirmError: ({ txUrl }: { txUrl?: string }) => (
     <>
       Error confirming <TxLink url={txUrl} label="the transaction" />.
     </>
   ),
-  ConfirmSuccess: ({ txUrl }: { txUrl?: string }) => (
+  ConfirmSuccess: () => (
     <>
-      And we’re done! <TxLink url={txUrl} label="The transaction" />{" "}
-      has been confirmed.
+      And we’re done! The transaction has been confirmed.
     </>
   ),
 };

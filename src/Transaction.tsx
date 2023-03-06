@@ -205,11 +205,7 @@ export function Transaction({
             .with({ result: P.union("loading", "idle") }, () => (
               <TxControls
                 main={successLabel}
-                message={
-                  <TxSteps.ConfirmWait
-                    txUrl={txUrl(txWrite.data?.hash ?? "") ?? ""}
-                  />
-                }
+                message={<TxSteps.ConfirmWait />}
                 onSecondary={txUrl(txWrite.data?.hash ?? "") ?? undefined}
                 secondary="tx"
                 contractCode={contractCode}
@@ -232,11 +228,7 @@ export function Transaction({
             .with({ result: "success" }, () => (
               <TxControls
                 main={successLabel}
-                message={
-                  <TxSteps.ConfirmSuccess
-                    txUrl={txUrl(txWrite.data?.hash ?? "") ?? ""}
-                  />
-                }
+                message={<TxSteps.ConfirmSuccess />}
                 onMain={txResult.data ? successAction(txResult.data) : undefined}
                 onSecondary={txUrl(txWrite.data?.hash ?? "") ?? undefined}
                 secondary="tx"
@@ -330,7 +322,8 @@ function TxControls({
           disabled={!onSecondary}
           href={typeof onSecondary === "string" ? onSecondary : undefined}
           external={typeof onSecondary === "string"}
-          label={secondary === "tx" ? "Etherscan" : "Abandon"}
+          label={secondary === "tx" ? "Open Tx" : "Abandon"}
+          title={secondary === "tx" ? "Open Transaction" : undefined}
           onClick={typeof onSecondary !== "string" ? onSecondary : undefined}
         />
         {main === "connect"
