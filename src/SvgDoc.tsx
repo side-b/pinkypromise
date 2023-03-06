@@ -1,7 +1,8 @@
 // Note: this set of components is used to generate the SVG representation of a
 // promise. It serves both the React app and the Solidity contract, which
 // requires to only use dynamic features (react app) in a way that is
-// compatible with static features (solidity), e.g. by avoiding css={}.
+// compatible with static features (solidity), e.g. by avoiding css={}
+// when htmlMode is not true.
 // See scripts/codegen-PinkyPromiseSVg.sol.tsx for more context.
 
 import type { ReactNode } from "react";
@@ -18,25 +19,23 @@ function svgDocStyle({
   contentColor,
   fixedHeight,
   height,
-  htmlOnly,
+  htmlMode,
   paddingBottom,
   paddingSide,
   paddingTop,
   selector,
-  unsafeFont,
 }: {
   color: string;
   contentColor: string;
   fixedHeight: boolean;
   height: string;
-  htmlOnly: boolean;
+  htmlMode: boolean;
   paddingBottom: number;
   paddingSide: number;
   paddingTop: number;
   selector: string;
-  unsafeFont: boolean;
 }) {
-  const font = unsafeFont
+  const font = htmlMode
     ? "300 20px/1.5 \"Space Grotesk\", sans-serif"
     : "400 19px/28px \"Courier New\", monospace";
 
@@ -67,7 +66,7 @@ function svgDocStyle({
       overflow: hidden;
       width: ${CONTENT_WIDTH}px;
       height: 100%;
-      ${htmlOnly ? `min-height: ${CONTENT_WIDTH}px;` : ""}
+      ${htmlMode ? `min-height: ${CONTENT_WIDTH}px;` : ""}
     }
     ${selector} .header {
       flex-shrink: 0;
@@ -85,7 +84,7 @@ function svgDocStyle({
       text-align: right;
     }
     ${selector} .content {
-      flex-grow: ${fixedHeight || htmlOnly ? 1 : 0};
+      flex-grow: ${fixedHeight || htmlMode ? 1 : 0};
       display: flex;
       flex-direction: column;
       width: 100%;
@@ -95,7 +94,7 @@ function svgDocStyle({
       padding-top: 40px;
       flex-grow: 0;
       flex-shrink: 0;
-      line-height: ${unsafeFont ? 1.3 : "38px"};
+      line-height: ${htmlMode ? 1.3 : "38px"};
       font-size: 32px;
       font-weight: 400;
     }
@@ -132,6 +131,7 @@ function svgDocStyle({
       display: flex;
       flex-direction: column;
       padding-top: ${fixedHeight ? 0 : 40}px;
+      padding-bottom: 112px;
     }
     ${selector} .signee {
       display: flex;
@@ -173,19 +173,6 @@ function svgDocStyle({
     ${selector} .signature b {
       color: var(--contentColor);
     }
-    ${selector} .fingers {
-      flex-grow: 0;
-      flex-shrink: 0;
-      display: flex;
-      justify-content: center;
-      padding-top: 32px;
-    }
-    ${selector} .fingers svg {
-      display: block;
-    }
-    ${selector} .fingers svg path {
-      fill: var(--contentColor);
-    }
   `
     .replace(/\n/g, "")
     .replace(/  /g, "");
@@ -196,32 +183,32 @@ export function SvgDoc({
   classPrefix,
   color,
   contentColor,
+  fingersY,
   height,
-  htmlOnly = false,
+  htmlMode = false,
   onHeight,
   padding = [40, 40, 32],
   promiseId,
-  restrict,
+  restrict = false,
   signedOn,
   signees,
   status,
   title,
-  unsafeFont = false,
 }: {
   bodyHtml: string;
   classPrefix?: string;
   color: string;
   contentColor: string;
+  fingersY?: string;
   height?: number | string;
-  htmlOnly?: boolean;
+  htmlMode?: boolean;
   onHeight?: (height: number) => void;
   padding?: [top: number, side: number, bottom: number];
   promiseId: string;
   signedOn: string;
-  unsafeFont?: boolean;
 
-  // Restrict to either the wrapper or the content, this is only to circumvent the 8 string vars limit in Solidity.
-  restrict?: "main" | "wrapper";
+  // restrict to either the wrapper or the content (this is only to circumvent the 8 string vars limit in Solidity)
+  restrict?: false | "main" | "wrapper";
 
   // string type is used by
   // scripts/codegen-PinkyPromiseSVg.sol.tsx
@@ -274,9 +261,6 @@ export function SvgDoc({
         <div className="title">{title || PLACEHOLDER_TITLE}</div>
         <div className="body" dangerouslySetInnerHTML={{ __html: bodyHtml }} />
         <div className="signees">{signees}</div>
-        <div className="fingers">
-          <SvgDocFingers />
-        </div>
       </div>
     </div>
   );
@@ -288,14 +272,13 @@ export function SvgDoc({
   const style = svgDocStyle({
     color,
     contentColor,
-    fixedHeight: !measureMode && !htmlOnly,
-    htmlOnly,
+    fixedHeight: !measureMode && !htmlMode,
+    htmlMode,
     paddingBottom,
     paddingSide,
     paddingTop,
     selector,
-    unsafeFont,
-    height: htmlOnly ? "auto" : `${height}px`,
+    height: htmlMode ? "auto" : `${height}px`,
   });
 
   const rootIn = (
@@ -305,10 +288,24 @@ export function SvgDoc({
     </>
   );
 
-  const root = htmlOnly
+  const root = htmlMode
     ? (
       <div className={classPrefix}>
         <div className="root">{rootIn}</div>
+        <div
+          css={{
+            // we use css rather than a className because this only used by the app
+            position: "absolute",
+            left: "50%",
+            bottom: "0",
+            transform: "translateX(-50%)",
+            svg: {
+              display: "block",
+            },
+          }}
+        >
+          <SvgDocFingers color={contentColor} />
+        </div>
       </div>
     )
     : (
@@ -327,6 +324,11 @@ export function SvgDoc({
             rootIn,
           )}
         </foreignObject>
+        <SvgDocFingers
+          color={contentColor}
+          x={docWidth / 2 - 40}
+          y={fingersY ?? (typeof height === "number" ? height - 40 - 72 : "")}
+        />
       </svg>
     );
 
@@ -413,9 +415,19 @@ export function SvgDocSignature() {
   );
 }
 
-export function SvgDocFingers() {
+export function SvgDocFingers({ color, x, y }: {
+  color: string;
+  x?: number | string;
+  y?: number | string;
+}) {
   return (
-    <svg width="80" height="80" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      fill={color}
+      height="80"
+      width="80"
+      x={x}
+      y={y}
+    >
       <path
         clipRule="evenodd"
         fillRule="evenodd"

@@ -6,7 +6,7 @@ import "solmate/auth/Owned.sol";
 import "solmate/tokens/ERC721.sol";
 import "solmate/utils/LibString.sol";
 import {IERC5192} from "src/interfaces/IERC5192.sol";
-import {PinkyPromiseSvg} from "./PinkyPromiseSvg.sol";
+import {PinkyPromiseSvg} from "src/PinkyPromiseSvg.sol";
 
 /// @title PinkyPromise
 /// @author Pierre Bertet

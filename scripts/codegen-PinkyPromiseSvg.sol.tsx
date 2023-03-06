@@ -27,6 +27,7 @@ function getPromiseSvgWrapperCode() {
       status: "_STATUS_",
       title: "_TITLE_",
       restrict: "wrapper",
+      fingersY: "_FINGERS_Y_",
     }),
   ).replace(/&quot;/g, "\"").replace(/&gt;/g, ">");
 
@@ -48,7 +49,8 @@ function getPromiseSvgWrapperCode() {
     .replace(/_COLOR_/g, "', color ,'")
     .replace(/_HEIGHT_/g, "', height ,'")
     .replace(/_MAIN_/g, "', content ,'")
-    + "')";
+    .replace(/_FINGERS_Y_/g, "', fingersY ,'")
+    + "', promiseSvgFingers(promiseData.height, contentColor))";
 }
 
 function getPromiseSvgCodeContent() {
