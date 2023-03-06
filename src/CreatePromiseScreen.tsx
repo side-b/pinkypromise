@@ -43,7 +43,6 @@ type PromiseData = {
 export function CreatePromiseScreen() {
   const account = useAccount();
   const [mode, setMode] = useState<"editor" | "preview" | "transaction">("editor");
-  const [svgHeightPreview, setSvgHeightPreview] = useState(0);
   const [svgHeight, setSvgHeight] = useState(0);
 
   // Not necessarily valid, only to be used with the editor
@@ -160,7 +159,7 @@ export function CreatePromiseScreen() {
                 <SvgDoc
                   bodyHtml={previewBodyHtml}
                   classPrefix="svg-preview"
-                  height={svgHeightPreview}
+                  htmlMode={true}
                   padding={[0, 0, 0]}
                   promiseId="001"
                   signedOn={signedOn}
@@ -171,7 +170,6 @@ export function CreatePromiseScreen() {
                   }
                   status="draft"
                   title={previewTitle}
-                  unsafeFont={true}
                   {...svgDocColors}
                 />
               </Container>
@@ -247,24 +245,12 @@ export function CreatePromiseScreen() {
         promiseId="001"
         signedOn={signedOn}
         signees={
-          <SvgDocSignees signees={newPromiseData.signees.map((s) => [s, true])} />
+          <SvgDocSignees
+            signees={newPromiseData.signees.map((s) => [s, true])}
+          />
         }
         status="draft"
         title={newPromiseData.title}
-        {...svgDocColors}
-      />
-      <SvgDoc
-        bodyHtml={previewBodyHtml}
-        classPrefix="svg-height-preview"
-        onHeight={setSvgHeightPreview}
-        promiseId="001"
-        signedOn={signedOn}
-        signees={
-          <SvgDocSignees signees={newPromiseData.signees.map((s) => [s, true])} />
-        }
-        status="draft"
-        title={previewTitle}
-        unsafeFont={true}
         {...svgDocColors}
       />
     </div>
