@@ -275,7 +275,7 @@ export function PromiseScreen({ id }: { id: string }) {
                     bodyHtml={promiseData.bodyHtml}
                     classPrefix="svg-preview"
                     height={promiseData.height}
-                    htmlOnly={true}
+                    htmlMode={true}
                     padding={[0, 0, 0]}
                     promiseId={id}
                     signedOn={promiseData.signedOn}
@@ -286,7 +286,6 @@ export function PromiseScreen({ id }: { id: string }) {
                     }
                     status={formatPromiseState(promiseData.state)}
                     title={promiseData.title}
-                    unsafeFont={true}
                     {...promiseData.colors}
                   />
                   {(promiseData.state === "Nullified"
