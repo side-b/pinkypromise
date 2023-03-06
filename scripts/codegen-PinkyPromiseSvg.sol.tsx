@@ -2,17 +2,18 @@ import fs from "fs";
 import * as css from "lightningcss";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { SvgDoc, SvgDocSignature, SvgDocSignee } from "../src/SvgDoc";
+import { SvgDoc, SvgDocFingers, SvgDocSignature, SvgDocSignee } from "../src/SvgDoc";
 
 const SOURCE_PATH = new URL(
   "../contracts/PinkyPromiseSvg.tpl.sol",
   import.meta.url,
 ).pathname;
 
-const PROMISE_SVG_WRAPPER_MARKER = /"<PROMISE_SVG_WRAPPER>"/;
 const PROMISE_SVG_CONTENT_MARKER = /"<PROMISE_SVG_CONTENT>"/;
-const SIGNEE_MARKER = /"<SIGNEE_HTML>"/;
+const PROMISE_SVG_FINGERS_MARKER = /"<PROMISE_SVG_FINGERS>"/;
+const PROMISE_SVG_WRAPPER_MARKER = /"<PROMISE_SVG_WRAPPER>"/;
 const SIGNATURE_MARKER = /"<SIGNATURE_HTML>"/;
+const SIGNEE_MARKER = /"<SIGNEE_HTML>"/;
 
 function getPromiseSvgWrapperCode() {
   const wrapper = renderToStaticMarkup(
@@ -20,6 +21,7 @@ function getPromiseSvgWrapperCode() {
       bodyHtml: "_BODY_",
       color: "_COLOR_",
       contentColor: "_CONTENT_COLOR_",
+      fingers: "_FINGERS_",
       height: "_HEIGHT_",
       promiseId: "_PROMISE_ID_",
       signedOn: "_SIGNED_ON_",
@@ -27,7 +29,6 @@ function getPromiseSvgWrapperCode() {
       status: "_STATUS_",
       title: "_TITLE_",
       restrict: "wrapper",
-      fingersY: "_FINGERS_Y_",
     }),
   ).replace(/&quot;/g, "\"").replace(/&gt;/g, ">");
 
@@ -50,7 +51,8 @@ function getPromiseSvgWrapperCode() {
     .replace(/_HEIGHT_/g, "', height ,'")
     .replace(/_MAIN_/g, "', content ,'")
     .replace(/_FINGERS_Y_/g, "', fingersY ,'")
-    + "', promiseSvgFingers(promiseData.height, contentColor))";
+    .replace(/_FINGERS_/g, "', fingers ,'")
+    + "')";
 }
 
 function getPromiseSvgCodeContent() {
@@ -98,6 +100,18 @@ function getSignatureHtmlCode() {
   return `'${svg}'`;
 }
 
+function getFingersCode() {
+  const fingers = renderToStaticMarkup(createElement(SvgDocFingers, {
+    color: "_COLOR_",
+    x: "360",
+    y: "_FINGERS_Y_",
+  }));
+  return `string.concat('` + fingers
+    .replace(/_COLOR_/g, "', color ,'")
+    .replace(/_FINGERS_Y_/g, "', fingersY ,'")
+    + "')";
+}
+
 function insertCode(source: string, marker: RegExp, code: string) {
   const lines = source.split("\n");
   const lineIndex = lines.findIndex((line) => marker.test(line));
@@ -124,6 +138,7 @@ function updateTemplate(source: string) {
   );
   source = insertCode(source, SIGNEE_MARKER, getSigneeHtmlCode());
   source = insertCode(source, SIGNATURE_MARKER, getSignatureHtmlCode());
+  source = insertCode(source, PROMISE_SVG_FINGERS_MARKER, getFingersCode());
   source = "// FILE GENERATED, DO NOT EDIT DIRECTLY\n\n" + source;
   return source;
 }

@@ -183,7 +183,7 @@ export function SvgDoc({
   classPrefix,
   color,
   contentColor,
-  fingersY,
+  fingers,
   height,
   htmlMode = false,
   onHeight,
@@ -199,7 +199,7 @@ export function SvgDoc({
   classPrefix?: string;
   color: string;
   contentColor: string;
-  fingersY?: string;
+  fingers?: string;
   height?: number | string;
   htmlMode?: boolean;
   onHeight?: (height: number) => void;
@@ -324,11 +324,13 @@ export function SvgDoc({
             rootIn,
           )}
         </foreignObject>
-        <SvgDocFingers
-          color={contentColor}
-          x={docWidth / 2 - 40}
-          y={fingersY ?? (typeof height === "number" ? height - 40 - 72 : "")}
-        />
+        {fingers ?? (
+          <SvgDocFingers
+            color={contentColor}
+            x={docWidth / 2 - 40}
+            y={typeof height === "number" ? height - 40 - 72 : ""}
+          />
+        )}
       </svg>
     );
 
