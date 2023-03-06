@@ -6,6 +6,7 @@ import { GlobalStyles } from "./GlobalStyles";
 import { Header } from "./Header";
 import { HomeScreen } from "./HomeScreen";
 import { NftScreen } from "./NftScreen";
+import { NotFoundScreen } from "./NotFoundScreen";
 import { PromiseScreen } from "./PromiseScreen";
 import { PromisesScreen } from "./PromisesScreen";
 
@@ -65,9 +66,7 @@ export function App() {
                   <DevScreen />
                 </Route>
                 <Route>
-                  <div>
-                    Not found
-                  </div>
+                  <NotFoundScreen />
                 </Route>
               </Switch>
             </Router>
