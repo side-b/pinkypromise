@@ -125,7 +125,7 @@ export const PromisesScreen = memo(function PromisesScreen({
   const hasLoadedIds = idsStatus === "success";
   const loadingStatus = mineOnly
     ? (hasLoadedIds ? promisesInfo.status : idsStatus)
-    : (promisesInfo.status === "idle"
+    : (totalRead.fetchStatus === "fetching" || promisesInfo.status === "idle"
       ? "loading"
       : promisesInfo.status);
   const refetch = hasLoadedIds ? promisesInfo.refetch : idsRefetch;
