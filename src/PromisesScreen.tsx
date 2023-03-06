@@ -457,7 +457,7 @@ const PromiseCard = memo(function PromiseCard({
                 },
               }}
             >
-              <SvgDocFingers />
+              <SvgDocFingers color={promiseData.colors.contentColor} />
             </div>
           </div>
         </section>

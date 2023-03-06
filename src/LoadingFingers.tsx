@@ -32,7 +32,7 @@ export function LoadingFingers({
           transform: "scale(1.25)",
         }}
       >
-        <SvgDocFingers />
+        <SvgDocFingers color={color} />
       </div>
       <div
         css={{
