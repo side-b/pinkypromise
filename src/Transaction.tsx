@@ -339,8 +339,9 @@ function TxControls({
               color={COLORS.white}
               disabled={!onMain}
               href={typeof onMain === "string" ? onMain : undefined}
+              title={main === "sign" ? "Sign transaction" : undefined}
               label={match(main)
-                .with("sign", () => "Sign")
+                .with("sign", () => "Sign Tx")
                 .with("retry", () => "Retry")
                 .with("switch-network", () => "Switch network")
                 .otherwise(() => main ?? "OK")}
