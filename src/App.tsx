@@ -58,8 +58,13 @@ export function App() {
                     />
                   )}
                 </Route>
-                <Route path="/promise/:id">
-                  {(p) => <PromiseScreen id={p.id ?? ""} />}
+                <Route path="/promise/:id/:action?">
+                  {(p) => (
+                    <PromiseScreen
+                      action={p.action ?? ""}
+                      id={p.id ?? ""}
+                    />
+                  )}
                 </Route>
                 <Route path="/nft/:id">{(p) => <NftScreen id={p.id ?? ""} />}</Route>
                 <Route path="/dev">

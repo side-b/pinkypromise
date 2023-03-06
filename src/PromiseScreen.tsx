@@ -5,8 +5,8 @@ import { BigNumber } from "ethers";
 import { useEffect, useMemo, useState } from "react";
 import { a, useTransition } from "react-spring";
 import { match, P } from "ts-pattern";
-import { useAccount } from "wagmi";
-import { useContractRead } from "wagmi";
+import { useAccount, useContractRead } from "wagmi";
+import { useLocation } from "wouter";
 import { PinkyPromiseAbi } from "./abis";
 import { ActionBox } from "./ActionBox";
 import { AnimatableFingers } from "./AnimatableFingers";
@@ -46,7 +46,8 @@ import {
   textToBlocks,
 } from "./utils";
 
-export function PromiseScreen({ id }: { id: string }) {
+export function PromiseScreen({ action, id }: { action: string; id: string }) {
+  const [_, setLocation] = useLocation();
   const contractAddress = usePinkyPromiseContractAddress();
   const [{ status, refetch }, promiseData] = usePromiseData(id, contractAddress);
   const { color, contentColor } = promiseData.colors;
@@ -71,6 +72,71 @@ export function PromiseScreen({ id }: { id: string }) {
         : enumKeyToColor(isColorEnumKey(colorEnumKey) ? colorEnumKey ?? 0 : 0),
     );
   }, [background, txBag, colorEnumKey]);
+
+  useEffect(() => {
+    match([action, promiseData] as const)
+      .with(["break", {
+        connectedSigningState: "Signed",
+        state: P.union("Draft", "Signed"),
+      }], ([_, { state }]) => {
+        setTxBag({
+          config: {
+            address: contractAddress,
+            abi: PinkyPromiseAbi,
+            functionName: state === "Signed" ? "nullify" : "discard",
+            args: [id],
+          },
+          title: `Break promise ${id}`,
+          successLabel: "View promise",
+          successAction: () => `/promise/${id}`,
+          onCancel: () => {
+            setLocation(`/promise/${id}`);
+          },
+        });
+      })
+      .with(["unbreak", {
+        connectedSigningState: "NullRequest",
+        state: "Signed",
+      }], () => {
+        setTxBag({
+          config: {
+            address: contractAddress,
+            abi: PinkyPromiseAbi,
+            functionName: "cancelNullify",
+            args: [id],
+          },
+          title: "Unbreak pinky promise",
+          successLabel: "View promise",
+          successAction: () => `/promise/${id}`,
+          onCancel: () => {
+            setLocation(`/promise/${id}`);
+          },
+        });
+      })
+      .with(["sign", {
+        connectedSigningState: "Pending",
+        state: "Draft",
+      }], () => {
+        setTxBag({
+          config: {
+            address: contractAddress,
+            abi: PinkyPromiseAbi,
+            functionName: "sign",
+            args: [id],
+          },
+          title: "Sign pinky promise",
+          successLabel: "View promise",
+          successAction: () => `/promise/${id}`,
+          onCancel: () => setLocation(`/promise/${id}`),
+        });
+      })
+      .with([P.union("break", "unbreak", "sign"), P.any], () => {
+        setLocation(`/promise/${id}`);
+      })
+      .otherwise(() => {
+        setTxBag(null);
+      });
+  }, [promiseData, action]);
 
   const loadingTransition = useTransition({ status, txBag }, {
     keys: ({ status, txBag }) => `${status}${Boolean(txBag)}`,
@@ -169,21 +235,7 @@ export function PromiseScreen({ id }: { id: string }) {
                         color={buttonColor}
                         info={PROMISE_NOTICE_DRAFT_UNSIGNED[0]}
                         onButtonClick={() => {
-                          setTxBag({
-                            config: {
-                              address: contractAddress,
-                              abi: PinkyPromiseAbi,
-                              functionName: "sign",
-                              args: [id],
-                            },
-                            title: "Sign pinky promise",
-                            successLabel: "View promise",
-                            successAction: () => {
-                              setTxBag(null);
-                              return `/promise/${id}`;
-                            },
-                            onCancel: () => setTxBag(null),
-                          });
+                          setLocation(`/promise/${id}/sign`);
                         }}
                       />
                     ))
@@ -194,21 +246,7 @@ export function PromiseScreen({ id }: { id: string }) {
                         color={buttonColor}
                         info={PROMISE_NOTICE_DRAFT_SIGNED[0]}
                         onButtonClick={() => {
-                          setTxBag({
-                            config: {
-                              address: contractAddress,
-                              abi: PinkyPromiseAbi,
-                              functionName: "discard",
-                              args: [id],
-                            },
-                            title: `Break promise ${id}`,
-                            successLabel: "View promise",
-                            successAction: () => {
-                              setTxBag(null);
-                              return `/promise/${id}`;
-                            },
-                            onCancel: () => setTxBag(null),
-                          });
+                          setLocation(`/promise/${id}/break`);
                         }}
                       />
                     ))
@@ -221,21 +259,7 @@ export function PromiseScreen({ id }: { id: string }) {
                           color={buttonColor}
                           info={PROMISE_NOTICE_NULLREQUEST[0]}
                           onButtonClick={() => {
-                            setTxBag({
-                              config: {
-                                address: contractAddress,
-                                abi: PinkyPromiseAbi,
-                                functionName: "cancelNullify",
-                                args: [id],
-                              },
-                              title: "Unbreak pinky promise",
-                              successLabel: "View promise",
-                              successAction: () => {
-                                setTxBag(null);
-                                return `/promise/${id}`;
-                              },
-                              onCancel: () => setTxBag(null),
-                            });
+                            setLocation(`/promise/${id}/unbreak`);
                           }}
                         />
                       ),
@@ -249,21 +273,7 @@ export function PromiseScreen({ id }: { id: string }) {
                           color={buttonColor}
                           info={PROMISE_NOTICE_SIGNED[0]}
                           onButtonClick={() => {
-                            setTxBag({
-                              config: {
-                                address: contractAddress,
-                                abi: PinkyPromiseAbi,
-                                functionName: "nullify",
-                                args: [id],
-                              },
-                              title: `Break promise ${id}`,
-                              successLabel: "View promise",
-                              successAction: () => {
-                                setTxBag(null);
-                                return `/promise/${id}`;
-                              },
-                              onCancel: () => setTxBag(null),
-                            });
+                            setLocation(`/promise/${id}/break`);
                           }}
                         />
                       ),
@@ -349,6 +359,7 @@ function usePromiseData(id: string, contractAddress?: Address) {
     functionName: "promiseInfo",
     args: [BigNumber.from(id)],
     enabled: Boolean(contractAddress),
+    watch: true,
   });
 
   const promiseData = useMemo(() => {
