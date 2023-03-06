@@ -36,11 +36,16 @@ export NETWORK_PREFIX
 export ENS_REGISTRY
 export BPB_DATETIME
 
-forge script script/PinkyPromise.s.sol:PinkyPromiseScript --rpc-url $RPC_URL --broadcast $VERIFY
+forge script \
+    script/DeployPinkyPromise.s.sol:DeployPinkyPromiseScript \
+    --rpc-url $RPC_URL \
+    --broadcast \
+    $VERIFY \
+    -vvvv
 
-CONTRACT_ADDRESS=$(cat broadcast/PinkyPromise.s.sol/$CHAIN_ID/run-latest.json | jq '.transactions[] | select(.contractName == "PinkyPromise" and .transactionType == "CREATE") .contractAddress' --raw-output)
+CONTRACT_ADDRESS=$(cat broadcast/DeployPinkyPromise.s.sol/$CHAIN_ID/run-latest.json | jq '.transactions[] | select(.contractName == "PinkyPromise" and .transactionType == "CREATE") .contractAddress' --raw-output)
 
 echo ""
-echo "    Contract address: ${CONTRACT_ADDRESS}"
+echo "    Contract deployed: 👉 ${CONTRACT_ADDRESS}"
 echo ""
 echo ""
