@@ -5,6 +5,7 @@ import { FocusVisible } from "./FocusVisible";
 import { GlobalStyles } from "./GlobalStyles";
 import { Header } from "./Header";
 import { HomeScreen } from "./HomeScreen";
+import { NftScreen } from "./NftScreen";
 import { PromiseScreen } from "./PromiseScreen";
 import { PromisesScreen } from "./PromisesScreen";
 
@@ -39,9 +40,6 @@ export function App() {
           >
             <Router>
               <Switch>
-                <Route path="/dev">
-                  <DevScreen />
-                </Route>
                 <Route path="/">
                   <HomeScreen />
                 </Route>
@@ -61,6 +59,10 @@ export function App() {
                 </Route>
                 <Route path="/promise/:id">
                   {(p) => <PromiseScreen id={p.id ?? ""} />}
+                </Route>
+                <Route path="/nft/:id">{(p) => <NftScreen id={p.id ?? ""} />}</Route>
+                <Route path="/dev">
+                  <DevScreen />
                 </Route>
                 <Route>
                   <div>
