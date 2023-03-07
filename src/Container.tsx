@@ -82,6 +82,7 @@ function ContainerDrawer({ children }: { children: ReactNode }) {
       <div
         css={{
           overflow: "hidden",
+          width: "100%",
           paddingTop: 24,
         }}
       >

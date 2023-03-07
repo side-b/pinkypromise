@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { SpringValues } from "react-spring";
 import type { Address, SigningStateEnumKey, TxBag } from "./types";
 
 import { BigNumber } from "ethers";
@@ -194,157 +195,131 @@ export function PromiseScreen({ action, id }: { action: string; id: string }) {
           match(data)
             .with({ txBag: P.when(Boolean) }, ({ txBag }) =>
               txBag && (
-                <a.div
-                  style={style}
-                  css={{
-                    position: "absolute",
-                    zIndex: 1,
-                    inset: "0 0 auto",
-                    paddingTop: 40,
-                  }}
-                >
-                  <Transaction {...txBag} />
-                </a.div>
+                <Appear appear={style}>
+                  <div css={{ paddingTop: 40 }}>
+                    <Transaction {...txBag} />
+                  </div>
+                </Appear>
               ))
-            .with({ status: P.union("loading", "idle") }, () => (
-              <a.div
-                style={style}
-                css={{
-                  position: "absolute",
-                  zIndex: 1,
-                  inset: "0 0 auto",
-                  display: "grid",
-                  placeItems: "center",
-                  paddingTop: 80,
-                }}
-              >
-                <LoadingFingers />
-              </a.div>
-            ))
-            .with({ status: "success" }, () => (
-              <a.div
-                style={style}
-                css={{
-                  position: "absolute",
-                  zIndex: 2,
-                  inset: "0 0 auto",
-                  display: "grid",
-                  width: "100%",
-                  placeItems: "center",
-                  padding: "40px 0 80px",
-                }}
-              >
-                <Container
-                  color={color}
-                  drawer={match([
-                    promiseData.connectedSigningState,
-                    promiseData.state,
-                  ])
-                    .with([P.any, "Discarded"], () => (
-                      <Action
-                        color={buttonColor}
-                        info={PROMISE_NOTICE_DISCARDED[0]}
+            .with(
+              { status: P.union("loading", "idle") },
+              () => (
+                <Appear appear={style}>
+                  <div css={{ paddingTop: 80 }}>
+                    <LoadingFingers />
+                  </div>
+                </Appear>
+              ),
+            )
+            .with(
+              { status: "success" },
+              () => (
+                <Appear appear={style}>
+                  <div css={{ paddingTop: 40, paddingBottom: 80 }}>
+                    <Container
+                      color={color}
+                      drawer={match([
+                        promiseData.connectedSigningState,
+                        promiseData.state,
+                      ])
+                        .with([P.any, "Discarded"], () => (
+                          <Action
+                            color={buttonColor}
+                            info={PROMISE_NOTICE_DISCARDED[0]}
+                          />
+                        ))
+                        // The connected user has not signed yet
+                        .with(["Pending", "Draft"], () => (
+                          <Action
+                            buttonLabel={PROMISE_NOTICE_DRAFT_UNSIGNED[1]}
+                            color={buttonColor}
+                            info={PROMISE_NOTICE_DRAFT_UNSIGNED[0]}
+                            onButtonClick={() => {
+                              setLocation(`/promise/${fullPromiseId}/sign`);
+                            }}
+                          />
+                        ))
+                        // The connected user has signed but other signatures are missing
+                        .with(["Signed", "Draft"], () => (
+                          <Action
+                            buttonLabel={PROMISE_NOTICE_DRAFT_SIGNED[1]}
+                            color={buttonColor}
+                            info={PROMISE_NOTICE_DRAFT_SIGNED[0]}
+                            onButtonClick={() => {
+                              setLocation(`/promise/${fullPromiseId}/break`);
+                            }}
+                          />
+                        ))
+                        // The connected user requested to nullify and the contract is fully signed
+                        .with(
+                          ["NullRequest", "Signed"],
+                          () => (
+                            <Action
+                              buttonLabel={PROMISE_NOTICE_NULLREQUEST[1]}
+                              color={buttonColor}
+                              info={PROMISE_NOTICE_NULLREQUEST[0]}
+                              onButtonClick={() => {
+                                setLocation(`/promise/${fullPromiseId}/unbreak`);
+                              }}
+                            />
+                          ),
+                        )
+                        // The connected user is a signee and the contract is fully signed
+                        .with(
+                          ["Signed", "Signed"],
+                          () => (
+                            <Action
+                              buttonLabel={PROMISE_NOTICE_SIGNED[1]}
+                              color={buttonColor}
+                              info={PROMISE_NOTICE_SIGNED[0]}
+                              onButtonClick={() => {
+                                setLocation(`/promise/${fullPromiseId}/break`);
+                              }}
+                            />
+                          ),
+                        )
+                        .otherwise(() => null)}
+                      padding="56px 56px 56px"
+                    >
+                      <SvgDoc
+                        bodyHtml={promiseData.bodyHtml}
+                        classPrefix="svg-preview"
+                        height={promiseData.height}
+                        htmlMode={true}
+                        padding={[0, 0, 0]}
+                        promiseId={fullPromiseId}
+                        signedOn={promiseData.signedOn}
+                        signees={
+                          <SvgDocSignees
+                            signees={promiseData.signeesWithStates}
+                          />
+                        }
+                        status={formatPromiseState(promiseData.state)}
+                        title={promiseData.title}
+                        {...promiseData.colors}
                       />
-                    ))
-                    // The connected user has not signed yet
-                    .with(["Pending", "Draft"], () => (
-                      <Action
-                        buttonLabel={PROMISE_NOTICE_DRAFT_UNSIGNED[1]}
-                        color={buttonColor}
-                        info={PROMISE_NOTICE_DRAFT_UNSIGNED[0]}
-                        onButtonClick={() => {
-                          setLocation(`/promise/${fullPromiseId}/sign`);
-                        }}
-                      />
-                    ))
-                    // The connected user has signed but other signatures are missing
-                    .with(["Signed", "Draft"], () => (
-                      <Action
-                        buttonLabel={PROMISE_NOTICE_DRAFT_SIGNED[1]}
-                        color={buttonColor}
-                        info={PROMISE_NOTICE_DRAFT_SIGNED[0]}
-                        onButtonClick={() => {
-                          setLocation(`/promise/${fullPromiseId}/break`);
-                        }}
-                      />
-                    ))
-                    // The connected user requested to nullify and the contract is fully signed
-                    .with(
-                      ["NullRequest", "Signed"],
-                      () => (
-                        <Action
-                          buttonLabel={PROMISE_NOTICE_NULLREQUEST[1]}
-                          color={buttonColor}
-                          info={PROMISE_NOTICE_NULLREQUEST[0]}
-                          onButtonClick={() => {
-                            setLocation(`/promise/${fullPromiseId}/unbreak`);
-                          }}
+                      {(promiseData.state === "Nullified"
+                        || promiseData.state === "Discarded") && (
+                        <SvgDocTape
+                          width={832}
+                          height={promiseData.height}
+                          {...promiseData.colors}
                         />
-                      ),
-                    )
-                    // The connected user is a signee and the contract is fully signed
-                    .with(
-                      ["Signed", "Signed"],
-                      () => (
-                        <Action
-                          buttonLabel={PROMISE_NOTICE_SIGNED[1]}
-                          color={buttonColor}
-                          info={PROMISE_NOTICE_SIGNED[0]}
-                          onButtonClick={() => {
-                            setLocation(`/promise/${fullPromiseId}/break`);
-                          }}
-                        />
-                      ),
-                    )
-                    .otherwise(() => null)}
-                  padding="56px 56px 56px"
-                >
-                  <SvgDoc
-                    bodyHtml={promiseData.bodyHtml}
-                    classPrefix="svg-preview"
-                    height={promiseData.height}
-                    htmlMode={true}
-                    padding={[0, 0, 0]}
-                    promiseId={fullPromiseId}
-                    signedOn={promiseData.signedOn}
-                    signees={
-                      <SvgDocSignees
-                        signees={promiseData.signeesWithStates}
-                      />
-                    }
-                    status={formatPromiseState(promiseData.state)}
-                    title={promiseData.title}
-                    {...promiseData.colors}
-                  />
-                  {(promiseData.state === "Nullified"
-                    || promiseData.state === "Discarded") && (
-                    <SvgDocTape
-                      width={832}
-                      height={promiseData.height}
-                      {...promiseData.colors}
-                    />
-                  )}
-                </Container>
-              </a.div>
-            ))
+                      )}
+                    </Container>
+                  </div>
+                </Appear>
+              ),
+            )
             .with({ status: "error" }, () => (
-              <a.div
-                style={style}
-                css={{
-                  position: "absolute",
-                  zIndex: 2,
-                  inset: "0",
-                  display: "grid",
-                  placeItems: "center",
-                  color: COLORS.white,
-                }}
-              >
+              <Appear appear={style}>
                 <div
                   css={{
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
                     gap: 18,
+                    color: COLORS.white,
                   }}
                 >
                   <LoadingFingers
@@ -358,7 +333,7 @@ export function PromiseScreen({ action, id }: { action: string; id: string }) {
                     size="large"
                   />
                 </div>
-              </a.div>
+              </Appear>
             ))
             .exhaustive()
         )}
@@ -511,6 +486,27 @@ function BackgroundFingers() {
         openDistance={dimensions.width / 3}
         size={dimensions.height * 2}
       />
+    </div>
+  );
+}
+
+function Appear({ appear, children }: {
+  appear: SpringValues<{ opacity: number; transform: string }>;
+  children: ReactNode;
+}) {
+  return (
+    <div
+      css={{
+        position: "absolute",
+        zIndex: 1,
+        inset: 0,
+        display: "grid",
+        placeItems: "center",
+      }}
+    >
+      <a.div style={appear}>
+        {children}
+      </a.div>
     </div>
   );
 }
