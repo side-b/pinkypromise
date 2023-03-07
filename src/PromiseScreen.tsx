@@ -180,11 +180,6 @@ export function PromiseScreen({ action, id }: { action: string; id: string }) {
     return contentColor;
   }, [color, contentColor]);
 
-  if (networkPrefix === undefined || promiseId === undefined) {
-    // TODO: not found screen
-    return "Not found";
-  }
-
   return (
     <>
       <div

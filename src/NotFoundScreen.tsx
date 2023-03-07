@@ -24,7 +24,7 @@ export function NotFoundScreen() {
       >
         <LoadingFingers
           color={COLORS.red}
-          label="URL not found"
+          label="Path not found"
         />
         <Button
           label="Back"

@@ -58,11 +58,11 @@ export function App() {
                     />
                   )}
                 </Route>
-                <Route path="/promise/:id/:action?">
+                <Route path="/promise/:prefix-:id/:action?">
                   {(p) => (
                     <PromiseScreen
                       action={p.action ?? ""}
-                      id={p.id ?? ""}
+                      id={`${p.prefix}-${p.id}` ?? ""}
                     />
                   )}
                 </Route>

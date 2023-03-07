@@ -87,7 +87,7 @@ export function CreatePromiseScreen() {
   ], [newPromiseData]);
 
   const chainId = useCurrentChainId();
-  const chainPrefix = appChainFromId(chainId)?.prefix;
+  const chainPrefix = appChainFromId(chainId ?? -1)?.prefix;
   const contractAddress = usePinkyPromiseContractAddress(chainId);
   const svgDocColors = useMemo(() => promiseColors(editorData.color), [
     editorData.color,
