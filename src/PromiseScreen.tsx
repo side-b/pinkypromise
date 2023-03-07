@@ -1,16 +1,16 @@
 import type { ReactNode } from "react";
-import type { SpringValues } from "react-spring";
 import type { Address, SigningStateEnumKey, TxBag } from "./types";
 
 import { BigNumber } from "ethers";
 import { useEffect, useMemo, useState } from "react";
-import { a, useTransition } from "react-spring";
+import { useTransition } from "react-spring";
 import { match, P } from "ts-pattern";
 import { useAccount, useContractRead } from "wagmi";
 import { useLocation } from "wouter";
 import { PinkyPromiseAbi } from "./abis";
 import { ActionBox } from "./ActionBox";
 import { AnimatableFingers } from "./AnimatableFingers";
+import { Appear } from "./Appear";
 import { Button } from "./Button";
 import {
   COLORS,
@@ -26,7 +26,6 @@ import {
   isColorEnumKey,
   promiseStateFromEnumKey,
   signingStateFromEnumKey,
-  useCurrentChainId,
   usePinkyPromiseContractAddress,
 } from "./contract-utils";
 import { useBackground } from "./GlobalStyles";
@@ -215,7 +214,7 @@ export function PromiseScreen({ action, id }: { action: string; id: string }) {
               { status: "success" },
               () => (
                 <Appear appear={style}>
-                  <div css={{ paddingTop: 40, paddingBottom: 80 }}>
+                  <div css={{ padding: "40px 0 80px" }}>
                     <Container
                       color={color}
                       drawer={match([
@@ -486,27 +485,6 @@ function BackgroundFingers() {
         openDistance={dimensions.width / 3}
         size={dimensions.height * 2}
       />
-    </div>
-  );
-}
-
-function Appear({ appear, children }: {
-  appear: SpringValues<{ opacity: number; transform: string }>;
-  children: ReactNode;
-}) {
-  return (
-    <div
-      css={{
-        position: "absolute",
-        zIndex: 1,
-        inset: 0,
-        display: "grid",
-        placeItems: "center",
-      }}
-    >
-      <a.div style={appear}>
-        {children}
-      </a.div>
     </div>
   );
 }

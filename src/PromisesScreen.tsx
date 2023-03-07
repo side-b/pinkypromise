@@ -8,18 +8,16 @@ import { match, P } from "ts-pattern";
 import { useAccount, useContractRead, useContractReads, useNetwork } from "wagmi";
 import { Link, useLocation } from "wouter";
 import { PinkyPromiseAbi } from "./abis";
+import { Appear } from "./Appear";
 import { Button } from "./Button";
 import { COLORS } from "./constants";
 import {
   enumKeyToColor,
-  isChainIdSupported,
   isColorEnumKey,
   promiseStateFromEnumKey,
-  useCurrentChainId,
   useCurrentOrDefaultChainId,
   usePinkyPromiseContractAddress,
 } from "./contract-utils";
-import { NETWORK_DEFAULT } from "./environment";
 import { LoadingFingers } from "./LoadingFingers";
 import { Pagination } from "./Pagination";
 import { useResetScroll } from "./react-utils";
@@ -27,7 +25,6 @@ import { SvgDocFingers, SvgDocTape } from "./SvgDoc";
 import { isPromiseStateEnumKey } from "./types";
 import {
   appChainFromId,
-  appChainFromName,
   blocksToText,
   formatDate,
   formatPromiseState,
@@ -188,103 +185,56 @@ export const PromisesScreen = memo(function PromisesScreen({
         flexDirection: "column",
         width: WIDTH,
         margin: "0 auto",
+        position: "relative",
       }}
     >
-      <div
-        css={{
-          overflow: loadingStatus === "success" ? "visible" : "hidden",
-          flexGrow: 1,
-          position: "relative",
-          display: "grid",
-          placeItems: "center",
-          width: "100%",
-        }}
-      >
-        {loadingTransition((style, { status, cardsData, refetch, connectPlease }) =>
-          match(connectPlease || status)
-            .with(true, () => (
-              <a.div
-                style={style}
-                css={{
-                  position: "absolute",
-                  zIndex: 2,
-                  inset: "0",
-                  display: "grid",
-                  placeItems: "center",
-                  color: COLORS.white,
-                }}
-              >
-                <div
-                  css={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: 18,
-                  }}
-                >
-                  Connect your account to see your promises
-                </div>
-              </a.div>
-            ))
-            .with("loading", () => (
-              <a.div
-                style={style}
-                css={{
-                  position: "absolute",
-                  zIndex: 2,
-                  inset: "0 0 auto",
-                  display: "grid",
-                  placeItems: "center",
-                  height: "100%",
-                }}
-              >
+      {loadingTransition((style, { status, cardsData, refetch, connectPlease }) =>
+        match(connectPlease || status)
+          .with(true, () => (
+            <Appear appear={style}>
+              <div css={{ color: COLORS.white }}>
+                Connect your account to see your promises
+              </div>
+            </Appear>
+          ))
+          .with("loading", () => (
+            <Appear appear={style}>
+              <div css={{ paddingTop: 80 }}>
                 <LoadingFingers />
-              </a.div>
-            ))
-            .with("error", () => (
-              <a.div
-                style={style}
+              </div>
+            </Appear>
+          ))
+          .with("error", () => (
+            <Appear appear={style}>
+              <div
                 css={{
-                  position: "absolute",
-                  zIndex: 2,
-                  inset: "0",
-                  display: "grid",
-                  placeItems: "center",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 18,
                   color: COLORS.white,
                 }}
               >
-                <div
-                  css={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: 18,
-                  }}
-                >
-                  <LoadingFingers
-                    color={COLORS.red}
-                    label="Error loading promises"
-                  />
-                  <Button
-                    label="Retry"
-                    color={COLORS.red}
-                    onClick={refetch}
-                    size="large"
-                  />
-                </div>
-              </a.div>
-            ))
-            .with(P.union("success", "idle"), () => (
-              cardsData.length > 0
-                ? (
-                  <a.div
-                    style={style}
+                <LoadingFingers
+                  color={COLORS.red}
+                  label="Error loading promises"
+                />
+                <Button
+                  label="Retry"
+                  color={COLORS.red}
+                  onClick={refetch}
+                  size="large"
+                />
+              </div>
+            </Appear>
+          ))
+          .with(P.union("success", "idle"), () => (
+            cardsData.length > 0
+              ? (
+                <Appear appear={style}>
+                  <div
                     css={{
-                      position: "absolute",
-                      zIndex: 2,
-                      inset: "24px 0 auto",
-                      display: "grid",
-                      placeItems: "center",
+                      paddingTop: 24,
                       paddingBottom: 80,
                     }}
                   >
@@ -306,47 +256,38 @@ export const PromisesScreen = memo(function PromisesScreen({
                         : undefined}
                       page={page}
                     />
-                  </a.div>
-                )
-                : (
-                  <a.div
-                    style={style}
+                  </div>
+                </Appear>
+              )
+              : (
+                <Appear appear={style}>
+                  <div
                     css={{
-                      position: "absolute",
-                      zIndex: 2,
-                      inset: "0",
-                      display: "grid",
-                      placeItems: "center",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      gap: 18,
                       color: COLORS.white,
                     }}
                   >
-                    <div
-                      css={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        gap: 18,
+                    <LoadingFingers
+                      color={COLORS.white}
+                      label="No promises"
+                    />
+                    <Button
+                      label="New"
+                      color={COLORS.white}
+                      onClick={() => {
+                        setLocation("/new");
                       }}
-                    >
-                      <LoadingFingers
-                        color={COLORS.white}
-                        label="No promises"
-                      />
-                      <Button
-                        label="New"
-                        color={COLORS.white}
-                        onClick={() => {
-                          setLocation("/new");
-                        }}
-                        size="large"
-                      />
-                    </div>
-                  </a.div>
-                )
-            ))
-            .otherwise(() => null)
-        )}
-      </div>
+                      size="large"
+                    />
+                  </div>
+                </Appear>
+              )
+          ))
+          .otherwise(() => null)
+      )}
     </div>
   );
 });
@@ -574,7 +515,13 @@ function PromisesGrid({
   });
 
   return (
-    <div>
+    <div
+      css={{
+        display: "grid",
+        placeItems: "center",
+        height: "100%",
+      }}
+    >
       <div
         css={{
           display: "grid",
