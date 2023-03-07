@@ -1,13 +1,13 @@
 import type { ReactNode } from "react";
 import type { Address, TxBag } from "./types";
 
-import { useChainModal } from "@rainbow-me/rainbowkit";
 import { match, P } from "ts-pattern";
 import {
   useAccount,
   useContractWrite,
   useNetwork,
   usePrepareContractWrite,
+  useSwitchNetwork,
   useWaitForTransaction,
 } from "wagmi";
 import { AnimatableFingers } from "./AnimatableFingers";
@@ -28,17 +28,19 @@ export function Transaction({
 }: TxBag) {
   const { chain } = useNetwork();
   const account = useAccount();
-  const { openChainModal } = useChainModal();
+  const { switchNetwork } = useSwitchNetwork();
   const txPrepare = usePrepareContractWrite({
-    address: config.address,
     abi: config.abi,
-    functionName: config.functionName,
+    address: config.address,
     args: config.args,
+    chainId: config.chainId,
+    functionName: config.functionName,
   });
   const txWrite = useContractWrite(txPrepare.config);
   const txResult = useWaitForTransaction({
-    hash: txWrite.data?.hash,
+    chainId: config.chainId,
     enabled: txWrite.status === "success",
+    hash: txWrite.data?.hash,
   });
 
   const txUrl = useTxUrl();
@@ -128,16 +130,20 @@ export function Transaction({
             {title}
           </h1>
           {match({
-            unsupported: chain?.unsupported,
+            wrongChain: chain?.unsupported || (
+              chain && (chain.id !== config.chainId)
+            ),
             connected: Boolean(account.address),
             prepare: txPrepare.status,
             write: txWrite.status,
             result: txResult.status,
           })
-            .with({ unsupported: true }, () => (
+            .with({ wrongChain: true }, () => (
               <TxControls
                 main="switch-network"
-                onMain={openChainModal}
+                onMain={() => {
+                  switchNetwork?.(config.chainId);
+                }}
                 message={<TxSteps.AskChangeNetwork />}
                 onSecondary={onCancel}
                 secondary="cancel"

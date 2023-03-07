@@ -5,23 +5,29 @@ import { BigNumber } from "ethers";
 import { memo, useMemo } from "react";
 import { a, useTransition } from "react-spring";
 import { match, P } from "ts-pattern";
-import { useAccount, useContractRead, useContractReads } from "wagmi";
+import { useAccount, useContractRead, useContractReads, useNetwork } from "wagmi";
 import { Link, useLocation } from "wouter";
 import { PinkyPromiseAbi } from "./abis";
 import { Button } from "./Button";
 import { COLORS } from "./constants";
 import {
   enumKeyToColor,
+  isChainIdSupported,
   isColorEnumKey,
   promiseStateFromEnumKey,
+  useCurrentChainId,
+  useCurrentOrDefaultChainId,
   usePinkyPromiseContractAddress,
 } from "./contract-utils";
+import { NETWORK_DEFAULT } from "./environment";
 import { LoadingFingers } from "./LoadingFingers";
 import { Pagination } from "./Pagination";
 import { useResetScroll } from "./react-utils";
 import { SvgDocFingers, SvgDocTape } from "./SvgDoc";
 import { isPromiseStateEnumKey } from "./types";
 import {
+  appChainFromId,
+  appChainFromName,
   blocksToText,
   formatDate,
   formatPromiseState,
@@ -49,23 +55,27 @@ export const PromisesScreen = memo(function PromisesScreen({
   mineOnly?: boolean;
   page: number;
 }) {
-  const contractAddress = usePinkyPromiseContractAddress();
+  let chainId = useCurrentOrDefaultChainId();
+  const contractAddress = usePinkyPromiseContractAddress(chainId);
+
   const [_, setLocation] = useLocation();
   const { address } = useAccount();
 
   const signeePromises = useContractRead({
-    address: contractAddress,
     abi: PinkyPromiseAbi,
-    functionName: "signeePromises",
+    address: contractAddress,
     args: address ? [address] : undefined,
+    chainId,
     enabled: Boolean(mineOnly && address),
+    functionName: "signeePromises",
   });
 
   const totalRead = useContractRead({
-    address: contractAddress,
     abi: PinkyPromiseAbi,
-    functionName: "total",
+    address: contractAddress,
+    chainId,
     enabled: !mineOnly,
+    functionName: "total",
   });
 
   const {
@@ -94,10 +104,11 @@ export const PromisesScreen = memo(function PromisesScreen({
 
   const promisesInfo = useContractReads({
     contracts: ids.map((id) => ({
-      address: contractAddress,
       abi: PinkyPromiseAbi,
-      functionName: "promiseInfo",
+      address: contractAddress,
       args: [BigNumber.from(id)],
+      chainId,
+      functionName: "promiseInfo",
     })),
     enabled: Boolean(contractAddress) && ids.length > 0,
     select: (data) => (
@@ -542,6 +553,9 @@ function PromisesGrid({
   onPrevPage?: () => void;
   page: number;
 }) {
+  const chainId = useCurrentOrDefaultChainId();
+  const networkPrefix = appChainFromId(chainId)?.prefix ?? "";
+
   const transitions = useTransition(cards, {
     keys: (card) => card.key,
     from: {
@@ -558,6 +572,7 @@ function PromisesGrid({
       tension: 1200,
     },
   });
+
   return (
     <div>
       <div
@@ -587,7 +602,7 @@ function PromisesGrid({
                 ? <EmptyCard />
                 : (
                   <PromiseCard
-                    promiseId={card.promise.id}
+                    promiseId={`${networkPrefix}-${card.promise.id}`}
                     promiseData={card.promise.data}
                   />
                 )}

@@ -16,6 +16,7 @@ import { Container } from "./Container";
 import {
   colorEnumKey,
   promiseIdFromTxLogs,
+  useCurrentChainId,
   usePinkyPromiseContractAddress,
 } from "./contract-utils";
 import { Editor } from "./Editor";
@@ -25,6 +26,7 @@ import { useResetScroll } from "./react-utils";
 import { SvgDoc, SvgDocSignees } from "./SvgDoc";
 import { Transaction } from "./Transaction";
 import {
+  appChainFromId,
   blocksToHtml,
   formatDate,
   isAddress,
@@ -84,7 +86,9 @@ export function CreatePromiseScreen() {
     newPromiseData.title || PLACEHOLDER_TITLE,
   ], [newPromiseData]);
 
-  const contractAddress = usePinkyPromiseContractAddress();
+  const chainId = useCurrentChainId();
+  const chainPrefix = appChainFromId(chainId)?.prefix;
+  const contractAddress = usePinkyPromiseContractAddress(chainId);
   const svgDocColors = useMemo(() => promiseColors(editorData.color), [
     editorData.color,
   ]);
@@ -202,8 +206,9 @@ export function CreatePromiseScreen() {
               >
                 <Transaction
                   config={{
-                    address: contractAddress,
                     abi: PinkyPromiseAbi,
+                    address: contractAddress,
+                    chainId,
                     functionName: "newPromise",
                     args: [{
                       body: newPromiseData.body,
@@ -215,7 +220,7 @@ export function CreatePromiseScreen() {
                   title="Creating pinky promise"
                   successLabel="View Promise"
                   successAction={({ logs }) => (
-                    `/promise/${promiseIdFromTxLogs(logs)}`
+                    `/promise/${chainPrefix}-${promiseIdFromTxLogs(logs)}`
                   )}
                   onCancel={() => {
                     setMode("editor");
@@ -258,11 +263,13 @@ export function CreatePromiseScreen() {
 }
 
 function useTxFeeEstimate(data: PromiseData): Dnum {
-  const contractAddress = usePinkyPromiseContractAddress();
+  const chainId = useCurrentChainId();
+  const contractAddress = usePinkyPromiseContractAddress(chainId);
   const feeData = useFeeData();
   const txPrepare = usePrepareContractWrite({
-    address: contractAddress,
     abi: PinkyPromiseAbi,
+    address: contractAddress,
+    chainId,
     functionName: "newPromise",
     args: [{
       body: data.body,

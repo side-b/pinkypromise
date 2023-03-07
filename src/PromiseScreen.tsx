@@ -25,6 +25,7 @@ import {
   isColorEnumKey,
   promiseStateFromEnumKey,
   signingStateFromEnumKey,
+  useCurrentChainId,
   usePinkyPromiseContractAddress,
 } from "./contract-utils";
 import { useBackground } from "./GlobalStyles";
@@ -39,17 +40,33 @@ import { Transaction } from "./Transaction";
 import { isPromiseStateEnumKey, isSigningStateEnumKey } from "./types";
 import {
   addressesEqual,
+  appChainFromPrefix,
   blocksToHtml,
   formatDate,
   formatPromiseState,
+  parseFullPromiseId,
   promiseColors,
   textToBlocks,
 } from "./utils";
 
 export function PromiseScreen({ action, id }: { action: string; id: string }) {
   const [_, setLocation] = useLocation();
-  const contractAddress = usePinkyPromiseContractAddress();
-  const [{ status, refetch }, promiseData] = usePromiseData(id, contractAddress);
+
+  const [networkPrefix, promiseId] = parseFullPromiseId(id) ?? [];
+  const fullPromiseId = `${networkPrefix}-${promiseId}`;
+
+  const chainId = (
+    networkPrefix && appChainFromPrefix(networkPrefix)?.chainId
+  ) ?? -1;
+
+  const contractAddress = usePinkyPromiseContractAddress(chainId);
+
+  const [{ status, refetch }, promiseData] = usePromiseData(
+    String(promiseId),
+    chainId,
+    contractAddress,
+  );
+
   const { color, contentColor } = promiseData.colors;
   const { colorEnumKey } = promiseData;
 
@@ -81,16 +98,17 @@ export function PromiseScreen({ action, id }: { action: string; id: string }) {
       }], ([_, { state }]) => {
         setTxBag({
           config: {
+            chainId,
             address: contractAddress,
             abi: PinkyPromiseAbi,
             functionName: state === "Signed" ? "nullify" : "discard",
-            args: [id],
+            args: [promiseId],
           },
-          title: `Break promise ${id}`,
+          title: `Break promise ${fullPromiseId}`,
           successLabel: "View promise",
-          successAction: () => `/promise/${id}`,
+          successAction: () => `/promise/${fullPromiseId}`,
           onCancel: () => {
-            setLocation(`/promise/${id}`);
+            setLocation(`/promise/${fullPromiseId}`);
           },
         });
       })
@@ -103,13 +121,13 @@ export function PromiseScreen({ action, id }: { action: string; id: string }) {
             address: contractAddress,
             abi: PinkyPromiseAbi,
             functionName: "cancelNullify",
-            args: [id],
+            args: [promiseId],
           },
           title: "Unbreak pinky promise",
           successLabel: "View promise",
-          successAction: () => `/promise/${id}`,
+          successAction: () => `/promise/${fullPromiseId}`,
           onCancel: () => {
-            setLocation(`/promise/${id}`);
+            setLocation(`/promise/${fullPromiseId}`);
           },
         });
       })
@@ -122,21 +140,21 @@ export function PromiseScreen({ action, id }: { action: string; id: string }) {
             address: contractAddress,
             abi: PinkyPromiseAbi,
             functionName: "sign",
-            args: [id],
+            args: [promiseId],
           },
           title: "Sign pinky promise",
           successLabel: "View promise",
-          successAction: () => `/promise/${id}`,
-          onCancel: () => setLocation(`/promise/${id}`),
+          successAction: () => `/promise/${fullPromiseId}`,
+          onCancel: () => setLocation(`/promise/${fullPromiseId}`),
         });
       })
       .with([P.union("break", "unbreak", "sign"), P.any], () => {
-        setLocation(`/promise/${id}`);
+        setLocation(`/promise/${fullPromiseId}`);
       })
       .otherwise(() => {
         setTxBag(null);
       });
-  }, [promiseData, action]);
+  }, [action, chainId, promiseData, promiseId, fullPromiseId]);
 
   const loadingTransition = useTransition({ status, txBag }, {
     keys: ({ status, txBag }) => `${status}${Boolean(txBag)}`,
@@ -161,6 +179,11 @@ export function PromiseScreen({ action, id }: { action: string; id: string }) {
     if (color === COLORS.blue) return color;
     return contentColor;
   }, [color, contentColor]);
+
+  if (networkPrefix === undefined || promiseId === undefined) {
+    // TODO: not found screen
+    return "Not found";
+  }
 
   return (
     <>
@@ -235,7 +258,7 @@ export function PromiseScreen({ action, id }: { action: string; id: string }) {
                         color={buttonColor}
                         info={PROMISE_NOTICE_DRAFT_UNSIGNED[0]}
                         onButtonClick={() => {
-                          setLocation(`/promise/${id}/sign`);
+                          setLocation(`/promise/${fullPromiseId}/sign`);
                         }}
                       />
                     ))
@@ -246,7 +269,7 @@ export function PromiseScreen({ action, id }: { action: string; id: string }) {
                         color={buttonColor}
                         info={PROMISE_NOTICE_DRAFT_SIGNED[0]}
                         onButtonClick={() => {
-                          setLocation(`/promise/${id}/break`);
+                          setLocation(`/promise/${fullPromiseId}/break`);
                         }}
                       />
                     ))
@@ -259,7 +282,7 @@ export function PromiseScreen({ action, id }: { action: string; id: string }) {
                           color={buttonColor}
                           info={PROMISE_NOTICE_NULLREQUEST[0]}
                           onButtonClick={() => {
-                            setLocation(`/promise/${id}/unbreak`);
+                            setLocation(`/promise/${fullPromiseId}/unbreak`);
                           }}
                         />
                       ),
@@ -273,7 +296,7 @@ export function PromiseScreen({ action, id }: { action: string; id: string }) {
                           color={buttonColor}
                           info={PROMISE_NOTICE_SIGNED[0]}
                           onButtonClick={() => {
-                            setLocation(`/promise/${id}/break`);
+                            setLocation(`/promise/${fullPromiseId}/break`);
                           }}
                         />
                       ),
@@ -287,7 +310,7 @@ export function PromiseScreen({ action, id }: { action: string; id: string }) {
                     height={promiseData.height}
                     htmlMode={true}
                     padding={[0, 0, 0]}
-                    promiseId={id}
+                    promiseId={fullPromiseId}
                     signedOn={promiseData.signedOn}
                     signees={
                       <SvgDocSignees
@@ -350,15 +373,20 @@ export function PromiseScreen({ action, id }: { action: string; id: string }) {
   );
 }
 
-function usePromiseData(id: string, contractAddress?: Address) {
+function usePromiseData(
+  promiseId: string,
+  chainId: number,
+  contractAddress?: Address,
+) {
   const { address: accountAddress } = useAccount();
 
   const promiseInfoRead = useContractRead({
-    address: contractAddress,
     abi: PinkyPromiseAbi,
-    functionName: "promiseInfo",
-    args: [BigNumber.from(id)],
+    address: contractAddress,
+    args: [BigNumber.from(promiseId)],
+    chainId,
     enabled: Boolean(contractAddress),
+    functionName: "promiseInfo",
     watch: true,
   });
 

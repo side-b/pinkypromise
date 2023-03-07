@@ -1,4 +1,5 @@
 import type {
+  Address,
   ColorEnumKey,
   ColorId,
   Log,
@@ -12,8 +13,10 @@ import { utils as ethersUtils } from "ethers";
 import { match } from "ts-pattern";
 import { useNetwork } from "wagmi";
 import { PinkyPromiseAbi } from "./abis";
-import { NETWORKS } from "./environment";
+import { APP_CHAINS } from "./constants";
+import { NETWORK_DEFAULT, NETWORKS } from "./environment";
 import { isNetworkName } from "./types";
+import { appChainFromId, appChainFromName } from "./utils";
 
 export function promiseIdFromTxLogs(logs: Log[]): string | null {
   const PinkyPromiseInterface = new ethersUtils.Interface(PinkyPromiseAbi);
@@ -49,15 +52,38 @@ export function isColorEnumKey(key: number): key is ColorEnumKey {
     || key === 3;
 }
 
-export function usePinkyPromiseContractAddress() {
+export function useCurrentChainId() {
   const { chain } = useNetwork();
-  let network = chain?.network;
-  if (network === "hardhat") network = "local";
-  return typeof network === "string" && isNetworkName(network)
-    ? NETWORKS[network]?.contract
-    // if the connected network is unknown,
-    // we return the first one found in the env
-    : Object.values(NETWORKS)[0]?.contract;
+  return chain?.id;
+}
+
+export function useCurrentOrDefaultChainId() {
+  const chainId = useCurrentChainId() ?? -1;
+  return isChainIdSupported(chainId)
+    ? chainId
+    : appChainFromName(NETWORK_DEFAULT)?.chainId ?? -1;
+}
+
+export function isChainIdSupported(id: number) {
+  return APP_CHAINS.some((chain) => chain.chainId === id);
+}
+
+export function usePinkyPromiseContractAddress(
+  chainId?: number,
+): Address | undefined {
+  const network = useNetwork();
+  chainId ??= network.chain?.id;
+
+  const chain = appChainFromId(chainId ?? -1);
+  if (!chain) {
+    return undefined;
+  }
+
+  return (
+    isNetworkName(chain.name)
+      ? NETWORKS[chain.name]?.contract
+      : Object.values(NETWORKS)[0]?.contract
+  ) ?? undefined;
 }
 
 export function promiseStateFromEnumKey(state: PromiseStateEnumKey): PromiseState {

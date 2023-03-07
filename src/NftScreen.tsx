@@ -2,10 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { BigNumber } from "ethers";
 import { useContractRead } from "wagmi";
 import { PinkyPromiseAbi } from "./abis";
-import { usePinkyPromiseContractAddress } from "./contract-utils";
+import { useCurrentChainId, usePinkyPromiseContractAddress } from "./contract-utils";
 
 export function NftScreen({ id }: { id: string }) {
-  const contractAddress = usePinkyPromiseContractAddress();
+  const chainId = useCurrentChainId();
+  const contractAddress = usePinkyPromiseContractAddress(chainId);
   const tokenURI = useContractRead({
     address: contractAddress,
     abi: PinkyPromiseAbi,

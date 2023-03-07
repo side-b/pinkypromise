@@ -1,4 +1,14 @@
-import type { ColorId } from "./types";
+import type { AppChain, ColorId } from "./types";
+
+export const APP_CHAINS = [
+  { chainId: 42161, prefix: "A", name: "arbitrum" },
+  { chainId: 8453, prefix: "B", name: "base" },
+  { chainId: 5, prefix: "G", name: "goerli" },
+  { chainId: 31337, prefix: "L", name: "local" },
+  { chainId: 1, prefix: "E", name: "mainnet" },
+  { chainId: 10, prefix: "O", name: "optimism" },
+  { chainId: 137, prefix: "P", name: "polygon" },
+] satisfies AppChain[];
 
 export const PROMISE_SYNONYMS = [
   "Pacts",

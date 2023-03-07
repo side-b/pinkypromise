@@ -9,7 +9,7 @@ import {
 } from "@rainbow-me/rainbowkit/wallets";
 import { match } from "ts-pattern";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
-import { goerli, hardhat, mainnet, polygon } from "wagmi/chains";
+import { arbitrum, goerli, hardhat, mainnet, optimism, polygon } from "wagmi/chains";
 import { infuraProvider } from "wagmi/providers/infura";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 import { publicProvider } from "wagmi/providers/public";
@@ -23,11 +23,15 @@ const { chains, provider, webSocketProvider } = configureChains(
     .filter(isNetworkName)
     .map((name: NetworkName) => (
       match(name)
+        .with("arbitrum", () => arbitrum)
+        .with("optimism", () => optimism)
         .with("mainnet", () => mainnet)
         .with("polygon", () => polygon)
         .with("goerli", () => goerli)
         .with("local", () => hardhat)
-        .exhaustive()
+        .otherwise(() => {
+          throw new Error(`Unsupported network: ${name}`);
+        })
     )),
   [
     infuraProvider({ priority: 1, apiKey: INFURA_KEY }),

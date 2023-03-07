@@ -11,7 +11,37 @@ export function isAddress(address: string): address is Address {
   return ADDRESS_RE.test(address);
 }
 
-export type NetworkName = "mainnet" | "polygon" | "goerli" | "local";
+export type NetworkPrefix =
+  | "A" // Arbitrum
+  | "B" // Base
+  | "E" // Ethereum
+  | "G" // Goerli
+  | "L" // Local
+  | "O" // Optimism
+  | "P"; // Polygon
+
+export type AppChain = {
+  prefix: NetworkPrefix;
+  name: string;
+  chainId: number;
+};
+
+export function isNetworkPrefix(prefix: string): prefix is NetworkPrefix {
+  return ["A", "B", "E", "G", "L", "O", "P"].indexOf(prefix) !== -1;
+}
+
+export type PromiseId = `${number}`;
+export type FullPromiseId = `${NetworkPrefix}-${PromiseId}`; // network prefix + promise identifier
+
+export type NetworkName =
+  | "arbitrum"
+  | "base"
+  | "mainnet"
+  | "goerli"
+  | "local"
+  | "optimism"
+  | "polygon";
+
 export function isNetworkName(value: string): value is NetworkName {
   return value === "mainnet"
     || value === "polygon"

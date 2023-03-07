@@ -1,7 +1,14 @@
-import type { Address, ColorId, EnsName, PromiseState } from "./types";
+import type {
+  Address,
+  ColorId,
+  EnsName,
+  NetworkPrefix,
+  PromiseState,
+} from "./types";
 
 import { match } from "ts-pattern";
-import { COLORS } from "./constants";
+import { APP_CHAINS, COLORS } from "./constants";
+import { isNetworkPrefix } from "./types";
 
 export const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
 export function isAddress(value: string): value is Address {
@@ -132,6 +139,28 @@ export function shortNetworkName(id: number) {
     return "grl";
   }
   return "???";
+}
+
+export function appChainFromPrefix(prefix: NetworkPrefix) {
+  return APP_CHAINS.find((chain) => chain.prefix === prefix);
+}
+
+export function appChainFromId(chainId: number) {
+  return APP_CHAINS.find((chain) => chain.chainId === chainId);
+}
+
+export function appChainFromName(name: string) {
+  return APP_CHAINS.find((chain) => chain.name === name);
+}
+
+export function parseFullPromiseId(
+  fullPromiseId: string,
+): undefined | [prefix: NetworkPrefix, id: number] {
+  let parts = fullPromiseId.split("-");
+  const id = parseInt(parts[1], 10);
+  return (isNetworkPrefix(parts[0]) && !isNaN(id))
+    ? [parts[0], id]
+    : undefined;
 }
 
 export async function sleep(duration: number) {
