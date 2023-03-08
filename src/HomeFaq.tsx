@@ -1,15 +1,28 @@
 import type { ReactNode } from "react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useDimensions from "react-cool-dimensions";
+import { useInView } from "react-cool-inview";
 import { a, useSpring } from "react-spring";
 import { COLORS, FAQ_ITEMS } from "./constants";
 import { PlusMinusButton } from "./PlusMinusButton";
 
+const QUESTION_HEIGHT = 64;
+
 export function HomeFaq() {
+  const { observe, inView } = useInView({
+    threshold: 0.4,
+    unobserveOnEnter: true,
+  });
   const [openedItem, setOpenedItem] = useState(-1);
+  useEffect(() => {
+    if (inView) {
+      setOpenedItem((index) => index === -1 ? 0 : index);
+    }
+  }, [inView]);
   return (
     <div
+      ref={observe}
       css={{
         padding: "128px 0",
         background: COLORS.red,
@@ -53,8 +66,20 @@ function HomeFaqItem({
   question: string;
 }) {
   const answerDimensions = useDimensions();
-  const { height } = useSpring({
-    height: 64 + (opened ? answerDimensions.height : 0),
+  const spring = useSpring({
+    from: {
+      itemHeight: QUESTION_HEIGHT,
+      visibility: "hidden" as const,
+    },
+    to: opened
+      ? {
+        itemHeight: QUESTION_HEIGHT + answerDimensions.height,
+        visibility: "visible" as const,
+      }
+      : {
+        itemHeight: QUESTION_HEIGHT,
+        visibility: "hidden" as const,
+      },
     config: {
       mass: 2,
       friction: 100,
@@ -63,7 +88,7 @@ function HomeFaqItem({
   });
   return (
     <a.li
-      style={{ height }}
+      style={{ height: spring.itemHeight }}
       css={{
         overflow: "hidden",
         position: "relative",
@@ -84,7 +109,7 @@ function HomeFaqItem({
             inset: "0 12px auto auto",
             display: "flex",
             alignItems: "center",
-            height: 64,
+            height: QUESTION_HEIGHT,
           }}
         >
           <PlusMinusButton
@@ -98,7 +123,7 @@ function HomeFaqItem({
           css={{
             display: "flex",
             alignItems: "center",
-            height: 64,
+            height: QUESTION_HEIGHT,
             padding: "0 24px",
             fontSize: 24,
             fontWeight: 400,
@@ -109,9 +134,19 @@ function HomeFaqItem({
         </h2>
       </label>
       <div ref={answerDimensions.observe}>
-        <div css={{ padding: "0 64px 24px 24px" }}>
+        <a.div
+          style={{ visibility: spring.visibility }}
+          css={{
+            padding: "0 64px 24px 24px",
+            "a:focus": {
+              outline: `2px solid ${COLORS.black}`,
+              outlineOffset: 2,
+              borderRadius: 2,
+            },
+          }}
+        >
           {answer}
-        </div>
+        </a.div>
       </div>
     </a.li>
   );
