@@ -4,6 +4,8 @@ import { AnimatableFingers } from "./AnimatableFingers";
 import { Button } from "./Button";
 import { COLORS, PROMISE_SYNONYMS } from "./constants";
 import { Footer } from "./Footer";
+import { HomeFaq } from "./HomeFaq";
+import { HomeIntro } from "./HomeIntro";
 import { HomeSteps } from "./HomeSteps";
 import {
   useChainedProgress,
@@ -15,15 +17,15 @@ import { WordsLoop } from "./WordsLoop";
 
 export function HomeScreen() {
   const [animateWords, setAnimateWords] = useState(false);
-  const [onlyFingers, setOnlyFingers] = useState(true);
+  const [fingersAnimRunning, setFingersAnimRunning] = useState(true);
 
   const springs = useChainedProgress([
-    [0, "leftFinger", { onStart: () => setOnlyFingers(true) }],
+    [0, "leftFinger", { onStart: () => setFingersAnimRunning(true) }],
     [0.1, "rightFinger"],
     [0.5, "closeFingers"],
     [0.9, "reveal", {
       config: { mass: 1, friction: 80, tension: 1400 },
-      onStart: () => setOnlyFingers(false),
+      onStart: () => setFingersAnimRunning(false),
     }],
     [1, "pause", { config: { duration: 600 } }],
   ], {
@@ -36,9 +38,9 @@ export function HomeScreen() {
 
   useEffect(() => {
     const cl = document.documentElement.classList;
-    if (onlyFingers) cl.add("no-scroll");
+    if (fingersAnimRunning) cl.add("no-scroll");
     return () => cl.remove("no-scroll");
-  }, [onlyFingers]);
+  }, [fingersAnimRunning]);
 
   useResetScroll();
 
@@ -64,7 +66,7 @@ export function HomeScreen() {
           style={{
             transform: springs.reveal.progress.to((p: number) => `
               translateY(${lerp(p, -120, 40)}px)
-              scale(${lerp(p, 1, 140 / (dimensions.height * 1.8))})
+              scale(${lerp(p, 1, 120 / (dimensions.height * 1.8))})
             `),
           }}
           css={{
@@ -95,10 +97,10 @@ export function HomeScreen() {
         </a.div>
         <a.div
           css={{
-            display: onlyFingers ? "none" : "flex",
+            display: fingersAnimRunning ? "none" : "flex",
             flexDirection: "column",
             alignItems: "center",
-            marginTop: "240px",
+            marginTop: "224px",
           }}
           style={{
             opacity: springs.reveal.progress.to([0, 0.2, 1], [0, 1, 1]),
@@ -112,16 +114,16 @@ export function HomeScreen() {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              paddingBottom: "60px",
+              paddingBottom: 112,
             }}
           >
             <div
               css={{
-                paddingBottom: "48px",
+                paddingBottom: 48,
                 textAlign: "center",
-                fontSize: "200px",
+                fontSize: 200,
                 fontWeight: 500,
-                lineHeight: "1",
+                lineHeight: 1,
                 textTransform: "uppercase",
                 color: "#FFF",
                 userSelect: "none",
@@ -130,7 +132,7 @@ export function HomeScreen() {
                 },
               }}
             >
-              <div>On-chain</div>
+              <div css={{ fontSize: 160 }}>On-chain</div>
               <WordsLoop
                 animate={animateWords}
                 word="Promises"
@@ -140,20 +142,19 @@ export function HomeScreen() {
             <Button
               color={COLORS.blue}
               href="/new"
-              label="Cool, cool"
+              label="Cool cool"
               size="giant"
             />
           </div>
-          <div css={{ display: onlyFingers ? "none" : "block", width: "100%" }}>
-            <HomeSteps />
-          </div>
           <div
             css={{
-              display: onlyFingers ? "none" : "flex",
-              justifyContent: "center",
-              height: "104px",
+              display: fingersAnimRunning ? "none" : "block",
+              width: "100%",
             }}
           >
+            <HomeIntro />
+            <HomeSteps />
+            <HomeFaq />
             <Footer />
           </div>
         </a.div>

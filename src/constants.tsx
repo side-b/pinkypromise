@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { AppChain, ColorId } from "./types";
 
 export const APP_CHAINS = [
@@ -101,9 +102,9 @@ export const PROMISE_NOTICE_SIGNED = [
 ];
 
 export const FOOTER_LINKS = [
-  ["side-b", "https://github.com/bpierre/pinkypromise"],
-  ["faq", "https://github.com/bpierre/pinkypromise"],
   ["source", "https://github.com/bpierre/pinkypromise"],
+  ["side-b", "https://github.com/bpierre/pinkypromise"],
+  ["contracts", "https://github.com/bpierre/pinkypromise"],
 ];
 
 function TxLink({ label, url }: { label: string; url?: string }) {
@@ -137,3 +138,21 @@ export const TxSteps = {
     </>
   ),
 };
+
+export const FAQ_ITEMS = [
+  ["What is a pinky promise?"],
+  [
+    "What are soulbound tokens?",
+    <p>
+      Soulbound tokens are non-transferable tokens; once you acquire one, it will
+      always be tied to your personal wallet and identity, and cannot be sold or
+      given to another person.
+    </p>,
+  ],
+  ["What are the fees?"],
+  ["What are the legal implications of creating a promise?"],
+  ["Where are the promises stored?"],
+  ["Can I see a signed promise in my wallet?"],
+  ["Is pinky promise fully open source?"],
+  ["Who is behind Pinky Promise?"],
+] satisfies Array<[question: string, answer?: ReactNode]>;

@@ -31,6 +31,9 @@ dependencies:
   react:
     specifier: ^18.2.0
     version: 18.2.0
+  react-cool-dimensions:
+    specifier: ^3.0.0
+    version: 3.0.0(react@18.2.0)
   react-cool-inview:
     specifier: ^3.0.1
     version: 3.0.1(react@18.2.0)
@@ -4586,6 +4589,14 @@ packages:
     resolution: {integrity: sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==}
     dependencies:
       safe-buffer: 5.2.1
+    dev: false
+
+  /react-cool-dimensions@3.0.0(react@18.2.0):
+    resolution: {integrity: sha512-UVQC4vgwvYtHqo3vzG6j840p1QOSHrRbL0mZMRTQqz4XfB4qDmYW1V7OQmSVEQ8VY7kLLj4K2A15bRNM3nf+8A==}
+    peerDependencies:
+      react: '>= 16.8.0'
+    dependencies:
+      react: 18.2.0
     dev: false
 
   /react-cool-inview@3.0.1(react@18.2.0):

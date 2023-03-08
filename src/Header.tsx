@@ -59,10 +59,10 @@ export function Header() {
               textTransform: "lowercase",
               color: COLORS.white,
               textDecoration: "none",
-              borderRadius: "48px",
+              borderRadius: 8,
               "&:focus-visible": {
                 outline: `2px solid ${COLORS.white}`,
-                outlineOffset: "16px",
+                outlineOffset: 8,
               },
               "&:active": {
                 transform: "translate(1px, 1px)",

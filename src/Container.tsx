@@ -27,7 +27,7 @@ export function Container({
           zIndex: 2,
           display: "grid",
           placeItems: "center",
-          paddingBottom: 80,
+          paddingBottom: drawer ? 80 : 0,
         }}
       >
         <div
@@ -49,7 +49,17 @@ export function Container({
           {children}
         </div>
       </div>
-      {drawer && <ContainerDrawer>{drawer}</ContainerDrawer>}
+      {drawer && (
+        <div
+          css={{
+            display: "flex",
+            justifyContent: "center",
+            maxWidth,
+          }}
+        >
+          <ContainerDrawer>{drawer}</ContainerDrawer>
+        </div>
+      )}
     </>
   );
 }
@@ -76,7 +86,6 @@ function ContainerDrawer({ children }: { children: ReactNode }) {
         marginTop: -80,
         width: "100%",
         maxWidth: 752,
-        paddingBottom: 70,
       }}
     >
       <div

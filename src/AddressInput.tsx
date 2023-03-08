@@ -5,8 +5,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { a, useTransition } from "react-spring";
 import { useProvider } from "wagmi";
-import { AddRemoveButton } from "./AddRemoveButton";
+import { COLORS } from "./constants";
 import { Loader } from "./Loader";
+import { PlusMinusButton } from "./PlusMinusButton";
 import { isEnsName } from "./utils";
 
 export function AddressInput({
@@ -77,9 +78,10 @@ export function AddressInput({
                 inset: "12px 12px auto auto",
               }}
             >
-              <AddRemoveButton
-                color={accentColor}
-                mode="remove"
+              <PlusMinusButton
+                color={COLORS[accentColor ?? "pink"]}
+                mode="minus"
+                title="Remove"
                 onClick={() => onRemove()}
               />
             </a.div>

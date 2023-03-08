@@ -29,8 +29,10 @@ export function HomeSteps() {
   return (
     <ol
       css={{
+        overflow: "hidden",
         counterReset: "a",
         width: "100%",
+        margin: 0,
         padding: 0,
         fontSize: 32,
         "li": {
