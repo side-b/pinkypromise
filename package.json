@@ -13,10 +13,10 @@
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
-    "@rainbow-me/rainbowkit": "^0.9.0",
-    "@tanstack/react-query": "^4.24.6",
-    "@wagmi/core": "^0.9.5",
-    "abitype": "^0.4.1",
+    "@rainbow-me/rainbowkit": "^0.11.1",
+    "@tanstack/react-query": "^4.26.1",
+    "@wagmi/core": "^0.10.1",
+    "abitype": "^0.6.8",
     "colord": "^2.9.3",
     "dnum": "^2.3.2",
     "ethereum-blockies-base64": "^1.0.2",
@@ -26,13 +26,13 @@
     "react-dom": "^18.2.0",
     "react-spring": "^9.6.1",
     "ts-pattern": "^4.1.4",
-    "wagmi": "^0.11.5",
+    "wagmi": "^0.11.7",
     "wouter": "^2.10.0",
-    "zod": "^3.20.6"
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@emotion/babel-plugin": "^11.10.5",
-    "@types/node": "^18.13.0",
+    "@types/node": "^18.14.6",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.10",
     "@vitejs/plugin-react": "^3.1.0",
