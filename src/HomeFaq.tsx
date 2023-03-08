@@ -138,7 +138,7 @@ function HomeFaqItem({
           style={{ visibility: spring.visibility }}
           css={{
             padding: "0 64px 24px 24px",
-            "a:focus": {
+            "a:focus-visible": {
               outline: `2px solid ${COLORS.black}`,
               outlineOffset: 2,
               borderRadius: 2,
