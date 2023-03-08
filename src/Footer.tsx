@@ -1,7 +1,7 @@
 import { Button } from "./Button";
 import { COLORS, FOOTER_LINKS } from "./constants";
 
-import sideb from "./sideb.png";
+import sideb from "./side-b.png";
 
 export function Footer() {
   return (
