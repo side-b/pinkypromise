@@ -129,16 +129,14 @@ export function formatPromiseState(state: PromiseState) {
 }
 
 export function shortNetworkName(id: number) {
-  if (id === 31337) {
-    return "lcl";
-  }
-  if (id === 1) {
-    return "eth";
-  }
-  if (id === 5) {
-    return "grl";
-  }
-  return "???";
+  return match(id)
+    .with(31337, () => "lcl")
+    .with(1, () => "eth")
+    .with(5, () => "grl")
+    .with(137, () => "plg")
+    .with(42161, () => "abt")
+    .with(42161, () => "opt")
+    .otherwise(() => "???");
 }
 
 export function appChainFromPrefix(prefix: NetworkPrefix) {
