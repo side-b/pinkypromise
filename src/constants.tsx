@@ -193,7 +193,7 @@ export const FAQ_ITEMS = [
     </p>,
   ],
   [
-    "Is pinky promise open source?",
+    "Is Pinky Promise open source?",
     <p>
       Yes, the codebase is fully open source and available{" "}
       <a
