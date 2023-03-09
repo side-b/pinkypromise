@@ -44,8 +44,11 @@ export const PROMISE_COLORS_BY_ID = Object.entries(PROMISE_COLORS) as Array<[
   string,
 ]>;
 
+export const HOME_INTRO =
+  "Onchain accountability from jolly commitments between friends and foes";
+
 export const HOME_STEPS = [
-  "Sign a promise with friends (foes work too). It will get stored entirely on-chain, using an immutable contract.",
+  "Sign a promise with friends (foes work too). It will get stored entirely onchain, using an immutable contract.",
   "Each participant receives a soulbound NFT, allowing to consult, or get haunted by, the promise from their wallets.",
   "You can break a promise at any time, like in real life − except here, all participants need to do it. Less grudge overall.",
 ];
@@ -106,7 +109,7 @@ export const GH_REPO_URL = "https://github.com/bpierre/pinkypromise";
 export const FOOTER_LINKS = [
   ["source", GH_REPO_URL],
   ["side-b", GH_REPO_URL],
-  ["contracts", GH_REPO_URL],
+  ["contract", GH_REPO_URL],
 ];
 
 function TxLink({ label, url }: { label: string; url?: string }) {
@@ -146,7 +149,7 @@ export const FAQ_ITEMS = [
   [
     "Where are the promises stored?",
     <p>
-      Promises are stored entirely on-chain and don’t rely on any other storage
+      Promises are stored entirely onchain and don’t rely on any other storage
       solution. This is to ensure a maximum level of availability now and in the
       future.
     </p>,

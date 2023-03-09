@@ -132,7 +132,7 @@ export function HomeScreen() {
                 },
               }}
             >
-              <div css={{ fontSize: 160 }}>On-chain</div>
+              <div css={{ fontSize: 160 }}>Onchain</div>
               <WordsLoop
                 animate={animateWords}
                 word="Promises"
@@ -142,7 +142,7 @@ export function HomeScreen() {
             <Button
               color={COLORS.blue}
               href="/new"
-              label="Cool cool"
+              label="make one"
               size="giant"
             />
           </div>

@@ -13,7 +13,7 @@ import {
 import { AnimatableFingers } from "./AnimatableFingers";
 import { Button } from "./Button";
 import { ConnectButton } from "./ConnectButton";
-import { COLORS, TxSteps } from "./constants";
+import { COLORS, GH_REPO_URL, TxSteps } from "./constants";
 import { Container } from "./Container";
 import { useChainedProgress, useContractUrl, useTxUrl } from "./react-utils";
 import { SplitButton } from "./SplitButton";
@@ -47,7 +47,7 @@ export function Transaction({
 
   const contractCode = [
     config.address,
-    "https://github.com/side-b/pinky-promise/contracts/PinkyPromise.sol",
+    `${GH_REPO_URL}/contracts/PinkyPromise.sol`,
   ] as const;
 
   const fingersSprings = useChainedProgress([
