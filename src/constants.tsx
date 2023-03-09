@@ -101,10 +101,12 @@ export const PROMISE_NOTICE_SIGNED = [
   "Break", // nullify()
 ];
 
+export const GH_REPO_URL = "https://github.com/bpierre/pinkypromise";
+
 export const FOOTER_LINKS = [
-  ["source", "https://github.com/bpierre/pinkypromise"],
-  ["side-b", "https://github.com/bpierre/pinkypromise"],
-  ["contracts", "https://github.com/bpierre/pinkypromise"],
+  ["source", GH_REPO_URL],
+  ["side-b", GH_REPO_URL],
+  ["contracts", GH_REPO_URL],
 ];
 
 function TxLink({ label, url }: { label: string; url?: string }) {
@@ -140,7 +142,7 @@ export const TxSteps = {
 };
 
 export const FAQ_ITEMS = [
-  ["What is a pinky promise?"],
+  ["What is a Pinky Promise?"],
   [
     "Where are the promises stored?",
     <p>
@@ -195,13 +197,43 @@ export const FAQ_ITEMS = [
     <p>
       Yes, the codebase is fully open source and available{" "}
       <a
-        href="https://github.com/bpierre/pinkypromise"
+        href={GH_REPO_URL}
         rel="nofollow"
         target="_blank"
       >
         on GitHub
       </a>. It is published under the MIT license.
     </p>,
+  ],
+  [
+    "What happens if this app goes down?",
+    <>
+      <p>
+        Pinky Promise has been made while keeping in mind to make it as decentralized
+        as possible. It means that this web app is completely optional to access your
+        promises, thanks to the following decisions:
+      </p>
+      <p>
+        First, the entire promise gets rendered as the image of its soulbound NFTs,
+        allowing anyone to consult it from an NFT-compatible wallet or website
+        without relying on anything else than its contract.
+      </p>
+      <p>
+        Second, we aimed for the contract to be as usable as possible by a human
+        (e.g. on Etherscan). This means trying to pick functions and parameters that
+        correspond to what a person without knowledge of the implementation details
+        should expect.
+      </p>
+      <p>
+        Lastly, the app has been made in a way that self hosting should be
+        straightforward. Building the app takes can be done using one command, and a
+        single JSON-RPC connection is all the app needs to fetch its data. See{" "}
+        <a href={GH_REPO_URL} rel="nofollow" target="_blank">
+          the repository
+        </a>{" "}
+        for more details on how to do this.
+      </p>
+    </>,
   ],
   [
     "Who is behind Pinky Promise?",

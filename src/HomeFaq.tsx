@@ -11,7 +11,7 @@ const QUESTION_HEIGHT = 64;
 
 export function HomeFaq() {
   const { observe, inView } = useInView({
-    threshold: 0.4,
+    threshold: 0.3,
     unobserveOnEnter: true,
   });
   const [openedItem, setOpenedItem] = useState(-1);
@@ -138,6 +138,9 @@ function HomeFaqItem({
           style={{ visibility: spring.visibility }}
           css={{
             padding: "0 64px 24px 24px",
+            "p:not(:first-of-type)": {
+              marginTop: 24,
+            },
             "a:focus-visible": {
               outline: `2px solid ${COLORS.black}`,
               outlineOffset: 2,
