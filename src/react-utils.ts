@@ -23,12 +23,12 @@ export function useWindowDimensions() {
   return dimensions;
 }
 
-export function useProgress(springProps?: UseSpringProps) {
+export function useProgress(springProps?: UseSpringProps, enabled: boolean = true) {
   const ref = useSpringRef();
   const spring = useSpring({
     ref,
     from: { progress: 0 },
-    to: { progress: 1 },
+    to: { progress: Number(enabled) },
     ...springProps,
   });
   return {
@@ -42,14 +42,19 @@ export function useChainedProgress(
   steps: Array<[number, string, UseSpringProps?]>,
   options: {
     duration?: number;
+    enabled?: boolean;
     onComplete?: () => void;
     props?: Parameters<typeof useProgress>[0];
   } = {},
 ) {
   options.duration ??= 1000;
+  options.enabled ??= true;
 
   const springs = steps.reduce<
-    Record<string, ReturnType<typeof useProgress>>
+    Record<
+      (typeof steps)[number][1],
+      ReturnType<typeof useProgress>
+    >
   >((springs, [, name, props = {}], index) => {
     const props_ = { ...options.props, ...props };
     return ({
@@ -58,6 +63,7 @@ export function useChainedProgress(
         index === steps.length - 1
           ? { ...props_, onRest: () => options.onComplete?.() }
           : props_,
+        options.enabled,
       ),
     });
   }, {});
@@ -71,9 +77,11 @@ export function useChainedProgress(
   return springs;
 }
 
-export function useExplorerBaseUrl() {
-  const { chain } = useNetwork();
-  return chain?.blockExplorers?.etherscan.url ?? undefined;
+export function useExplorerBaseUrl(chainId?: number) {
+  const { chain, chains } = useNetwork();
+  chainId ??= chain?.id;
+  const chain_ = chains.find((chain) => chain.id === chainId);
+  return chain_?.blockExplorers?.etherscan.url ?? undefined;
 }
 
 export function useTxUrl() {

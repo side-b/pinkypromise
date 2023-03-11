@@ -6,12 +6,13 @@
 // See scripts/codegen-PinkyPromiseSVg.sol.tsx for more context.
 
 import type { ReactNode } from "react";
-import type { Address } from "./types";
+import type { Address, EnsName } from "./types";
 
 import { createElement, useEffect, useMemo, useRef } from "react";
 import { useEnsName } from "wagmi";
 import { PLACEHOLDER_TITLE } from "./constants";
 import { useExplorerBaseUrl } from "./react-utils";
+import { isAddress } from "./types";
 
 const CONTENT_WIDTH = 720;
 
@@ -357,7 +358,7 @@ export function SvgDoc({
 export function SvgDocSignees({
   signees,
 }: {
-  signees: Array<readonly [Address, boolean | string]>;
+  signees: Array<readonly [Address | EnsName, boolean | string]>;
 }) {
   const explorerBaseUrl = useExplorerBaseUrl();
   return (
@@ -383,7 +384,9 @@ export function SvgDocSignee({
   signature,
   title,
 }: {
-  address: Address;
+  // Not necessarily an address, it could be a placeholder
+  // (solidity codegen script) or a demo-only ENS name (HomeIntro)
+  address: string;
   explorerBaseUrl?: string;
   label?: string;
   signature: string | ReactNode;
@@ -421,11 +424,11 @@ export function SvgDocSigneeEns({
   explorerBaseUrl,
   signature,
 }: {
-  address: Address;
+  address: Address | EnsName;
   explorerBaseUrl?: string;
   signature: string | ReactNode;
 }) {
-  const ensName = useEnsName({ address });
+  const ensName = useEnsName({ address: isAddress(address) ? address : undefined });
   const title = `${ensName.data ? `${ensName.data} − ` : ""}${address}`;
   const label = ensName.data ?? address;
   return (

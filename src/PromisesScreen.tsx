@@ -52,7 +52,7 @@ export const PromisesScreen = memo(function PromisesScreen({
   mineOnly?: boolean;
   page: number;
 }) {
-  let chainId = useCurrentOrDefaultChainId();
+  const chainId = useCurrentOrDefaultChainId();
   const contractAddress = usePinkyPromiseContractAddress(chainId);
 
   const [_, setLocation] = useLocation();

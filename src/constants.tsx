@@ -105,6 +105,7 @@ export const PROMISE_NOTICE_SIGNED = [
 ];
 
 export const GH_REPO_URL = "https://github.com/bpierre/pinkypromise";
+export const SIDEB_URL = "https://github.com/side-b";
 
 export const FOOTER_LINKS = [
   ["source", GH_REPO_URL],

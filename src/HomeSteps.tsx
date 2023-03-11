@@ -80,94 +80,101 @@ function Step({
       ref={observe}
       css={{
         display: "flex",
-        flexDirection: revert ? "row-reverse" : "row",
-        justifyContent: "space-between",
+        justifyContent: "center",
         width: "100%",
-        height: 800,
         color,
         background,
-        listStyle: "none",
         "*": {
           userSelect: "none",
         },
       }}
     >
-      <a.div
-        style={{
-          opacity: appear,
-          transform: appear
-            .to([0, 1], revert ? [100, 0] : [-100, 0])
-            .to((v) => `translate3d(${v}%, 0, 0)`),
-        }}
+      <div
         css={{
           display: "flex",
-          alignItems: "center",
-          justifyContent: revert ? "flex-start" : "flex-end",
-          width: 480,
-          borderRight: revert ? 0 : `10px solid ${color}`,
-          borderLeft: revert ? `10px solid ${color}` : 0,
+          flexDirection: revert ? "row-reverse" : "row",
+          justifyContent: "space-between",
+          maxWidth: 1440,
+          height: 800,
         }}
       >
-        <img
-          alt=""
-          height={h}
-          src={img}
-          width={w}
+        <a.div
+          style={{
+            opacity: appear,
+            transform: appear
+              .to([0, 1], revert ? [100, 0] : [-100, 0])
+              .to((v) => `translate3d(${v}%, 0, 0)`),
+          }}
           css={{
-            transform: `translate(
+            display: "flex",
+            alignItems: "center",
+            justifyContent: revert ? "flex-start" : "flex-end",
+            width: 480,
+            borderRight: revert ? 0 : `10px solid ${color}`,
+            borderLeft: revert ? `10px solid ${color}` : 0,
+          }}
+        >
+          <img
+            alt=""
+            height={h}
+            src={img}
+            width={w}
+            css={{
+              transform: `translate(
               ${xShift * (revert ? 1 : -1)}px,
               ${yShift}px
             )`,
+            }}
+          />
+        </a.div>
+        <a.div
+          style={{
+            opacity: appear,
+            transform: appear
+              .to([0, 1], revert ? [-100, 0] : [100, 0])
+              .to((v) => `translate3d(${v}%, 0, 0)`),
           }}
-        />
-      </a.div>
-      <a.div
-        style={{
-          opacity: appear,
-          transform: appear
-            .to([0, 1], revert ? [-100, 0] : [100, 0])
-            .to((v) => `translate3d(${v}%, 0, 0)`),
-        }}
-        css={{
-          flexGrow: "1",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          width: "100%",
-          marginLeft: 120,
-          marginRight: 120,
-        }}
-      >
-        <div
           css={{
+            flexGrow: "1",
             display: "flex",
             flexDirection: "column",
-            alignItems: "flex-start",
             justifyContent: "center",
+            alignItems: "center",
+            width: "100%",
+            marginLeft: 120,
+            marginRight: 120,
           }}
         >
           <div
             css={{
               display: "flex",
-              alignItems: "center",
+              flexDirection: "column",
+              alignItems: "flex-start",
               justifyContent: "center",
-              width: 190,
-              height: 120,
-              marginBottom: 40,
-              fontSize: 80,
-              fontWeight: 500,
-              borderRadius: 120,
-              border: `10px solid ${color}`,
             }}
           >
-            {index + 1}
+            <div
+              css={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 190,
+                height: 120,
+                marginBottom: 40,
+                fontSize: 80,
+                fontWeight: 500,
+                borderRadius: 120,
+                border: `10px solid ${color}`,
+              }}
+            >
+              {index + 1}
+            </div>
+            <div css={{ maxWidth: 640 }}>
+              {description.trim()}
+            </div>
           </div>
-          <div css={{ maxWidth: 640 }}>
-            {description.trim()}
-          </div>
-        </div>
-      </a.div>
+        </a.div>
+      </div>
     </div>
   );
 }

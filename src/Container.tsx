@@ -42,7 +42,7 @@ export function Container({
             padding,
             color: contentColor,
             background: color,
-            borderRadius: "64px",
+            borderRadius: 64,
             boxShadow: "0 80px 120px rgba(43, 8, 28, 0.20)",
           }}
         >
