@@ -72,7 +72,7 @@ export function Footer() {
           </div>
         </div>
         <Appear spring={springs.sideb}>
-          <SideB label="Contract" url={contractExplorerUrl} />
+          <SideB label="Contract" url={SIDEB_URL} />
         </Appear>
         <div css={{ position: "absolute", inset: "0 0 0 auto" }}>
           <div
