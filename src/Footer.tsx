@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import { useInView } from "react-cool-inview";
 import { a } from "react-spring";
 import { Button } from "./Button";
@@ -38,10 +40,16 @@ export function Footer() {
   return (
     <footer
       ref={observe}
-      css={{ background: COLORS.blue }}
+      css={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        background: COLORS.blue,
+      }}
     >
       <div
         css={{
+          position: "relative",
           display: "flex",
           gap: 48,
           justifyContent: "center",
@@ -49,24 +57,59 @@ export function Footer() {
           height: 200,
         }}
       >
-        {[
-          [LinkButton, ["Source", GH_REPO_URL], springs.leftBtn] as const,
-          [SideB, ["side-b", SIDEB_URL], springs.sideb] as const,
-          [LinkButton, ["Contract", contractExplorerUrl], springs.rightBtn] as const,
-        ].map(([Component, [label, url], { progress }]) => (
-          <a.div
-            key={label + url}
-            style={{
-              transform: progress.to((v: number) =>
-                `translate3d(0, ${(1 - v) * 200}px, 0)`
-              ),
+        <div css={{ position: "absolute", inset: "0 auto 0 0" }}>
+          <div
+            css={{
+              position: "absolute",
+              inset: "0 48px 0 auto",
+              display: "flex",
+              alignItems: "center",
             }}
           >
-            <Component label={label} url={url} />
-          </a.div>
-        ))}
+            <Appear spring={springs.leftBtn}>
+              <LinkButton label="Source" url={GH_REPO_URL} />
+            </Appear>
+          </div>
+        </div>
+        <Appear spring={springs.sideb}>
+          <SideB label="Contract" url={contractExplorerUrl} />
+        </Appear>
+        <div css={{ position: "absolute", inset: "0 0 0 auto" }}>
+          <div
+            css={{
+              position: "absolute",
+              inset: "0 auto 0 48px",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <Appear spring={springs.rightBtn}>
+              <LinkButton label="Contract" url={contractExplorerUrl} />
+            </Appear>
+          </div>
+        </div>
       </div>
     </footer>
+  );
+}
+
+function Appear({
+  children,
+  spring,
+}: {
+  children: ReactNode;
+  spring: ReturnType<typeof useChainedProgress>[string];
+}) {
+  return (
+    <a.div
+      style={{
+        transform: spring.progress.to((v: number) =>
+          `translate3d(0, ${(1 - v) * 200}px, 0)`
+        ),
+      }}
+    >
+      {children}
+    </a.div>
   );
 }
 
