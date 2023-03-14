@@ -120,13 +120,10 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         _;
     }
 
-    constructor(
-        string memory name_,
-        string memory symbol_,
-        string memory networkPrefix_,
-        address ensRegistry_,
-        address bpbDateTime_
-    ) ERC721(name_, symbol_) Owned(msg.sender) {
+    constructor(string memory networkPrefix_, address ensRegistry_, address bpbDateTime_)
+        ERC721("Pinky Promise", "PP")
+        Owned(msg.sender)
+    {
         networkPrefix = networkPrefix_;
         ensRegistry = ensRegistry_;
         bpbDateTime = bpbDateTime_;
