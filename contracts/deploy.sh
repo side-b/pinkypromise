@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
 
+set -e
+
 source ./.env
 
 CHAIN_ID=

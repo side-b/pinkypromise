@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
 
+set -e
+
 source ./.env
 
 RPC_URL=""
@@ -34,7 +36,7 @@ if [[ -z $DEMO_PK3 ]]; then
     exit 1
 fi
 
-CONTRACT_ADDRESS=$(cat broadcast/PinkyPromise.s.sol/$CHAIN_ID/run-latest.json | jq '.transactions[] | select(.contractName == "PinkyPromise" and .transactionType == "CREATE") .contractAddress' --raw-output)
+CONTRACT_ADDRESS=$(cat broadcast/DeployPinkyPromise.s.sol/$CHAIN_ID/run-latest.json | jq '.transactions[] | select(.contractName == "PinkyPromise" and .transactionType == "CREATE") .contractAddress' --raw-output)
 
 if [[ -z $CONTRACT_ADDRESS ]]; then
     echo "Could not find a deployed contract for this chain ID" 1>&2
