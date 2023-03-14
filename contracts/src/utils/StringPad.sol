@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.13;
+pragma solidity 0.8.17;
 
 library StringPad {
     function padStart(string memory value, uint256 targetLength, string memory padString)
-        public
+        internal
         pure
         returns (string memory paddedValue)
     {

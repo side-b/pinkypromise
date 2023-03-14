@@ -3,7 +3,7 @@ pragma solidity 0.8.17;
 
 import "forge-std/Script.sol";
 import {PinkyPromise} from "src/PinkyPromise.sol";
-import {HexStrings} from "src/lib/HexStrings.sol";
+import {HexStrings} from "src/utils/HexStrings.sol";
 
 uint16 constant signeeHeight = 40;
 

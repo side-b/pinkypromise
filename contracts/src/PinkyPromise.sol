@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import "base64/base64.sol";
-import "solmate/auth/Owned.sol";
-import "solmate/tokens/ERC721.sol";
-import "solmate/utils/LibString.sol";
-import {IERC5192} from "src/interfaces/IERC5192.sol";
-import {PinkyPromiseSvg} from "src/PinkyPromiseSvg.sol";
+import {Base64} from "base64/base64.sol";
+import {Owned} from "solmate/auth/Owned.sol";
+import {ERC721} from "solmate/tokens/ERC721.sol";
+import {LibString} from "solmate/utils/LibString.sol";
+import {IERC5192} from "./interfaces/IERC5192.sol";
+import {PinkyPromiseSvg} from "./PinkyPromiseSvg.sol";
 
 /// @title PinkyPromise
 /// @author Pierre Bertet

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.13;
+pragma solidity 0.8.17;
 
 import "solmate/utils/LibString.sol";
-import {StringPad} from "src/lib/StringPad.sol";
+import {StringPad} from "./StringPad.sol";
 
 interface BokkyPooBahsDateTimeContract {
     function getYear(uint256 timestamp) external pure returns (uint256 year);
@@ -15,7 +15,7 @@ library DateUtils {
     using StringPad for string;
 
     function formatDate(address bpbDateTimeAddress, uint256 timestamp)
-        public
+        internal
         view
         returns (string memory formattedDate)
     {

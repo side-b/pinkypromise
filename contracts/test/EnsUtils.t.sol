@@ -2,8 +2,8 @@
 pragma solidity 0.8.17;
 
 import "forge-std/Test.sol";
-import {EnsUtils} from "src/lib/EnsUtils.sol";
-import {AddressUtils} from "src/lib/AddressUtils.sol";
+import {EnsUtils} from "src/utils/EnsUtils.sol";
+import {AddressUtils} from "src/utils/AddressUtils.sol";
 
 address constant ENS_REGISTRY = 0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e;
 address constant NULL_ADDRESS = 0x0000000000000000000000000000000000000000;

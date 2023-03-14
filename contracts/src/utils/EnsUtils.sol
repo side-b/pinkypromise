@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.13;
+pragma solidity 0.8.17;
 
-import {AddressUtils} from "src/lib/AddressUtils.sol";
+import {AddressUtils} from "./AddressUtils.sol";
 
 interface IENS {
     function resolver(bytes32 node) external view returns (address);
@@ -14,7 +14,7 @@ interface IENSReverseResolver {
 library EnsUtils {
     using AddressUtils for address;
 
-    function nameOrAddress(address registry, address address_) public view returns (string memory) {
+    function nameOrAddress(address registry, address address_) internal view returns (string memory) {
         if (registry.code.length == 0) {
             return address_.toString();
         }
@@ -38,7 +38,7 @@ library EnsUtils {
         }
     }
 
-    function reverseResolveNameHash(address address_) public pure returns (bytes32 namehash) {
+    function reverseResolveNameHash(address address_) internal pure returns (bytes32 namehash) {
         namehash = keccak256(abi.encodePacked(namehash, keccak256(abi.encodePacked("reverse"))));
         namehash = keccak256(abi.encodePacked(namehash, keccak256(abi.encodePacked("addr"))));
         namehash = keccak256(abi.encodePacked(namehash, keccak256(abi.encodePacked(address_.toStringNoPrefix()))));

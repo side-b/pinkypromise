@@ -5,10 +5,10 @@ pragma solidity 0.8.17;
 
 import "solmate/utils/LibString.sol";
 import {StrSlice, toSlice} from "dk1a-stringutils/StrSlice.sol";
-import {DateUtils} from "src/lib/DateUtils.sol";
-import {EnsUtils} from "src/lib/EnsUtils.sol";
-import {AddressUtils} from "src/lib/AddressUtils.sol";
-import {PinkyPromise} from "src/PinkyPromise.sol";
+import {DateUtils} from "./utils/DateUtils.sol";
+import {EnsUtils} from "./utils/EnsUtils.sol";
+import {AddressUtils} from "./utils/AddressUtils.sol";
+import {PinkyPromise} from "./PinkyPromise.sol";
 
 library PinkyPromiseSvg {
     using LibString for uint16;
