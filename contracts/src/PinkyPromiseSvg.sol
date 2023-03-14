@@ -5,15 +5,17 @@ pragma solidity 0.8.17;
 
 import "solmate/utils/LibString.sol";
 import {StrSlice, toSlice} from "dk1a-stringutils/StrSlice.sol";
+import {AddressUtils} from "./utils/AddressUtils.sol";
 import {DateUtils} from "./utils/DateUtils.sol";
 import {EnsUtils} from "./utils/EnsUtils.sol";
-import {AddressUtils} from "./utils/AddressUtils.sol";
+import {StringReplace} from "./utils/StringReplace.sol";
 import {PinkyPromise} from "./PinkyPromise.sol";
 
 library PinkyPromiseSvg {
     using LibString for uint16;
     using LibString for uint256;
     using AddressUtils for address;
+    using StringReplace for string;
 
     struct Contracts {
         address ensRegistry;
@@ -206,38 +208,6 @@ library PinkyPromiseSvg {
         revert("PromiseState value missing from promiseStatusLabel()");
     }
 
-    function textBlockToHtml(StrSlice textBlock) public view returns (string memory) {
-        StrSlice h1Tag = toSlice("# ");
-        StrSlice h2Tag = toSlice("## ");
-
-        if (textBlock.startsWith(h1Tag)) {
-            // stripPrefix
-            return
-                string.concat("<h1>", lineBreaksToHtml(textBlock.getSubslice(2, textBlock.len()).toString()), "</h1>");
-        }
-
-        if (textBlock.startsWith(h2Tag)) {
-            return
-                string.concat("<h2>", lineBreaksToHtml(textBlock.getSubslice(3, textBlock.len()).toString()), "</h2>");
-        }
-
-        return string.concat("<p>", lineBreaksToHtml(textBlock.toString()), "</p>");
-    }
-
-    function lineBreaksToHtml(string memory text) public view returns (string memory) {
-        string memory html;
-        StrSlice remaining = toSlice(text);
-        StrSlice brSeparator = toSlice("\n");
-
-        while (remaining.contains(brSeparator)) {
-            (, StrSlice part, StrSlice _remaining) = remaining.splitOnce(brSeparator);
-            remaining = _remaining;
-            html = string.concat(html, part.toString(), "<br/>");
-        }
-
-        return string.concat(html, remaining.toString());
-    }
-
     function promiseTextToHtml(string memory text) public view returns (string memory) {
         string memory html;
         StrSlice remaining = toSlice(text);
@@ -250,5 +220,29 @@ library PinkyPromiseSvg {
         }
 
         return string.concat(html, textBlockToHtml(remaining));
+    }
+
+    function textBlockToHtml(StrSlice textBlock) public view returns (string memory) {
+        if (textBlock.startsWith(toSlice("# "))) {
+            return string.concat(
+                "<h1>", textBlockContentToHtml(textBlock.getSubslice(2, textBlock.len()).toString()), "</h1>"
+            );
+        }
+
+        if (textBlock.startsWith(toSlice("## "))) {
+            return string.concat(
+                "<h2>", textBlockContentToHtml(textBlock.getSubslice(3, textBlock.len()).toString()), "</h2>"
+            );
+        }
+
+        return string.concat("<p>", textBlockContentToHtml(textBlock.toString()), "</p>");
+    }
+
+    function textBlockContentToHtml(string memory content) public view returns (string memory) {
+        content = content.replace("&", "&amp;");
+        content = content.replace("<", "&lt;");
+        content = content.replace(">", "&gt;");
+        content = content.replace("\n", "<br/>");
+        return content;
     }
 }

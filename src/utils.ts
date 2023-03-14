@@ -44,6 +44,9 @@ export function textToBlocks(text: string): HtmlBlock[] {
   return text
     .trim()
     .replace(/\n{3,}/g, "\n\n")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
     .split("\n\n")
     .map((line) =>
       match(line.trim())
