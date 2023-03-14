@@ -2,7 +2,7 @@
 pragma solidity 0.8.17;
 
 import "forge-std/Test.sol";
-import "solmate/utils/LibString.sol";
+import {LibString} from "solmate/utils/LibString.sol";
 import {AddressUtils} from "src/utils/AddressUtils.sol";
 import {PinkyPromise} from "src/PinkyPromise.sol";
 
