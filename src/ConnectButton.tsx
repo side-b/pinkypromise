@@ -32,32 +32,30 @@ export function ConnectButton(
           );
         }
 
+        if (chain.unsupported) {
+          return (
+            <Button
+              color={COLORS.white}
+              onClick={openChainModal}
+              label={
+                <DotLabel
+                  dotColor={COLORS.red}
+                  label="Wrong network"
+                />
+              }
+            />
+          );
+        }
+
         return (
           <SplitButton
             first={{
               gap: 8,
               label: (
-                <div
-                  css={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                  }}
-                >
-                  <div
-                    css={{
-                      width: 10,
-                      height: 10,
-                      background: chain.unsupported ? COLORS.red : "#7DFF00",
-                      border: `2px solid ${COLORS.white}`,
-                      borderRadius: "100%",
-                      transform: "translateY(1px)",
-                    }}
-                  />
-                  {chain.unsupported
-                    ? "wrong network"
-                    : shortNetworkName(chain.id)}
-                </div>
+                <DotLabel
+                  dotColor="#7DFF00"
+                  label={shortNetworkName(chain.id)}
+                />
               ),
               onClick: openChainModal,
               title: `Connected to ${chain.name}`,
@@ -70,5 +68,35 @@ export function ConnectButton(
         );
       }}
     </RKConnectButton.Custom>
+  );
+}
+
+function DotLabel({
+  dotColor,
+  label,
+}: {
+  dotColor: string;
+  label: string;
+}) {
+  return (
+    <div
+      css={{
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+      }}
+    >
+      <div
+        css={{
+          width: 10,
+          height: 10,
+          background: dotColor,
+          border: `2px solid ${COLORS.white}`,
+          borderRadius: "100%",
+          transform: "translateY(1px)",
+        }}
+      />
+      {label}
+    </div>
   );
 }
