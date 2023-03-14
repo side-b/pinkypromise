@@ -3,7 +3,7 @@ import type { ColorId, EnsName } from "./types";
 
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { a, useTransition } from "react-spring";
+import { a, useTransition } from "@react-spring/web";
 import { useProvider } from "wagmi";
 import { COLORS } from "./constants";
 import { Loader } from "./Loader";

@@ -3,7 +3,7 @@ import type { Address, SigningStateEnumKey, TxBag } from "./types";
 
 import { BigNumber } from "ethers";
 import { useEffect, useMemo, useState } from "react";
-import { useTransition } from "react-spring";
+import { useTransition } from "@react-spring/web";
 import { match, P } from "ts-pattern";
 import { useAccount, useContractRead } from "wagmi";
 import { useLocation } from "wouter";

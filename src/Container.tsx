@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 import { useInView } from "react-cool-inview";
-import { a, useSpring } from "react-spring";
+import { a, useSpring } from "@react-spring/web";
 import { COLORS } from "./constants";
 
 export function Container({

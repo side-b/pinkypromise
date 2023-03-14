@@ -11,7 +11,7 @@ import {
   useSpringRef,
   useSpringValue,
   useTransition,
-} from "react-spring";
+} from "@react-spring/web";
 import { match } from "ts-pattern";
 import { COLORS, PROMISE_COLORS_BY_ID } from "./constants";
 import { useFocusVisible } from "./FocusVisible";

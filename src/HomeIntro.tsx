@@ -1,5 +1,5 @@
 import { useInView } from "react-cool-inview";
-import { a, useSpring } from "react-spring";
+import { a, useSpring } from "@react-spring/web";
 import { COLORS, HOME_INTRO } from "./constants";
 import { SvgDoc, SvgDocSignees } from "./SvgDoc";
 

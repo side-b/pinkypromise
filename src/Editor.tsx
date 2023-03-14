@@ -3,7 +3,7 @@ import type { ColorId } from "./types";
 
 import * as dn from "dnum";
 import { useEffect, useState } from "react";
-import { a, useTransition } from "react-spring";
+import { a, useTransition } from "@react-spring/web";
 import { ActionBox } from "./ActionBox";
 import { AddressInput } from "./AddressInput";
 import { Button } from "./Button";

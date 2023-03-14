@@ -1,5 +1,5 @@
 import { keyframes } from "@emotion/react";
-import { a, useSpring } from "react-spring";
+import { a, useSpring } from "@react-spring/web";
 import { COLORS } from "./constants";
 
 const rotateKeyframes = keyframes`

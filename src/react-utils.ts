@@ -1,8 +1,8 @@
-import type { UseSpringProps } from "react-spring";
+import type { UseSpringProps } from "@react-spring/web";
 import type { Address } from "./types";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useChain, useSpring, useSpringRef } from "react-spring";
+import { useChain, useSpring, useSpringRef } from "@react-spring/web";
 import { useNetwork } from "wagmi";
 import { uid } from "./utils";
 

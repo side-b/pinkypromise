@@ -5,7 +5,7 @@ import type { Address, ColorEnumKey } from "./types";
 import * as dn from "dnum";
 import { useEffect } from "react";
 import { useMemo, useState } from "react";
-import { a, useTransition } from "react-spring";
+import { a, useTransition } from "@react-spring/web";
 import { match } from "ts-pattern";
 import { useAccount, useFeeData, usePrepareContractWrite } from "wagmi";
 import { PinkyPromiseAbi } from "./abis";

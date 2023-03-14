@@ -3,7 +3,7 @@ import type { PromiseInfoReturnType, PromiseState } from "./types";
 import { colord } from "colord";
 import { BigNumber } from "ethers";
 import { memo, useMemo } from "react";
-import { a, useTransition } from "react-spring";
+import { a, useTransition } from "@react-spring/web";
 import { match, P } from "ts-pattern";
 import { useAccount, useContractRead, useContractReads, useNetwork } from "wagmi";
 import { Link, useLocation } from "wouter";

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
-import type { SpringValues } from "react-spring";
+import type { SpringValues } from "@react-spring/web";
 
-import { a } from "react-spring";
+import { a } from "@react-spring/web";
 
 export function Appear({ appear, children }: {
   appear: SpringValues<{ opacity: number; transform: string }>;

@@ -1,5 +1,5 @@
 import { memo, useEffect, useRef, useState } from "react";
-import { a, useTransition } from "react-spring";
+import { a, useTransition } from "@react-spring/web";
 import { COLORS } from "./constants";
 
 export const WordsLoop = memo(function WordsLoop({

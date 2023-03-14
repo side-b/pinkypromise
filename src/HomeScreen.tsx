@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { a } from "react-spring";
+import { a } from "@react-spring/web";
 import { AnimatableFingers } from "./AnimatableFingers";
 import { Button } from "./Button";
 import { COLORS, PROMISE_SYNONYMS } from "./constants";

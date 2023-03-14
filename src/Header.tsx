@@ -1,4 +1,4 @@
-import { a } from "react-spring";
+import { a } from "@react-spring/web";
 import { useAccount } from "wagmi";
 import { Link, useLocation } from "wouter";
 import { Button } from "./Button";

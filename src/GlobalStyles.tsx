@@ -3,7 +3,7 @@ import type { ColorId } from "./types";
 
 import { Global } from "@emotion/react";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { a, useTransition } from "react-spring";
+import { a, useTransition } from "@react-spring/web";
 import { COLORS } from "./constants";
 
 import spaceGrotesk from "./SpaceGrotesk-VariableFont_wght.woff2";

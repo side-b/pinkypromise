@@ -1,4 +1,4 @@
-import { a, useSpring } from "react-spring";
+import { a, useSpring } from "@react-spring/web";
 import { COLORS } from "./constants";
 import { useUid } from "./react-utils";
 

@@ -1,6 +1,6 @@
-import type { SpringValue } from "react-spring";
+import type { SpringValue } from "@react-spring/web";
 
-import { a } from "react-spring";
+import { a } from "@react-spring/web";
 
 import pinkyLeft from "./pinky-left.svg?raw";
 import pinkyRight from "./pinky-right.svg?raw";

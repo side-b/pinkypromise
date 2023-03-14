@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 import { useInView } from "react-cool-inview";
-import { a } from "react-spring";
+import { a } from "@react-spring/web";
 import { Button } from "./Button";
 import { COLORS, GH_REPO_URL, SIDEB_URL } from "./constants";
 import {
