@@ -1,9 +1,9 @@
 import type { PromiseInfoReturnType, PromiseState } from "./types";
 
+import { a, useTransition } from "@react-spring/web";
 import { colord } from "colord";
 import { BigNumber } from "ethers";
 import { memo, useMemo } from "react";
-import { a, useTransition } from "@react-spring/web";
 import { match, P } from "ts-pattern";
 import { useAccount, useContractRead, useContractReads, useNetwork } from "wagmi";
 import { Link, useLocation } from "wouter";
@@ -133,7 +133,7 @@ export const PromisesScreen = memo(function PromisesScreen({
   const hasLoadedIds = idsStatus === "success";
   const loadingStatus = mineOnly
     ? (hasLoadedIds ? promisesInfo.status : idsStatus)
-    : (totalRead.fetchStatus === "fetching" || promisesInfo.status === "idle"
+    : (totalRead.fetchStatus === "fetching"
       ? "loading"
       : promisesInfo.status);
   const refetch = hasLoadedIds ? promisesInfo.refetch : idsRefetch;
