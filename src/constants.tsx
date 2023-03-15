@@ -55,11 +55,9 @@ export const HOME_STEPS = [
 
 export const DOC_WIDTH = 800;
 
-export const PLACEHOLDER_TITLE = "Pinky Promise";
-export const PLACEHOLDER_BODY = `Pinky, pinky bow-bell,
-Whoever tells a lie
-Will sink down to the bad place
-And never rise up again.`;
+export const PLACEHOLDER_TITLE = "Collab agreement";
+export const PLACEHOLDER_BODY =
+  "We wish to associate as co-creators and partners in a prospective business adventure and will share all/any profits equally, realised from the sale of any products and/or services provided by this partnership.";
 
 export const EDITOR_CONFIRM_NOTICE = `
   The title and content are required. Add as many signees addresses as you want.
