@@ -65,7 +65,9 @@ export function useCurrentOrDefaultChainId() {
 }
 
 export function isChainIdSupported(id: number) {
-  return APP_CHAINS.some((chain) => chain.chainId === id);
+  return Object.keys(NETWORKS).some((name) => (
+    appChainFromName(name)?.chainId === id
+  ));
 }
 
 export function usePinkyPromiseContractAddress(
