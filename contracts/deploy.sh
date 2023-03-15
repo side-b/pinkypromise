@@ -48,6 +48,11 @@ forge script \
 CONTRACT_ADDRESS=$(cat broadcast/DeployPinkyPromise.s.sol/$CHAIN_ID/run-latest.json | jq '.transactions[] | select(.contractName == "PinkyPromise" and .transactionType == "CREATE") .contractAddress' --raw-output)
 
 echo ""
-echo "    Contract deployed: 👉 ${CONTRACT_ADDRESS}"
+echo "  Contracts deployed."
 echo ""
+echo "  ChainID: $CHAIN_ID"
+echo "  PinkyPromise Contract: $CONTRACT_ADDRESS"
+echo "  ENS registry Contract: $ENS_REGISTRY"
+echo "  BPB DateTime Contract: $BPB_DATETIME"
+echo "  Network prefix: $NETWORK_PREFIX"
 echo ""
