@@ -15,7 +15,7 @@ library DateUtils {
     using StringPad for string;
 
     function formatDate(address bpbDateTimeAddress, uint256 timestamp)
-        internal
+        public
         view
         returns (string memory formattedDate)
     {
