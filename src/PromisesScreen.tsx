@@ -54,60 +54,29 @@ export const PromisesScreen = memo(function PromisesScreen({
 }) {
   const chainId = useCurrentOrDefaultChainId();
   const contractAddress = usePinkyPromiseContractAddress(chainId);
-
   const [_, setLocation] = useLocation();
   const { address } = useAccount();
 
-  const signeePromises = useContractRead({
-    abi: PinkyPromiseAbi,
-    address: contractAddress,
-    args: address ? [address] : undefined,
-    chainId,
-    enabled: Boolean(mineOnly && address),
-    functionName: "signeePromises",
-  });
+  const promisesIds = usePromisesIds(mineOnly ? "account" : "all");
 
-  const totalRead = useContractRead({
-    abi: PinkyPromiseAbi,
-    address: contractAddress,
-    chainId,
-    enabled: !mineOnly,
-    functionName: "total",
-  });
+  const promisesIdsForPage = promisesIds.data?.slice(
+    (page - 1) * PROMISES_PER_PAGE,
+    (page - 1) * PROMISES_PER_PAGE + PROMISES_PER_PAGE,
+  );
 
-  const {
-    status: idsStatus,
-    refetch: idsRefetch,
-  } = mineOnly ? signeePromises : totalRead;
+  const hasNextPage = page < Math.ceil(
+    (promisesIds.data?.length ?? 0) / PROMISES_PER_PAGE,
+  );
 
-  const total = mineOnly
-    ? (signeePromises.data?.length ?? 0)
-    : (totalRead.data?.toNumber() ?? 0);
-
-  const [ids, cardsKeys] = useMemo(() => {
-    const ids = (
-      mineOnly
-        ? signeePromises.data?.map((v) => v.toString()).reverse() ?? []
-        : Array.from({ length: total }).map((_, index) => `${total - index}`)
-    ).slice(
-      (page - 1) * PROMISES_PER_PAGE,
-      (page - 1) * PROMISES_PER_PAGE + PROMISES_PER_PAGE,
-    );
-    return [
-      ids,
-      ids.map((id) => `${mineOnly}-${page}-${id}`),
-    ];
-  }, [page, total, signeePromises, mineOnly]);
-
-  const promisesInfo = useContractReads({
-    contracts: ids.map((id) => ({
+  const promises = useContractReads({
+    contracts: promisesIdsForPage?.map((id) => ({
       abi: PinkyPromiseAbi,
       address: contractAddress,
       args: [BigNumber.from(id)],
       chainId,
       functionName: "promiseInfo",
     })),
-    enabled: Boolean(contractAddress) && ids.length > 0,
+    enabled: Boolean(contractAddress) && promisesIdsForPage !== null,
     select: (data) => (
       (data as PromiseInfoReturnType[])?.map((info): PromiseCardData => {
         const colorEnumKey = info?.data.color ?? 0;
@@ -130,44 +99,35 @@ export const PromisesScreen = memo(function PromisesScreen({
     ),
   });
 
-  const hasLoadedIds = idsStatus === "success";
-  const loadingStatus = mineOnly
-    ? (hasLoadedIds ? promisesInfo.status : idsStatus)
-    : (totalRead.fetchStatus === "fetching"
-      ? "loading"
-      : promisesInfo.status);
-  const refetch = hasLoadedIds ? promisesInfo.refetch : idsRefetch;
-
-  const cardsData = useMemo(() => {
-    const { data } = promisesInfo;
-    return data
-      ? (
-        cardsKeys.map((key, index) => (
-          key.startsWith("empty-")
-            ? { type: "empty", key } as const
-            : {
-              type: "promise",
-              key,
-              promise: {
-                id: ids[index],
-                data: data[index],
-              },
-            } as const
-        ))
-      )
+  const cards = useMemo(() => {
+    const { data } = promises;
+    return promisesIdsForPage && data
+      ? (data && promisesIdsForPage)?.map((id, index) => ({
+        key: `${id}-${page}-${mineOnly}`,
+        promise: { id, data: data[index] },
+      } as const))
       : [];
-  }, [cardsKeys, promisesInfo]);
+  }, [page, promisesIdsForPage, promises]);
+
+  const status = (
+    promisesIds.fetchStatus === "fetching"
+      ? "loading"
+      : promisesIds.status === "success"
+      ? promises.status
+      : promisesIds.status
+  );
+
+  const refetch = promisesIds.refetch;
 
   const loadingTransition = useTransition({
-    cardsData,
-    hasLoadedIds,
-    refetch,
-    status: loadingStatus,
+    cards,
     connectPlease: mineOnly && !address,
-    mineOnly,
+    hasNextPage,
+    promises,
+    status,
   }, {
-    keys: ({ hasLoadedIds, status, mineOnly, connectPlease }) => (
-      `${hasLoadedIds}${status}${mineOnly}${connectPlease}`
+    keys: ({ connectPlease, status }) => (
+      `${status}-${connectPlease}-${mineOnly}-${page}`
     ),
     from: { opacity: 0, transform: "scale3d(0.9, 0.9, 1)" },
     enter: { opacity: 1, transform: "scale3d(1, 1, 1)" },
@@ -188,7 +148,12 @@ export const PromisesScreen = memo(function PromisesScreen({
         position: "relative",
       }}
     >
-      {loadingTransition((style, { status, cardsData, refetch, connectPlease }) =>
+      {loadingTransition((style, {
+        cards,
+        connectPlease,
+        hasNextPage,
+        status,
+      }) => (
         match(connectPlease || status)
           .with(true, () => (
             <Appear appear={style}>
@@ -197,7 +162,7 @@ export const PromisesScreen = memo(function PromisesScreen({
               </div>
             </Appear>
           ))
-          .with("loading", () => (
+          .with(P.union("loading", "idle"), () => (
             <Appear appear={style}>
               <div css={{ paddingTop: 80 }}>
                 <LoadingFingers />
@@ -228,8 +193,8 @@ export const PromisesScreen = memo(function PromisesScreen({
               </div>
             </Appear>
           ))
-          .with(P.union("success", "idle"), () => (
-            cardsData.length > 0
+          .with("success", () => (
+            cards.length > 0
               ? (
                 <Appear appear={style}>
                   <div
@@ -239,21 +204,17 @@ export const PromisesScreen = memo(function PromisesScreen({
                     }}
                   >
                     <PromisesGrid
-                      cards={cardsData}
-                      onNextPage={page < Math.ceil(total / PROMISES_PER_PAGE)
-                        ? () => {
-                          setLocation(
-                            `/${mineOnly ? "mine" : "promises"}/${page + 1}`,
-                          );
-                        }
-                        : undefined}
-                      onPrevPage={page > 1
-                        ? () => {
-                          setLocation(
-                            `/${mineOnly ? "mine" : "promises"}/${page - 1}`,
-                          );
-                        }
-                        : undefined}
+                      cards={cards}
+                      onNextPage={hasNextPage && (() => {
+                        setLocation(
+                          `/${mineOnly ? "mine" : "promises"}/${page + 1}`,
+                        );
+                      })}
+                      onPrevPage={page > 1 && (() => {
+                        setLocation(
+                          `/${mineOnly ? "mine" : "promises"}/${page - 1}`,
+                        );
+                      })}
                       page={page}
                     />
                   </div>
@@ -286,8 +247,8 @@ export const PromisesScreen = memo(function PromisesScreen({
                 </Appear>
               )
           ))
-          .otherwise(() => null)
-      )}
+          .exhaustive()
+      ))}
     </div>
   );
 });
@@ -427,71 +388,18 @@ const PromiseCard = memo(function PromiseCard({
   );
 });
 
-const EmptyCard = memo(function EmptyCard() {
-  return (
-    <Link href="/new">
-      <a
-        draggable="false"
-        css={{
-          display: "grid",
-          placeItems: "center",
-          width: "100%",
-          height: 400,
-          background: colord(COLORS.grey).alpha(0.4).toHex(),
-          borderRadius: "64px",
-          boxShadow: "0 40px 40px rgba(43, 8, 28, 0.10)",
-          "&:focus-visible": {
-            outline: `2px solid ${COLORS.white}`,
-            outlineOffset: "3px",
-          },
-          "&:active": {
-            transform: "translate(1px, 1px)",
-          },
-        }}
-      >
-        <div
-          css={{
-            display: "grid",
-            placeItems: "center",
-            width: "40px",
-            height: "40px",
-            color: COLORS.white,
-            background: COLORS.pink,
-            border: "0",
-            borderRadius: "50%",
-          }}
-        >
-          <svg width="40" height="40" fill="none" viewBox="0 0 40 40">
-            <path
-              d="M9 20h22M20 31V9"
-              stroke={COLORS.white}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-            />
-          </svg>
-        </div>
-      </a>
-    </Link>
-  );
-});
-
 function PromisesGrid({
   cards,
   onNextPage,
   onPrevPage,
   page,
 }: {
-  cards: Array<
-    | { type: "empty"; key: string }
-    | {
-      type: "promise";
-      key: string;
-      promise: { id: string; data: PromiseCardData };
-    }
-  >;
-  onNextPage?: () => void;
-  onPrevPage?: () => void;
+  cards: Array<{
+    key: string;
+    promise: { id: string; data: PromiseCardData };
+  }>;
+  onNextPage?: false | (() => void);
+  onPrevPage?: false | (() => void);
   page: number;
 }) {
   const chainId = useCurrentOrDefaultChainId();
@@ -545,23 +453,74 @@ function PromisesGrid({
                 contain: "size layout style",
               }}
             >
-              {card.type === "empty"
-                ? <EmptyCard />
-                : (
-                  <PromiseCard
-                    promiseId={`${networkPrefix}-${card.promise.id}`}
-                    promiseData={card.promise.data}
-                  />
-                )}
+              <PromiseCard
+                promiseId={`${networkPrefix}-${card.promise.id}`}
+                promiseData={card.promise.data}
+              />
             </a.div>
           </div>
         ))}
       </div>
       <Pagination
-        onNext={onNextPage}
-        onPrev={onPrevPage}
+        onNext={onNextPage || undefined}
+        onPrev={onPrevPage || undefined}
         page={page}
       />
     </div>
   );
+}
+
+function usePromisesIds(
+  mode: "account" | "all",
+): {
+  data: string[] | null;
+  fetchStatus: ReturnType<typeof useContractRead>["fetchStatus"];
+  refetch: ReturnType<typeof useContractRead>["refetch"];
+  status: ReturnType<typeof useContractRead>["status"];
+} {
+  const chainId = useCurrentOrDefaultChainId();
+  const contractAddress = usePinkyPromiseContractAddress(chainId);
+
+  // Get the total amount of promises
+  const promisesCount = useContractRead({
+    abi: PinkyPromiseAbi,
+    address: contractAddress,
+    chainId,
+    enabled: mode === "all",
+    functionName: "total",
+  });
+
+  // Get a list of promise IDs for the connected account
+  const { address } = useAccount();
+  const currentAccountIds = useContractRead({
+    abi: PinkyPromiseAbi,
+    address: contractAddress,
+    args: address ? [address] : undefined,
+    chainId,
+    enabled: mode === "account" && Boolean(address),
+    functionName: "signeePromises",
+  });
+
+  const ids = useMemo(() => {
+    if (mode === "account") {
+      return currentAccountIds.data?.map(String).reverse() ?? null;
+    }
+    const count = promisesCount.data?.toNumber() ?? null;
+    return count === null ? null : Array
+      .from({ length: count })
+      .map((_, index) => `${count - index}`);
+  }, [promisesCount, currentAccountIds, mode]);
+
+  const { fetchStatus, refetch, status } = (
+    mode === "account"
+      ? currentAccountIds
+      : promisesCount
+  );
+
+  return {
+    data: ids,
+    fetchStatus,
+    refetch,
+    status,
+  };
 }
