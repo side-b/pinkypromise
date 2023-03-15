@@ -144,7 +144,16 @@ export const TxSteps = {
 };
 
 export const FAQ_ITEMS = [
-  ["What is a Pinky Promise?"],
+  [
+    "What is a Pinky Promise?",
+    <p>
+      A Pinky Promise is a commitment to act in a certain way, a public declaration
+      of intentions, a socio-technical contract on the blockchain. It’s the simplest
+      (and cutest) way of co-signing messages between friends that live entirely
+      onchain. These promises act as a framework for cooperation in human-machine
+      systems that are based on trust.
+    </p>,
+  ],
   [
     "Where are the promises stored?",
     <p>
