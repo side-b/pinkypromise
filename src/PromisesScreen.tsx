@@ -1,11 +1,10 @@
 import type { PromiseInfoReturnType, PromiseState } from "./types";
 
 import { a, useTransition } from "@react-spring/web";
-import { colord } from "colord";
 import { BigNumber } from "ethers";
 import { memo, useMemo } from "react";
 import { match, P } from "ts-pattern";
-import { useAccount, useContractRead, useContractReads, useNetwork } from "wagmi";
+import { useAccount, useContractRead, useContractReads } from "wagmi";
 import { Link, useLocation } from "wouter";
 import { PinkyPromiseAbi } from "./abis";
 import { Appear } from "./Appear";
@@ -154,8 +153,8 @@ export const PromisesScreen = memo(function PromisesScreen({
         hasNextPage,
         status,
       }) => (
-        match(connectPlease || status)
-          .with(true, () => (
+        match(connectPlease ? "connect-please" as const : status)
+          .with("connect-please", () => (
             <Appear appear={style}>
               <div css={{ color: COLORS.white }}>
                 Connect your account to see your promises
