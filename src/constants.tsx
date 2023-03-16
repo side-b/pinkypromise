@@ -44,6 +44,8 @@ export const PROMISE_COLORS_BY_ID = Object.entries(PROMISE_COLORS) as Array<[
   string,
 ]>;
 
+export const HOME_BUTTON = "Very well";
+
 export const HOME_INTRO =
   "Onchain accountability from jolly commitments between friends and foes";
 

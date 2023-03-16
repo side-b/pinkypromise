@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
 import { a } from "@react-spring/web";
+import { useEffect, useState } from "react";
 import { AnimatableFingers } from "./AnimatableFingers";
 import { Button } from "./Button";
-import { COLORS, PROMISE_SYNONYMS } from "./constants";
+import { COLORS, HOME_BUTTON, PROMISE_SYNONYMS } from "./constants";
 import { Footer } from "./Footer";
 import { HomeFaq } from "./HomeFaq";
 import { HomeIntro } from "./HomeIntro";
@@ -142,7 +142,7 @@ export function HomeScreen() {
             <Button
               color={COLORS.blue}
               href="/new"
-              label="make one"
+              label={HOME_BUTTON}
               size="giant"
             />
           </div>
