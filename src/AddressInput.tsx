@@ -1,9 +1,9 @@
 import type { ChangeEvent } from "react";
 import type { ColorId, EnsName } from "./types";
 
+import { a, useTransition } from "@react-spring/web";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { a, useTransition } from "@react-spring/web";
 import { useProvider } from "wagmi";
 import { COLORS } from "./constants";
 import { Loader } from "./Loader";
@@ -127,9 +127,11 @@ function useResolveAddress(value: string, onChange: (value: string) => void) {
         setNameToResolve(null);
       },
       onBlur() {
-        if (isEnsName(value)) {
+        const valueTrimmed = value.trim();
+        onChange(valueTrimmed);
+        if (isEnsName(valueTrimmed)) {
           resolvedAddress.remove();
-          setNameToResolve(value);
+          setNameToResolve(valueTrimmed);
         }
       },
       value: isLoading ? `resolving ${nameToResolve}…` : value,
