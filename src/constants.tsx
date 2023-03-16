@@ -237,7 +237,7 @@ export const FAQ_ITEMS = [
     </>,
   ],
   [
-    "To what extent are promises legally binding / enforceable?",
+    "Are promises legally binding / enforceable?",
     <p>
       We’re not lawyers, but we can safely say that a pinky promise doesn’t have
       legal enforceability per se. Yet it could be used in a legal context as proof
