@@ -225,13 +225,14 @@ export const FAQ_ITEMS = [
     "How does breaking a promise work?",
     <>
       <p>
-        Breaking a promise happens when all signees agree to do it, which will mark
-        the promise as void. It can be useful to ensure a promise is not valid any
-        more (e.g. when signing a new version). request on the promise screen,s
+        Breaking a promise happens when all signees agree to do it, which marks the
+        promise as broken (void). This feature can be used to mark a promise as not
+        valid any more in an explicit way (e.g. when signing a new version of a
+        contract).
       </p>
       <p>
-        If it happens while the promise is still a draft (before it gets signed by
-        all), then anyone can break it and it will happen immediately.
+        Any signee can break the promise while it is still a draft (i.e. before it
+        gets fully signed), without requiring the others to do it.
       </p>
     </>,
   ],
