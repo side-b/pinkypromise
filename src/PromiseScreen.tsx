@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 import type { Address, SigningStateEnumKey, TxBag } from "./types";
 
+import { useTransition } from "@react-spring/web";
 import { BigNumber } from "ethers";
 import { useEffect, useMemo, useState } from "react";
-import { useTransition } from "@react-spring/web";
 import { match, P } from "ts-pattern";
 import { useAccount, useContractRead } from "wagmi";
 import { useLocation } from "wouter";
@@ -290,6 +290,7 @@ export function PromiseScreen({ action, id }: { action: string; id: string }) {
                         signedOn={promiseData.signedOn}
                         signees={
                           <SvgDocSignees
+                            chainId={chainId}
                             signees={promiseData.signeesWithStates}
                           />
                         }

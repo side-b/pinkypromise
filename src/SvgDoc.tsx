@@ -65,7 +65,6 @@ function svgDocStyle({
     ${selector} .main {
       display: flex;
       flex-direction: column;
-      overflow: hidden;
       width: ${CONTENT_WIDTH}px;
       height: 100%;
       ${htmlMode ? `min-height: ${CONTENT_WIDTH}px;` : ""}
@@ -129,7 +128,6 @@ function svgDocStyle({
     ${selector} .signees {
       flex-grow: 0;
       flex-shrink: 0;
-      overflow: hidden;
       display: flex;
       flex-direction: column;
       padding-top: ${fixedHeight ? 0 : 40}px;
@@ -142,13 +140,12 @@ function svgDocStyle({
       justify-content: space-between;
       height: 40px;
     }
-    ${selector} .signee a {
-      text-decoration: none;
-    }
-    ${selector} .signee > div:first-child {
+    ${selector} .signee .account {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      text-decoration: none;
+      outline: 0;
     }
     ${selector} .signature {
       flex-shrink: 0;
@@ -355,14 +352,25 @@ export function SvgDoc({
     : root;
 }
 
+// Only used in HTML mode
 export function SvgDocSignees({
+  chainId,
   signees,
 }: {
+  chainId?: number;
   signees: Array<readonly [Address | EnsName, boolean | string]>;
 }) {
-  const explorerBaseUrl = useExplorerBaseUrl();
+  const explorerBaseUrl = useExplorerBaseUrl(chainId);
   return (
-    <>
+    <div
+      css={{
+        ".signee a:focus-visible": {
+          outline: "2px solid var(--contentColor)",
+          outlineOffset: 4,
+          borderRadius: 4,
+        },
+      }}
+    >
       {signees.map(([signee, signState]) => (
         <SvgDocSigneeEns
           key={signee}
@@ -373,7 +381,7 @@ export function SvgDocSignees({
             : <span className="signature">{signState}</span>}
         />
       ))}
-    </>
+    </div>
   );
 }
 
@@ -384,8 +392,9 @@ export function SvgDocSignee({
   signature,
   title,
 }: {
-  // Not necessarily an address, it could be a placeholder
-  // (solidity codegen script) or a demo-only ENS name (HomeIntro)
+  // address could be any string and not only an Address:
+  // it could be a placeholder (solidity codegen script)
+  // or a demo-only ENS name (HomeIntro).
   address: string;
   explorerBaseUrl?: string;
   label?: string;
@@ -395,24 +404,23 @@ export function SvgDocSignee({
   label ??= address;
   return (
     <div className="signee">
-      <div>
-        {explorerBaseUrl
-          ? (
-            <a
-              href={`${explorerBaseUrl}/address/${address}`}
-              rel="nofollow"
-              target="_blank"
-              title={title}
-            >
-              {label}
-            </a>
-          )
-          : (
-            <span title={title}>
-              {label}
-            </span>
-          )}
-      </div>
+      {explorerBaseUrl
+        ? (
+          <a
+            className="account"
+            href={`${explorerBaseUrl}/address/${address}`}
+            rel="nofollow"
+            target="_blank"
+            title={title}
+          >
+            {label}
+          </a>
+        )
+        : (
+          <span title={title} className="account">
+            {label}
+          </span>
+        )}
       {signature}
     </div>
   );
