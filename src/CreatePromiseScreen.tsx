@@ -32,6 +32,7 @@ import {
   isAddress,
   promiseColors,
   textToBlocks,
+  uniqueAddresses,
 } from "./utils";
 
 type PromiseData = {
@@ -70,7 +71,9 @@ export function CreatePromiseScreen() {
   const newPromiseData = useMemo<PromiseData>(() => ({
     body: editorData.body.trim(),
     color: colorEnumKey(editorData.color),
-    signees: editorData.signees.map((signee) => signee[0]).filter(isAddress),
+    signees: uniqueAddresses(
+      editorData.signees.map((signee) => signee[0]).filter(isAddress),
+    ),
     title: editorData.title.trim(),
     height: svgHeight,
   }), [editorData, svgHeight]);

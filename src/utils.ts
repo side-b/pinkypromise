@@ -167,3 +167,23 @@ export function parseFullPromiseId(
 export async function sleep(duration: number) {
   return new Promise((r) => setTimeout(r, duration));
 }
+
+export function uniqueAddresses(addresses: Address[]): Address[] {
+  return unique(addresses, (addr) => addr.toLowerCase());
+}
+
+export function unique<T, U>(
+  items: T[],
+  keys: (T) => U = ((item) => item),
+): T[] {
+  const uniqueKeys: U[] = [];
+  const uniqueItems: T[] = [];
+  for (const item of items) {
+    const key = keys(item);
+    if (!uniqueKeys.includes(key)) {
+      uniqueKeys.push(key);
+      uniqueItems.push(item);
+    }
+  }
+  return uniqueItems;
+}
