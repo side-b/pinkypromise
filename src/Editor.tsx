@@ -1,9 +1,9 @@
 import type { Dnum } from "dnum";
 import type { ColorId } from "./types";
 
+import { a, useTransition } from "@react-spring/web";
 import * as dn from "dnum";
 import { useEffect, useState } from "react";
-import { a, useTransition } from "@react-spring/web";
 import { ActionBox } from "./ActionBox";
 import { AddressInput } from "./AddressInput";
 import { Button } from "./Button";
@@ -114,7 +114,7 @@ export function Editor({
           },
         }}
       >
-        <div css={{ paddingBottom: "80px" }}>
+        <div css={{ paddingBottom: 80 }}>
           <Container>
             <div>
               <input
