@@ -2,14 +2,15 @@ import type { Dnum } from "dnum";
 import type { EditorData } from "./Editor";
 import type { Address, ColorEnumKey } from "./types";
 
+import { a, useTransition } from "@react-spring/web";
 import * as dn from "dnum";
 import { useEffect } from "react";
 import { useMemo, useState } from "react";
-import { a, useTransition } from "@react-spring/web";
 import { match } from "ts-pattern";
 import { useAccount, useFeeData, usePrepareContractWrite } from "wagmi";
 import { PinkyPromiseAbi } from "./abis";
 import { ActionBox } from "./ActionBox";
+import { Appear } from "./Appear";
 import { Button } from "./Button";
 import { COLORS, PLACEHOLDER_BODY, PLACEHOLDER_TITLE } from "./constants";
 import { Container } from "./Container";
@@ -110,8 +111,9 @@ export function CreatePromiseScreen() {
 
   const modeTransitions = useTransition({ mode, editorColor: editorData.color }, {
     keys: ({ mode, editorColor }) => String(mode + editorColor),
-    from: { progress: 0, opacity: 0, transform: "scale3d(0.85, 0.85, 1)" },
-    enter: { progress: 1, opacity: 1, transform: "scale3d(1, 1, 1)" },
+    from: { opacity: 0, transform: "scale3d(0.9, 0.9, 1)" },
+    enter: { opacity: 1, transform: "scale3d(1, 1, 1)" },
+    leave: { opacity: 0, immediate: true },
     config: {
       mass: 2,
       friction: 80,
@@ -130,121 +132,139 @@ export function CreatePromiseScreen() {
         paddingTop: 16,
       }}
     >
-      {modeTransitions((styles, { mode }) =>
+      {modeTransitions((style, { mode }) =>
         match(mode)
           .with("preview", () => (
-            <a.div
-              style={styles}
-              css={{
-                display: "grid",
-                placeItems: "center",
-                transformOrigin: "50% 50%",
-                position: "relative",
-              }}
-            >
-              <Container
-                color={svgDocColors.color}
-                drawer={
-                  <ActionBox
-                    info={"Review your promise before initiating a transaction that will create the promise and sign it on chain."}
-                    infoColor="#7B7298"
-                    button={
-                      <Button
-                        color={COLORS[editorData.color]}
-                        disabled={!submitEnabled}
-                        label="All good"
-                        mode="primary"
-                        size="large"
-                        type="submit"
-                        onClick={() => setMode("transaction")}
-                      />
-                    }
-                  />
-                }
-                padding="56px 56px 56px"
+            <Appear appear={style}>
+              <div
+                css={{
+                  display: "grid",
+                  placeItems: "center",
+                  transformOrigin: "50% 50%",
+                  position: "relative",
+                  paddingTop: 16,
+                  paddingBottom: 80,
+                }}
               >
-                <SvgDoc
-                  bodyHtml={previewBodyHtml}
-                  classPrefix="svg-preview"
-                  htmlMode={true}
-                  padding={[0, 0, 0]}
-                  promiseId="001"
-                  signedOn={signedOn}
-                  signees={
-                    <SvgDocSignees
-                      signees={newPromiseData.signees.map((s) => [s, true])}
+                <Container
+                  color={svgDocColors.color}
+                  drawer={
+                    <ActionBox
+                      info={"Review your promise before initiating a transaction that will create the promise and sign it on chain."}
+                      infoColor="#7B7298"
+                      button={
+                        <Button
+                          color={COLORS[editorData.color]}
+                          disabled={!submitEnabled}
+                          label="All good"
+                          mode="primary"
+                          size="large"
+                          type="submit"
+                          onClick={() => setMode("transaction")}
+                        />
+                      }
                     />
                   }
-                  status="draft"
-                  title={previewTitle}
-                  {...svgDocColors}
-                />
-              </Container>
-            </a.div>
+                  padding="56px 56px 56px"
+                >
+                  <SvgDoc
+                    bodyHtml={previewBodyHtml}
+                    classPrefix="svg-preview"
+                    htmlMode={true}
+                    padding={[0, 0, 0]}
+                    promiseId="001"
+                    signedOn={signedOn}
+                    signees={
+                      <SvgDocSignees
+                        signees={newPromiseData.signees.map((s) => [s, true])}
+                      />
+                    }
+                    status="draft"
+                    title={previewTitle}
+                    {...svgDocColors}
+                  />
+                </Container>
+              </div>
+            </Appear>
           ))
           .with("editor", () => (
-            <a.div
-              style={styles}
-              css={{ transformOrigin: "50% 50%" }}
-            >
-              <Editor
-                data={editorData}
-                onChange={setEditorData}
-                submitEnabled={submitEnabled}
-                onSubmit={() => setMode("transaction")}
-                feeEstimate={feeEstimate}
-              />
-            </a.div>
+            <Appear appear={style}>
+              <div
+                css={{
+                  display: "grid",
+                  transformOrigin: "50% 50%",
+                  paddingTop: 16,
+                }}
+              >
+                <Editor
+                  data={editorData}
+                  onChange={setEditorData}
+                  submitEnabled={submitEnabled}
+                  onSubmit={() => setMode("transaction")}
+                  feeEstimate={feeEstimate}
+                />
+              </div>
+            </Appear>
           ))
           .with(
             "transaction",
             () => (
-              <a.div
-                style={styles}
-                css={{
-                  display: "grid",
-                  height: "100%",
-                  transformOrigin: "50% 50%",
-                }}
-              >
-                <Transaction
-                  config={{
-                    abi: PinkyPromiseAbi,
-                    address: contractAddress,
-                    chainId,
-                    functionName: "newPromise",
-                    args: [{
-                      body: newPromiseData.body,
-                      color: newPromiseData.color,
-                      height: newPromiseData.height,
-                      title: newPromiseData.title,
-                    }, newPromiseData.signees],
+              <Appear appear={style}>
+                <div
+                  css={{
+                    display: "grid",
+                    height: "100%",
+                    transformOrigin: "50% 50%",
                   }}
-                  title="Creating pinky promise"
-                  successLabel="View Promise"
-                  successAction={({ logs }) => (
-                    `/promise/${chainPrefix}-${promiseIdFromTxLogs(logs)}`
-                  )}
-                  onCancel={() => {
-                    setMode("editor");
-                  }}
-                />
-              </a.div>
+                >
+                  <Transaction
+                    config={{
+                      abi: PinkyPromiseAbi,
+                      address: contractAddress,
+                      chainId,
+                      functionName: "newPromise",
+                      args: [{
+                        body: newPromiseData.body,
+                        color: newPromiseData.color,
+                        height: newPromiseData.height,
+                        title: newPromiseData.title,
+                      }, newPromiseData.signees],
+                    }}
+                    title="Creating pinky promise"
+                    successLabel="View Promise"
+                    successAction={({ logs }) => (
+                      `/promise/${chainPrefix}-${promiseIdFromTxLogs(logs)}`
+                    )}
+                    onCancel={() => {
+                      setMode("editor");
+                    }}
+                  />
+                </div>
+              </Appear>
             ),
           )
           .exhaustive()
       )}
       {mode !== "transaction" && (
-        <EditorBar
-          color={editorData.color}
-          onColor={(color) => {
-            setEditorData((data) => ({ ...data, color }));
+        <div
+          css={{
+            position: "relative",
+            zIndex: 2,
+            display: "grid",
+            width: 128,
           }}
-          onPreviewToggle={() => {
-            setMode((mode) => mode === "preview" ? "editor" : "preview");
-          }}
-          preview={mode === "preview"}
-        />
+        >
+          <EditorBar
+            color={editorData.color}
+            onColor={(color) => {
+              setEditorData((data) => ({ ...data, color }));
+            }}
+            onPreviewToggle={() => {
+              setMode((mode) => mode === "preview" ? "editor" : "preview");
+            }}
+            preview={mode === "preview"}
+          />
+        </div>
       )}
       <SvgDoc
         bodyHtml={bodyHtml}
