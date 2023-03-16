@@ -13,7 +13,6 @@ import { utils as ethersUtils } from "ethers";
 import { match } from "ts-pattern";
 import { useNetwork } from "wagmi";
 import { PinkyPromiseAbi } from "./abis";
-import { APP_CHAINS } from "./constants";
 import { NETWORK_DEFAULT, NETWORKS } from "./environment";
 import { isNetworkName } from "./types";
 import { appChainFromId, appChainFromName } from "./utils";
