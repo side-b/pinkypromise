@@ -101,6 +101,7 @@ export function Button({
     "> div": {
       transform: match(size)
         .with("large", () => "translateY(-3px)")
+        .with("giant", () => "translateY(-6px)")
         .otherwise(() => "translateY(0)"),
     },
     ...modeStyles,
@@ -111,6 +112,7 @@ export function Button({
     css.borderTopLeftRadius = 0;
     css.borderBottomLeftRadius = 0;
   }
+
   if (omitBorder === "right") {
     css.borderRight = 0;
     css.borderTopRightRadius = 0;
