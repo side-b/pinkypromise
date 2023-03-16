@@ -174,7 +174,7 @@ export function uniqueAddresses(addresses: Address[]): Address[] {
 
 export function unique<T, U>(
   items: T[],
-  keys: (T) => U = ((item) => item),
+  keys: (item: T) => U,
 ): T[] {
   const uniqueKeys: U[] = [];
   const uniqueItems: T[] = [];
