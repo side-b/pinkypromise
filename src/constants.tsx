@@ -175,7 +175,7 @@ export const FAQ_ITEMS = [
   [
     "What are soulbound tokens?",
     <p>
-      Soulbound tokens are non-transferable tokens – like a tattoo on your digital
+      Soulbound NFTs are non-transferable tokens – like a tattoo on your digital
       self. Once you’ve got one, it’s there for life and it will always be tied to
       the account that signed the promise. You can’t sell it or give it away, it’s
       yours and yours forever.
@@ -191,11 +191,49 @@ export const FAQ_ITEMS = [
   ],
   [
     "What networks are supported?",
-    <p>
-      Pinky Promise is deployed on the following networks: Ethereum, Goerli, Polygon,
-      Arbitrum, and Optimism. This app supports creating promises in any of these
-      networks and you can switch between them using the button in the header.
-    </p>,
+    <>
+      <p>
+        Pinky Promise is deployed on the following networks: Ethereum, Goerli,
+        Polygon, Arbitrum, and Optimism. This app supports creating promises in any
+        of these networks and you can switch between them using the button in the
+        header.
+      </p>
+      <p>
+        To start, we recommend you to try creating a promise on Goerli since it is
+        intented as a testing network.
+      </p>
+    </>,
+  ],
+  [
+    "What formatting options can I use?",
+    <>
+      <p>
+        Pinky Promise supports a limited set of text formatting features based on the
+        markdown syntax, which includes:
+      </p>
+      <p>
+        - Line breaks: one for new lines, two for paragraphs.<br />
+        - Level 1 heading, use <code>{"# heading"}</code>.<br />
+        - Level 2 heading, use <code>{"## heading"}</code>.<br />
+      </p>
+      <p>
+        You can preview these features in the promise editor.
+      </p>
+    </>,
+  ],
+  [
+    "How does breaking a promise work?",
+    <>
+      <p>
+        Breaking a promise happens when all signees agree to do it, which will mark
+        the promise as void. It can be useful to ensure a promise is not valid any
+        more (e.g. when signing a new version). request on the promise screen,s
+      </p>
+      <p>
+        If it happens while the promise is still a draft (before it gets signed by
+        all), then anyone can break it and it will happen immediately.
+      </p>
+    </>,
   ],
   [
     "To what extent are promises legally binding / enforceable?",

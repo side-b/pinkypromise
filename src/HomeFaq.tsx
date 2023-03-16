@@ -172,12 +172,19 @@ function HomeFaqItem({
           css={{
             padding: "0 64px 24px 24px",
             "p:not(:first-of-type)": {
-              marginTop: 24,
+              marginTop: 16,
             },
             "a:focus-visible": {
               outline: `2px solid ${COLORS.black}`,
               outlineOffset: 2,
               borderRadius: 2,
+            },
+            "code": {
+              padding: "0 4px",
+              marginRight: 1,
+              color: COLORS.white,
+              background: COLORS.black,
+              borderRadius: 4,
             },
           }}
         >
