@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import type { ColorId } from "./types";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   a,
   useChain,
@@ -12,69 +11,11 @@ import {
   useSpringValue,
   useTransition,
 } from "@react-spring/web";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { match } from "ts-pattern";
 import { COLORS, PROMISE_COLORS_BY_ID } from "./constants";
 import { useFocusVisible } from "./FocusVisible";
 import { IconEye } from "./IconEye";
-
-function usePositionSpring() {
-  const config = { mass: 1, friction: 80, tension: 1600 };
-  const scrollY = useRef(0);
-  const winHeight = useRef(window.innerHeight);
-  const topSpring = useSpringValue(360, { config });
-
-  const getBarTop = useCallback(() => {
-    return Math.max(
-      120 - Math.min(scrollY.current, 120) + 16, // prevent overlaping the header + 16px
-      360 // desired top
-        - scrollY.current
-        + Math.min( // prevent going lower than viewport
-          0,
-          winHeight.current - (
-            360 // desired top
-            + 304 // buttons height
-            + 24 // extra spacing
-          ),
-        ),
-    );
-  }, []);
-
-  useScroll({
-    onChange({ value }) {
-      scrollY.current = value.scrollY;
-      topSpring.start(getBarTop());
-    },
-    config,
-  });
-
-  useResize({
-    onChange({ value }) {
-      winHeight.current = value.height;
-      topSpring.start(getBarTop());
-    },
-    config,
-  });
-
-  return topSpring;
-}
-
-function useButtonsAppear<T>(items: T[], key: (v: T) => string) {
-  const ref = useSpringRef();
-  const springs = useTransition(items, {
-    ref,
-    key,
-    delay: 200,
-    from: { opacity: 0, transform: `scale3d(0.5, 0.5, 1)` },
-    enter: { opacity: 1, transform: `scale3d(1, 1, 1)` },
-    config: {
-      mass: 2,
-      friction: 80,
-      tension: 1200,
-    },
-    trail: 50,
-  });
-  return { springs, ref };
-}
 
 export function EditorBar({
   color,
@@ -109,8 +50,14 @@ export function EditorBar({
   const barAppearRef = useSpringRef();
   const barAppear = useSpring({
     ref: barAppearRef,
-    from: { opacity: 0, transform: `scale3d(1, 0, 1)` },
-    to: { opacity: 1, transform: `scale3d(1, 1, 1)` },
+    from: {
+      opacity: 0,
+      transform: "scale3d(1, 0, 1)",
+    },
+    to: {
+      opacity: 1,
+      transform: "scale3d(1, 1, 1)",
+    },
     config: {
       mass: 2,
       friction: 80,
@@ -125,16 +72,22 @@ export function EditorBar({
 
   useChain([buttonsAppearRef, barAppearRef], [0, 0.1], 800);
 
-  const topSpring = usePositionSpring();
+  const barTop = useBarTop();
 
   return (
-    <div css={{ paddingLeft: "64px" }}>
+    <div
+      css={{
+        width: 128,
+        paddingLeft: 64,
+      }}
+    >
       <a.div
-        style={{ top: topSpring, ...barAppear }}
+        style={{ top: barTop, ...barAppear }}
         css={{
           position: "fixed",
-          left: "64px",
-          height: "304px",
+          left: 64,
+          height: 304,
+          transformOrigin: "50% 50%",
         }}
       >
         <div
@@ -142,10 +95,10 @@ export function EditorBar({
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            width: "64px",
+            width: 64,
             padding: "16px 0",
             background: COLORS.grey,
-            borderRadius: "64px",
+            borderRadius: 64,
           }}
         >
           {buttonsAppear((style, _item, _state, index) => {
@@ -215,21 +168,21 @@ function ColorButton({
           position: "relative",
           display: "grid",
           placeItems: "center",
-          width: "64px",
-          height: "56px",
-          padding: "0",
-          border: "0",
+          width: 64,
+          height: 56,
+          padding: 0,
+          border: 0,
           background: "none",
           cursor: "pointer",
           "&:active > div": {
             transform: "translate(1px, 1px)",
           },
           "&:focus-visible": {
-            outline: "0",
+            outline: 0,
           },
           "&:focus-visible > div": {
             outline: `2px solid ${COLORS.pink}`,
-            outlineOffset: "4px",
+            outlineOffset: 4,
           },
         }}
       >
@@ -243,26 +196,26 @@ function ColorButton({
         >
           <svg
             fill="none"
-            height="40"
+            height={40}
             viewBox="0 0 40 40"
-            width="40"
+            width={40}
             css={{
               position: "absolute",
               inset: 0,
             }}
           >
             <circle
-              cx="20"
-              cy="20"
+              cx={20}
+              cy={20}
               fill={color}
-              r="20"
+              r={20}
             />
             <a.circle
-              cx="20"
-              cy="20"
-              r="17"
+              cx={20}
+              cy={20}
+              r={17}
               stroke={COLORS.grey}
-              strokeWidth="4"
+              strokeWidth={4}
               style={selectedSpring}
               css={{ transformOrigin: "50% 50%" }}
             />
@@ -294,22 +247,22 @@ function PreviewButton({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          width: "64px",
-          height: "56px",
-          padding: "0",
+          width: 64,
+          height: 56,
+          padding: 0,
           background: "transparent",
-          border: "0",
+          border: 0,
           borderRadius: "50%",
           cursor: "pointer",
           "&:active > div": {
             transform: "translate(1px, 1px)",
           },
           "&:focus-visible": {
-            outline: "0",
+            outline: 0,
           },
           "&:focus-visible > div": {
             outline: `2px solid ${COLORS.pink}`,
-            outlineOffset: "4px",
+            outlineOffset: 4,
           },
         }}
       >
@@ -318,8 +271,8 @@ function PreviewButton({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            width: "40px",
-            height: "40px",
+            width: 40,
+            height: 40,
             borderRadius: "50%",
           }}
         >
@@ -453,4 +406,66 @@ function Arrow({ color }: { color: string }) {
       />
     </svg>
   );
+}
+
+function useBarTop() {
+  const getBarTop = useCallback(
+    (scrollY: number, winHeight: number) => {
+      return Math.max(
+        winHeight / 2 - 304 / 2, // desired top
+        120 - Math.min(scrollY, 120) + 16, // prevent overlaping the header + 16px
+      );
+    },
+    [],
+  );
+
+  const scrollY = useRef(window.scrollY);
+  const winHeight = useRef(window.innerHeight);
+
+  const config = { mass: 1, friction: 80, tension: 1600 };
+
+  const topSpring = useSpringValue(
+    getBarTop(scrollY.current, winHeight.current),
+    { config },
+  );
+
+  useScroll({
+    config,
+    onChange({ value }) {
+      scrollY.current = value.scrollY;
+      topSpring.start(
+        getBarTop(value.scrollY, winHeight.current),
+      );
+    },
+  });
+
+  useResize({
+    config,
+    onChange({ value }) {
+      winHeight.current = value.height;
+      topSpring.start(
+        getBarTop(scrollY.current, value.height),
+      );
+    },
+  });
+
+  return topSpring;
+}
+
+function useButtonsAppear<T>(items: T[], key: (v: T) => string) {
+  const ref = useSpringRef();
+  const springs = useTransition(items, {
+    ref,
+    key,
+    delay: 200,
+    from: { opacity: 0, transform: `scale3d(0.5, 0.5, 1)` },
+    enter: { opacity: 1, transform: `scale3d(1, 1, 1)` },
+    config: {
+      mass: 2,
+      friction: 80,
+      tension: 1200,
+    },
+    trail: 50,
+  });
+  return { springs, ref };
 }
