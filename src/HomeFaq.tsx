@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 
+import { a, useSpring } from "@react-spring/web";
 import { useState } from "react";
 import useDimensions from "react-cool-dimensions";
 import { useInView } from "react-cool-inview";
-import { a, useSpring } from "@react-spring/web";
 import { COLORS, FAQ_ITEMS } from "./constants";
 import { PlusMinusButton } from "./PlusMinusButton";
 
@@ -15,7 +15,7 @@ export function HomeFaq() {
     <div
       css={{
         padding: "128px 0",
-        background: COLORS.red,
+        background: "#FFD372",
       }}
     >
       <ul
