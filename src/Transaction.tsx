@@ -60,191 +60,193 @@ export function Transaction({
   });
 
   return (
-    <Container
-      color={COLORS.pink}
-      contentColor={COLORS.white}
-      maxWidth={600}
-      padding="0 48px 48px"
-    >
-      <section
-        css={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          width: 600 - 48 * 2,
-          height: 600 - 48,
-        }}
+    <div css={{ paddingBottom: 80 }}>
+      <Container
+        color={COLORS.pink}
+        contentColor={COLORS.white}
+        maxWidth={600}
+        padding="0 48px 48px"
       >
-        <div
+        <section
           css={{
-            position: "relative",
-            overflow: "hidden",
-            display: "grid",
-            justifyContent: "center",
-            width: "100%",
-            paddingTop: 28,
-            paddingBottom: 40,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            width: 600 - 48 * 2,
+            height: 600 - 48,
           }}
         >
           <div
             css={{
               position: "relative",
-              width: 200,
-              height: 200,
+              overflow: "hidden",
+              display: "grid",
+              justifyContent: "center",
+              width: "100%",
+              paddingTop: 28,
+              paddingBottom: 40,
             }}
           >
             <div
               css={{
-                position: "absolute",
-                top: 0,
-                left: "50%",
-                transform: "translateX(-50%)",
+                position: "relative",
+                width: 200,
+                height: 200,
               }}
             >
-              <AnimatableFingers
-                springValues={{
-                  closeFingers: fingersSprings.closeFingers.progress,
-                  leftFingerAppear: fingersSprings.leftFinger.progress,
-                  rightFingerAppear: fingersSprings.rightFinger.progress,
+              <div
+                css={{
+                  position: "absolute",
+                  top: 0,
+                  left: "50%",
+                  transform: "translateX(-50%)",
                 }}
-                openDistance={600}
-                size={200}
-              />
+              >
+                <AnimatableFingers
+                  springValues={{
+                    closeFingers: fingersSprings.closeFingers.progress,
+                    leftFingerAppear: fingersSprings.leftFinger.progress,
+                    rightFingerAppear: fingersSprings.rightFinger.progress,
+                  }}
+                  openDistance={600}
+                  size={200}
+                />
+              </div>
             </div>
           </div>
-        </div>
-        <div
-          css={{
-            flexGrow: "1",
-            display: "flex",
-            flexDirection: "column",
-            textAlign: "center",
-          }}
-        >
-          <h1
+          <div
             css={{
-              paddingBottom: 16,
-              fontSize: "40px",
+              flexGrow: "1",
+              display: "flex",
+              flexDirection: "column",
+              textAlign: "center",
             }}
           >
-            {title}
-          </h1>
-          {match({
-            wrongChain: chain?.unsupported || (
-              chain && (chain.id !== config.chainId)
-            ),
-            connected: Boolean(account.address),
-            prepare: txPrepare.status,
-            write: txWrite.status,
-            result: txResult.status,
-          })
-            .with({ wrongChain: true }, () => (
-              <TxControls
-                main="switch-network"
-                onMain={() => {
-                  switchNetwork?.(config.chainId);
-                }}
-                message={<TxSteps.AskChangeNetwork />}
-                onSecondary={onCancel}
-                secondary="cancel"
-                contractCode={contractCode}
-              />
-            ))
-            .with({ connected: false }, () => (
-              <TxControls
-                main="connect"
-                message={<TxSteps.AskConnect />}
-                onSecondary={onCancel}
-                secondary="cancel"
-                contractCode={contractCode}
-              />
-            ))
-            .with({ prepare: P.union("idle", "loading") }, () => (
-              <TxControls
-                main="sign"
-                message={<TxSteps.Preparing />}
-                onSecondary={onCancel}
-                secondary="cancel"
-                contractCode={contractCode}
-              />
-            ))
-            .with({ prepare: "error" }, () => (
-              <TxControls
-                main="retry"
-                message={<TxSteps.PreparingError />}
-                onMain={txPrepare.refetch}
-                onSecondary={onCancel}
-                secondary="cancel"
-                contractCode={contractCode}
-              />
-            ))
-            .with({ write: "idle" }, () => (
-              <TxControls
-                main="sign"
-                message={<TxSteps.BeforeSign />}
-                onMain={txWrite.write}
-                onSecondary={onCancel}
-                secondary="cancel"
-                contractCode={contractCode}
-              />
-            ))
-            .with({ write: "loading" }, () => (
-              <TxControls
-                main="sign"
-                message={<TxSteps.Sign />}
-                onMain={txWrite.write}
-                onSecondary={onCancel}
-                secondary="cancel"
-                contractCode={contractCode}
-              />
-            ))
-            .with({ write: "error" }, () => (
-              <TxControls
-                main="retry"
-                message={<TxSteps.SignError />}
-                onMain={txWrite.reset}
-                onSecondary={onCancel}
-                secondary="cancel"
-                contractCode={contractCode}
-              />
-            ))
-            .with({ result: P.union("loading", "idle") }, () => (
-              <TxControls
-                main={successLabel}
-                message={<TxSteps.ConfirmWait />}
-                onSecondary={txUrl(txWrite.data?.hash ?? "") ?? undefined}
-                secondary="tx"
-                contractCode={contractCode}
-              />
-            ))
-            .with({ result: "error" }, () => (
-              <TxControls
-                main="retry"
-                message={
-                  <TxSteps.ConfirmError
-                    txUrl={txUrl(txWrite.data?.hash ?? "") ?? ""}
-                  />
-                }
-                onMain={txWrite.reset}
-                onSecondary={txUrl(txWrite.data?.hash ?? "") ?? undefined}
-                secondary="tx"
-                contractCode={contractCode}
-              />
-            ))
-            .with({ result: "success" }, () => (
-              <TxControls
-                main={successLabel}
-                message={<TxSteps.ConfirmSuccess />}
-                onMain={txResult.data ? successAction(txResult.data) : undefined}
-                onSecondary={txUrl(txWrite.data?.hash ?? "") ?? undefined}
-                secondary="tx"
-                contractCode={contractCode}
-              />
-            ))
-            .exhaustive()}
-        </div>
-      </section>
-    </Container>
+            <h1
+              css={{
+                paddingBottom: 16,
+                fontSize: "40px",
+              }}
+            >
+              {title}
+            </h1>
+            {match({
+              wrongChain: chain?.unsupported || (
+                chain && (chain.id !== config.chainId)
+              ),
+              connected: Boolean(account.address),
+              prepare: txPrepare.status,
+              write: txWrite.status,
+              result: txResult.status,
+            })
+              .with({ wrongChain: true }, () => (
+                <TxControls
+                  main="switch-network"
+                  onMain={() => {
+                    switchNetwork?.(config.chainId);
+                  }}
+                  message={<TxSteps.AskChangeNetwork />}
+                  onSecondary={onCancel}
+                  secondary="cancel"
+                  contractCode={contractCode}
+                />
+              ))
+              .with({ connected: false }, () => (
+                <TxControls
+                  main="connect"
+                  message={<TxSteps.AskConnect />}
+                  onSecondary={onCancel}
+                  secondary="cancel"
+                  contractCode={contractCode}
+                />
+              ))
+              .with({ prepare: P.union("idle", "loading") }, () => (
+                <TxControls
+                  main="sign"
+                  message={<TxSteps.Preparing />}
+                  onSecondary={onCancel}
+                  secondary="cancel"
+                  contractCode={contractCode}
+                />
+              ))
+              .with({ prepare: "error" }, () => (
+                <TxControls
+                  main="retry"
+                  message={<TxSteps.PreparingError />}
+                  onMain={txPrepare.refetch}
+                  onSecondary={onCancel}
+                  secondary="cancel"
+                  contractCode={contractCode}
+                />
+              ))
+              .with({ write: "idle" }, () => (
+                <TxControls
+                  main="sign"
+                  message={<TxSteps.BeforeSign />}
+                  onMain={txWrite.write}
+                  onSecondary={onCancel}
+                  secondary="cancel"
+                  contractCode={contractCode}
+                />
+              ))
+              .with({ write: "loading" }, () => (
+                <TxControls
+                  main="sign"
+                  message={<TxSteps.Sign />}
+                  onMain={txWrite.write}
+                  onSecondary={onCancel}
+                  secondary="cancel"
+                  contractCode={contractCode}
+                />
+              ))
+              .with({ write: "error" }, () => (
+                <TxControls
+                  main="retry"
+                  message={<TxSteps.SignError />}
+                  onMain={txWrite.reset}
+                  onSecondary={onCancel}
+                  secondary="cancel"
+                  contractCode={contractCode}
+                />
+              ))
+              .with({ result: P.union("loading", "idle") }, () => (
+                <TxControls
+                  main={successLabel}
+                  message={<TxSteps.ConfirmWait />}
+                  onSecondary={txUrl(txWrite.data?.hash ?? "") ?? undefined}
+                  secondary="tx"
+                  contractCode={contractCode}
+                />
+              ))
+              .with({ result: "error" }, () => (
+                <TxControls
+                  main="retry"
+                  message={
+                    <TxSteps.ConfirmError
+                      txUrl={txUrl(txWrite.data?.hash ?? "") ?? ""}
+                    />
+                  }
+                  onMain={txWrite.reset}
+                  onSecondary={txUrl(txWrite.data?.hash ?? "") ?? undefined}
+                  secondary="tx"
+                  contractCode={contractCode}
+                />
+              ))
+              .with({ result: "success" }, () => (
+                <TxControls
+                  main={successLabel}
+                  message={<TxSteps.ConfirmSuccess />}
+                  onMain={txResult.data ? successAction(txResult.data) : undefined}
+                  onSecondary={txUrl(txWrite.data?.hash ?? "") ?? undefined}
+                  secondary="tx"
+                  contractCode={contractCode}
+                />
+              ))
+              .exhaustive()}
+          </div>
+        </section>
+      </Container>
+    </div>
   );
 }
 
