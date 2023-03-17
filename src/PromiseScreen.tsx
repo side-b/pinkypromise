@@ -369,6 +369,10 @@ function usePromiseData(
       ? info.signingStates
       : [];
 
+    const promiseState = promiseStateFromEnumKey(
+      info?.state && isPromiseStateEnumKey(info?.state) ? info?.state : 0,
+    );
+
     const signedOn = Number((info?.signedOn ?? 0).toString()) * 1000;
 
     return {
@@ -394,13 +398,14 @@ function usePromiseData(
           .with("Pending", () => "awaiting")
           .with(
             "NullRequest",
-            () => signee === accountAddress ? "break request" : true,
+            () =>
+              signee === accountAddress && promiseState === "Signed"
+                ? "break request"
+                : true,
           )
           .exhaustive(),
       ] as const)),
-      state: promiseStateFromEnumKey(
-        info?.state && isPromiseStateEnumKey(info?.state) ? info?.state : 0,
-      ),
+      state: promiseState,
       title: info?.data.title ?? "",
     };
   }, [accountAddress, promiseInfoRead.data]);
