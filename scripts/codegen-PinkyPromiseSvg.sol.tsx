@@ -21,7 +21,7 @@ function getPromiseSvgWrapperCode() {
       bodyHtml: "_BODY_",
       color: "_COLOR_",
       contentColor: "_CONTENT_COLOR_",
-      fingers: "_FINGERS_",
+      fingersMarker: "_FINGERS_",
       height: "_HEIGHT_",
       promiseId: "_PROMISE_ID_",
       signedOn: "_SIGNED_ON_",

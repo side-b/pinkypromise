@@ -1,8 +1,15 @@
-// Note: this set of components is used to generate the SVG representation of a
-// promise. It serves both the React app and the Solidity contract, which
-// requires to only use dynamic features (react app) in a way that is
-// compatible with static features (solidity), e.g. by avoiding css={}
-// when htmlMode is not true.
+// Note: this set of components is used to generate the visual
+// representation of a promise as SVG or HTML. It serves both the
+// React app and the Solidity contract, which requires to only use
+// dynamic features (react app) in a way that is compatible with
+// static features (solidity), e.g. by avoiding css={} when htmlMode
+// is not true.
+//
+// The term “marker” is used to refer to search & replace markers used
+// by the solidity generation script. These can be rendered without
+// dangerouslySetInnerHTML since they are only marker placeholders that
+// are going to get replaced at a later point.
+//
 // See scripts/codegen-PinkyPromiseSVg.sol.tsx for more context.
 
 import type { ReactNode } from "react";
@@ -16,173 +23,12 @@ import { isAddress } from "./types";
 
 const CONTENT_WIDTH = 720;
 
-function svgDocStyle({
-  color,
-  contentColor,
-  fixedHeight,
-  height,
-  htmlMode,
-  paddingBottom,
-  paddingSide,
-  paddingTop,
-  selector,
-}: {
-  color: string;
-  contentColor: string;
-  fixedHeight: boolean;
-  height: string;
-  htmlMode: boolean;
-  paddingBottom: number;
-  paddingSide: number;
-  paddingTop: number;
-  selector: string;
-}) {
-  const font = htmlMode
-    ? "300 20px/1.5 \"Space Grotesk\", sans-serif"
-    : "400 19px/28px \"Courier New\", monospace";
-
-  return `
-    ${selector} {
-      --color: ${color};
-      --contentColor: ${contentColor};
-      contain: layout;
-    }
-    ${selector} * {
-      box-sizing: border-box;
-      word-break: break-word;
-    }
-    ${selector} .root {
-      height: ${height};
-      padding: ${paddingTop}px ${paddingSide}px ${paddingBottom}px;
-      font: ${font};
-      color: var(--contentColor);
-      background: var(--color);
-    }
-    ${selector} a {
-      color: var(--contentColor);
-      text-decoration: none;
-    }
-    ${selector} .main {
-      display: flex;
-      flex-direction: column;
-      width: ${CONTENT_WIDTH}px;
-      height: 100%;
-      ${htmlMode ? `min-height: ${CONTENT_WIDTH}px;` : ""}
-    }
-    ${selector} .header {
-      flex-shrink: 0;
-      flex-grow: 0;
-      display: flex;
-      justify-content: space-between;
-      width: 100%;
-      height: 70px;
-      padding-bottom: 16px;
-      font-size: 18px;
-      text-transform: uppercase;
-      border-bottom: 2px solid var(--contentColor);
-    }
-    ${selector} .header > div + div {
-      text-align: right;
-    }
-    ${selector} .content {
-      flex-grow: ${fixedHeight || htmlMode ? 1 : 0};
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      height: ${fixedHeight ? "100%" : "auto"};
-    }
-    ${selector} .title {
-      padding-top: 40px;
-      flex-grow: 0;
-      flex-shrink: 0;
-      line-height: ${htmlMode ? 1.3 : "38px"};
-      font-size: 32px;
-      font-weight: 400;
-    }
-    ${selector} .body {
-      flex-grow: 1;
-      flex-shrink: 0;
-      overflow: hidden;
-      padding-top: 24px;
-    }
-    ${selector} .body p {
-      margin: 24px 0;
-    }
-    ${selector} .body p:first-child {
-      margin-top: 0;
-    }
-    ${selector} .body h1 {
-      position: relative;
-      margin: 32px 0;
-      padding-bottom: 5px;
-      line-height: 36px;
-      font-size: 26px;
-      font-weight: 400;
-    }
-    ${selector} .body h2 {
-      margin: 24px 0;
-      line-height: 32px;
-      font-size: 22px;
-      font-weight: 400;
-    }
-    ${selector} .signees {
-      flex-grow: 0;
-      flex-shrink: 0;
-      display: flex;
-      flex-direction: column;
-      padding-top: ${fixedHeight ? 0 : 40}px;
-      padding-bottom: 112px;
-    }
-    ${selector} .signee {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      justify-content: space-between;
-      height: 40px;
-    }
-    ${selector} .signee .account {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      text-decoration: none;
-      outline: 0;
-    }
-    ${selector} .signature {
-      flex-shrink: 0;
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      justify-content: flex-end;
-      color: var(--contentColor);
-      white-space: nowrap;
-      font-weight: 500;
-    }
-    ${selector} .signature > div:first-child {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 50px;
-      height: 28px;
-      background: var(--contentColor);
-      border-radius: 64px;
-    }
-    ${selector} .signature svg path {
-      fill: var(--color);
-    }
-    ${selector} .signature b {
-      color: var(--contentColor);
-    }
-  `
-    .replace(/\n/g, "")
-    .replace(/  /g, "");
-}
-
 export function SvgDoc({
   bodyHtml,
   classPrefix,
   color,
   contentColor,
-  fingers,
+  fingersMarker,
   height,
   htmlMode = false,
   onHeight,
@@ -198,7 +44,10 @@ export function SvgDoc({
   classPrefix?: string;
   color: string;
   contentColor: string;
-  fingers?: string;
+
+  // When set, acts as a marker that gets rendered instead of the fingers SVG code.
+  fingersMarker?: string;
+
   height?: number | string;
   htmlMode?: boolean;
   onHeight?: (height: number) => void;
@@ -323,7 +172,7 @@ export function SvgDoc({
             rootIn,
           )}
         </foreignObject>
-        {fingers ?? (
+        {fingersMarker ?? (
           <SvgDocFingers
             color={contentColor}
             x={docWidth / 2 - 40}
@@ -454,7 +303,7 @@ export function SvgDocSignature() {
   return (
     <div className="signature">
       <div>
-        <svg width="38" height="14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg fill="none" height={14} width={38} xmlns="http://www.w3.org/2000/svg">
           <path d="m.516 9.758-.118-1.05L0 6.592l.317-1.057.459-.302-.023-.314.201.197.224-.147 1.115.126.725.66.77 1.138L4.8 8.631l.594-1.26.697-1.308.538-.855.6-.799.667-.673.848-.551.843-.223.627.045.486.15.557.35.444.432.406.57.455.842.733 1.932.637 2.071 1.65-2.232 1.357-1.631.823-.781.892-.692.825-.485 1.017-.422.792-.204.797-.082 1.056.058.72.18.922.457.45.375.136-.183.957-1.182.527-.573.784-.68.754-.525.774-.379 1.071-.296.85-.077.689.047.808.169.76.257.702.357.762.532.577.487.555.622.841.062.757.669.237 1.004-.374.978-1.011.603-.38.18-.987-.038-.804-.74-.126-.528-.118-.341-.213-.334-.293-.338-.373-.302-.404-.262-.426-.193-.705-.2-.384-.044-.677.07-.65.204-.543.315-.574.478-.505.564-.553.772-.675 1.171-.716 1.52-.852.487-.903-.065-.726-.643-.194-.819.08-.576-.007-.017-.158-.224-.212-.156-.506-.196-.42-.046-.64.048-.69.19-.527.225-.636.378-.498.393-.657.62-.6.7-.717.944-2.322 3.489-.493.476-.756.385-.919-.138-.61-.558-.233-.448-1.077-3.74-.39-1.123-.315-.769-.478-.825-.067-.075-.115.041-.24.177L9 6.32l-.556.8-.42.757-.476.989-.965 2.266-.476.687-.768.502-1.017-.088-.71-.628-.18-.286-.068.2-.861.567-1-.074-.77-.681-.18-.766-.037-.807Z" />
         </svg>
       </div>
@@ -521,4 +370,164 @@ function brokenLabelUri(color: string) {
       `<svg xmlns="http://www.w3.org/2000/svg" width="126" height="20" fill="none"><path fill="${color}" d="M13.104 18v-2.784h2.208V3.984h-2.208V1.2h8.64c1.024 0 1.912.176 2.664.528.768.336 1.36.824 1.776 1.464.432.624.648 1.376.648 2.256v.24c0 .768-.144 1.4-.432 1.896-.288.48-.632.856-1.032 1.128-.384.256-.752.44-1.104.552v.432c.352.096.736.28 1.152.552.416.256.768.632 1.056 1.128.304.496.456 1.144.456 1.944v.24c0 .928-.216 1.728-.648 2.4-.432.656-1.032 1.16-1.8 1.512-.752.352-1.632.528-2.64.528h-8.736Zm5.376-2.88h2.976c.688 0 1.24-.168 1.656-.504.432-.336.648-.816.648-1.44v-.24c0-.624-.208-1.104-.624-1.44-.416-.336-.976-.504-1.68-.504H18.48v4.128Zm0-7.008h2.928c.656 0 1.192-.168 1.608-.504.432-.336.648-.8.648-1.392v-.24c0-.608-.208-1.072-.624-1.392-.416-.336-.96-.504-1.632-.504H18.48v4.032ZM31.442 18V1.2h7.295c1.056 0 1.977.184 2.76.552.785.368 1.392.888 1.825 1.56.431.672.647 1.464.647 2.376v.288c0 1.008-.24 1.824-.72 2.448a4.233 4.233 0 0 1-1.776 1.368v.432c.64.032 1.136.256 1.489.672.351.4.527.936.527 1.608V18h-3.167v-5.04c0-.384-.105-.696-.313-.936-.191-.24-.52-.36-.983-.36h-4.417V18h-3.168Zm3.167-9.216h3.792c.752 0 1.336-.2 1.752-.6.433-.416.648-.96.648-1.632v-.24c0-.672-.208-1.208-.623-1.608-.416-.416-1.008-.624-1.776-.624h-3.793v4.704ZM55.054 18.336c-2.112 0-3.792-.576-5.04-1.728-1.248-1.168-1.872-2.832-1.872-4.992V7.584c0-2.16.624-3.816 1.872-4.968 1.248-1.168 2.928-1.752 5.04-1.752s3.792.584 5.04 1.752c1.248 1.152 1.872 2.808 1.872 4.968v4.032c0 2.16-.624 3.824-1.872 4.992-1.248 1.152-2.928 1.728-5.04 1.728Zm0-2.832c1.184 0 2.104-.344 2.76-1.032.656-.688.984-1.608.984-2.76V7.488c0-1.152-.328-2.072-.984-2.76-.656-.688-1.576-1.032-2.76-1.032-1.168 0-2.088.344-2.76 1.032-.656.688-.984 1.608-.984 2.76v4.224c0 1.152.328 2.072.984 2.76.672.688 1.592 1.032 2.76 1.032ZM66.664 18V1.2h3.168v6.672h.432L75.712 1.2h4.056L72.76 9.48 80.008 18h-4.176l-5.568-6.816h-.432V18h-3.168ZM83.608 18V1.2h10.8v2.88h-7.632v4.008h6.96v2.88h-6.96v4.152h7.776V18H83.608ZM98.817 18V1.2h6.024l3.336 14.64h.432V1.2h3.12V18h-6.024l-3.336-14.64h-.432V18h-3.12Z"/></svg>`,
     )
   }`;
+}
+
+function svgDocStyle({
+  color,
+  contentColor,
+  fixedHeight,
+  height,
+  htmlMode,
+  paddingBottom,
+  paddingSide,
+  paddingTop,
+  selector,
+}: {
+  color: string;
+  contentColor: string;
+  fixedHeight: boolean;
+  height: string;
+  htmlMode: boolean;
+  paddingBottom: number;
+  paddingSide: number;
+  paddingTop: number;
+  selector: string;
+}) {
+  const font = htmlMode
+    ? "300 20px/1.5 \"Space Grotesk\", sans-serif"
+    : "400 19px/28px \"Courier New\", monospace";
+
+  return `
+    ${selector} {
+      --color: ${color};
+      --contentColor: ${contentColor};
+      contain: size style paint;
+    }
+    ${selector} * {
+      box-sizing: border-box;
+      word-break: break-word;
+    }
+    ${selector} .root {
+      height: ${height};
+      padding: ${paddingTop}px ${paddingSide}px ${paddingBottom}px;
+      font: ${font};
+      color: var(--contentColor);
+      background: var(--color);
+    }
+    ${selector} a {
+      color: var(--contentColor);
+      text-decoration: none;
+    }
+    ${selector} .main {
+      display: flex;
+      flex-direction: column;
+      width: ${CONTENT_WIDTH}px;
+      height: 100%;
+      ${htmlMode ? `min-height: ${CONTENT_WIDTH}px;` : ""}
+    }
+    ${selector} .header {
+      flex-shrink: 0;
+      flex-grow: 0;
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      height: 70px;
+      padding-bottom: 16px;
+      font-size: 18px;
+      text-transform: uppercase;
+      border-bottom: 2px solid var(--contentColor);
+    }
+    ${selector} .header > div + div {
+      text-align: right;
+    }
+    ${selector} .content {
+      flex-grow: ${fixedHeight || htmlMode ? 1 : 0};
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: ${fixedHeight ? "100%" : "auto"};
+    }
+    ${selector} .title {
+      padding-top: 40px;
+      flex-grow: 0;
+      flex-shrink: 0;
+      line-height: ${htmlMode ? 1.3 : "38px"};
+      font-size: 32px;
+      font-weight: 400;
+    }
+    ${selector} .body {
+      flex-grow: 1;
+      flex-shrink: 0;
+      overflow: hidden;
+      padding-top: 24px;
+    }
+    ${selector} .body p {
+      margin: 24px 0;
+    }
+    ${selector} .body p:first-child {
+      margin-top: 0;
+    }
+    ${selector} .body h1 {
+      margin: 32px 0;
+      padding-bottom: 5px;
+      line-height: 36px;
+      font-size: 26px;
+      font-weight: 400;
+    }
+    ${selector} .body h2 {
+      margin: 24px 0;
+      line-height: 32px;
+      font-size: 22px;
+      font-weight: 400;
+    }
+    ${selector} .signees {
+      flex-grow: 0;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      padding-top: ${fixedHeight ? 0 : 40}px;
+      padding-bottom: 112px;
+    }
+    ${selector} .signee {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      height: 40px;
+    }
+    ${selector} .signee .account {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-decoration: none;
+      outline: 0;
+    }
+    ${selector} .signature {
+      flex-shrink: 0;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: flex-end;
+      color: var(--contentColor);
+      white-space: nowrap;
+      font-weight: 500;
+    }
+    ${selector} .signature > div:first-child {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 50px;
+      height: 28px;
+      background: var(--contentColor);
+      border-radius: 64px;
+    }
+    ${selector} .signature svg path {
+      fill: var(--color);
+    }
+    ${selector} .signature b {
+      color: var(--contentColor);
+    }
+  `
+    .replace(/\n/g, "")
+    .replace(/  /g, "");
 }

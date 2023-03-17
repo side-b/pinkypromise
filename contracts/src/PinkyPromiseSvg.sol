@@ -5,17 +5,15 @@ pragma solidity 0.8.17;
 
 import "solmate/utils/LibString.sol";
 import {StrSlice, toSlice} from "dk1a-stringutils/StrSlice.sol";
-import {AddressUtils} from "./utils/AddressUtils.sol";
 import {DateUtils} from "./utils/DateUtils.sol";
 import {EnsUtils} from "./utils/EnsUtils.sol";
-import {StringReplace} from "./utils/StringReplace.sol";
+import {AddressUtils} from "./utils/AddressUtils.sol";
 import {PinkyPromise} from "./PinkyPromise.sol";
 
 library PinkyPromiseSvg {
     using LibString for uint16;
     using LibString for uint256;
     using AddressUtils for address;
-    using StringReplace for string;
 
     struct Contracts {
         address ensRegistry;
@@ -57,9 +55,9 @@ library PinkyPromiseSvg {
             color,
             ";--contentColor:",
             contentColor,
-            ";contain:layout}svg *{box-sizing:border-box;word-break:break-word}svg .root{height:",
+            ";contain:size style paint}svg *{box-sizing:border-box;word-break:break-word}svg .root{height:",
             height,
-            "px;color:var(--contentColor);background:var(--color);padding:40px 40px 32px;font:400 19px/28px Courier New,monospace}svg a{color:var(--contentColor);text-decoration:none}svg .main{width:720px;height:100%;flex-direction:column;display:flex;overflow:hidden}svg .header{width:100%;height:70px;text-transform:uppercase;border-bottom:2px solid var(--contentColor);flex-grow:0;flex-shrink:0;justify-content:space-between;padding-bottom:16px;font-size:18px;display:flex}svg .header>div+div{text-align:right}svg .content{width:100%;height:100%;flex-direction:column;flex-grow:1;display:flex}svg .title{flex-grow:0;flex-shrink:0;padding-top:40px;font-size:32px;font-weight:400;line-height:38px}svg .body{flex-grow:1;flex-shrink:0;padding-top:24px;overflow:hidden}svg .body p{margin:24px 0}svg .body p:first-child{margin-top:0}svg .body h1{margin:32px 0;padding-bottom:5px;font-size:26px;font-weight:400;line-height:36px;position:relative}svg .body h2{margin:24px 0;font-size:22px;font-weight:400;line-height:32px}svg .signees{flex-direction:column;flex-grow:0;flex-shrink:0;padding-top:0;padding-bottom:112px;display:flex;overflow:hidden}svg .signee{height:40px;justify-content:space-between;align-items:center;gap:12px;display:flex}svg .signee a{text-decoration:none}svg .signee>div:first-child{text-overflow:ellipsis;white-space:nowrap;overflow:hidden}svg .signature{color:var(--contentColor);white-space:nowrap;flex-shrink:0;justify-content:flex-end;align-items:center;gap:12px;font-weight:500;display:flex}svg .signature>div:first-child{width:50px;height:28px;background:var(--contentColor);border-radius:64px;justify-content:center;align-items:center;display:flex}svg .signature svg path{fill:var(--color)}svg .signature b{color:var(--contentColor)}</style>",
+            "px;color:var(--contentColor);background:var(--color);padding:40px 40px 32px;font:400 19px/28px Courier New,monospace}svg a{color:var(--contentColor);text-decoration:none}svg .main{width:720px;height:100%;flex-direction:column;display:flex}svg .header{width:100%;height:70px;text-transform:uppercase;border-bottom:2px solid var(--contentColor);flex-grow:0;flex-shrink:0;justify-content:space-between;padding-bottom:16px;font-size:18px;display:flex}svg .header>div+div{text-align:right}svg .content{width:100%;height:100%;flex-direction:column;flex-grow:1;display:flex}svg .title{flex-grow:0;flex-shrink:0;padding-top:40px;font-size:32px;font-weight:400;line-height:38px}svg .body{flex-grow:1;flex-shrink:0;padding-top:24px;overflow:hidden}svg .body p{margin:24px 0}svg .body p:first-child{margin-top:0}svg .body h1{margin:32px 0;padding-bottom:5px;font-size:26px;font-weight:400;line-height:36px}svg .body h2{margin:24px 0;font-size:22px;font-weight:400;line-height:32px}svg .signees{flex-direction:column;flex-grow:0;flex-shrink:0;padding-top:0;padding-bottom:112px;display:flex}svg .signee{height:40px;justify-content:space-between;align-items:center;gap:12px;display:flex}svg .signee .account{text-overflow:ellipsis;white-space:nowrap;outline:0;text-decoration:none;overflow:hidden}svg .signature{color:var(--contentColor);white-space:nowrap;flex-shrink:0;justify-content:flex-end;align-items:center;gap:12px;font-weight:500;display:flex}svg .signature>div:first-child{width:50px;height:28px;background:var(--contentColor);border-radius:64px;justify-content:center;align-items:center;display:flex}svg .signature svg path{fill:var(--color)}svg .signature b{color:var(--contentColor)}</style>",
             content,
             "</div></foreignObject>",
             fingers,
@@ -136,9 +134,9 @@ library PinkyPromiseSvg {
         string memory signature = "";
         if (signed) {
             signature =
-                '<div class="signature"><div><svg width="38" height="14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="m.516 9.758-.118-1.05L0 6.592l.317-1.057.459-.302-.023-.314.201.197.224-.147 1.115.126.725.66.77 1.138L4.8 8.631l.594-1.26.697-1.308.538-.855.6-.799.667-.673.848-.551.843-.223.627.045.486.15.557.35.444.432.406.57.455.842.733 1.932.637 2.071 1.65-2.232 1.357-1.631.823-.781.892-.692.825-.485 1.017-.422.792-.204.797-.082 1.056.058.72.18.922.457.45.375.136-.183.957-1.182.527-.573.784-.68.754-.525.774-.379 1.071-.296.85-.077.689.047.808.169.76.257.702.357.762.532.577.487.555.622.841.062.757.669.237 1.004-.374.978-1.011.603-.38.18-.987-.038-.804-.74-.126-.528-.118-.341-.213-.334-.293-.338-.373-.302-.404-.262-.426-.193-.705-.2-.384-.044-.677.07-.65.204-.543.315-.574.478-.505.564-.553.772-.675 1.171-.716 1.52-.852.487-.903-.065-.726-.643-.194-.819.08-.576-.007-.017-.158-.224-.212-.156-.506-.196-.42-.046-.64.048-.69.19-.527.225-.636.378-.498.393-.657.62-.6.7-.717.944-2.322 3.489-.493.476-.756.385-.919-.138-.61-.558-.233-.448-1.077-3.74-.39-1.123-.315-.769-.478-.825-.067-.075-.115.041-.24.177L9 6.32l-.556.8-.42.757-.476.989-.965 2.266-.476.687-.768.502-1.017-.088-.71-.628-.18-.286-.068.2-.861.567-1-.074-.77-.681-.18-.766-.037-.807Z"></path></svg></div><span>signed</span></div>';
+                '<div class="signature"><div><svg fill="none" height="14" width="38" xmlns="http://www.w3.org/2000/svg"><path d="m.516 9.758-.118-1.05L0 6.592l.317-1.057.459-.302-.023-.314.201.197.224-.147 1.115.126.725.66.77 1.138L4.8 8.631l.594-1.26.697-1.308.538-.855.6-.799.667-.673.848-.551.843-.223.627.045.486.15.557.35.444.432.406.57.455.842.733 1.932.637 2.071 1.65-2.232 1.357-1.631.823-.781.892-.692.825-.485 1.017-.422.792-.204.797-.082 1.056.058.72.18.922.457.45.375.136-.183.957-1.182.527-.573.784-.68.754-.525.774-.379 1.071-.296.85-.077.689.047.808.169.76.257.702.357.762.532.577.487.555.622.841.062.757.669.237 1.004-.374.978-1.011.603-.38.18-.987-.038-.804-.74-.126-.528-.118-.341-.213-.334-.293-.338-.373-.302-.404-.262-.426-.193-.705-.2-.384-.044-.677.07-.65.204-.543.315-.574.478-.505.564-.553.772-.675 1.171-.716 1.52-.852.487-.903-.065-.726-.643-.194-.819.08-.576-.007-.017-.158-.224-.212-.156-.506-.196-.42-.046-.64.048-.69.19-.527.225-.636.378-.498.393-.657.62-.6.7-.717.944-2.322 3.489-.493.476-.756.385-.919-.138-.61-.558-.233-.448-1.077-3.74-.39-1.123-.315-.769-.478-.825-.067-.075-.115.041-.24.177L9 6.32l-.556.8-.42.757-.476.989-.965 2.266-.476.687-.768.502-1.017-.088-.71-.628-.18-.286-.068.2-.861.567-1-.074-.77-.681-.18-.766-.037-.807Z"></path></svg></div><span>signed</span></div>';
         }
-        return string.concat('<div class="signee"><div><span>', addressHtml, "</span></div>", signature, "</div>");
+        return string.concat('<div class="signee"><span class="account">', addressHtml, "</span>", signature, "</div>");
     }
 
     function promiseColor(PinkyPromise.PromiseColor color) public pure returns (string memory) {
@@ -208,6 +206,38 @@ library PinkyPromiseSvg {
         revert("PromiseState value missing from promiseStatusLabel()");
     }
 
+    function textBlockToHtml(StrSlice textBlock) public view returns (string memory) {
+        StrSlice h1Tag = toSlice("# ");
+        StrSlice h2Tag = toSlice("## ");
+
+        if (textBlock.startsWith(h1Tag)) {
+            // stripPrefix
+            return
+                string.concat("<h1>", lineBreaksToHtml(textBlock.getSubslice(2, textBlock.len()).toString()), "</h1>");
+        }
+
+        if (textBlock.startsWith(h2Tag)) {
+            return
+                string.concat("<h2>", lineBreaksToHtml(textBlock.getSubslice(3, textBlock.len()).toString()), "</h2>");
+        }
+
+        return string.concat("<p>", lineBreaksToHtml(textBlock.toString()), "</p>");
+    }
+
+    function lineBreaksToHtml(string memory text) public view returns (string memory) {
+        string memory html;
+        StrSlice remaining = toSlice(text);
+        StrSlice brSeparator = toSlice("\n");
+
+        while (remaining.contains(brSeparator)) {
+            (, StrSlice part, StrSlice _remaining) = remaining.splitOnce(brSeparator);
+            remaining = _remaining;
+            html = string.concat(html, part.toString(), "<br/>");
+        }
+
+        return string.concat(html, remaining.toString());
+    }
+
     function promiseTextToHtml(string memory text) public view returns (string memory) {
         string memory html;
         StrSlice remaining = toSlice(text);
@@ -220,29 +250,5 @@ library PinkyPromiseSvg {
         }
 
         return string.concat(html, textBlockToHtml(remaining));
-    }
-
-    function textBlockToHtml(StrSlice textBlock) public view returns (string memory) {
-        if (textBlock.startsWith(toSlice("# "))) {
-            return string.concat(
-                "<h1>", textBlockContentToHtml(textBlock.getSubslice(2, textBlock.len()).toString()), "</h1>"
-            );
-        }
-
-        if (textBlock.startsWith(toSlice("## "))) {
-            return string.concat(
-                "<h2>", textBlockContentToHtml(textBlock.getSubslice(3, textBlock.len()).toString()), "</h2>"
-            );
-        }
-
-        return string.concat("<p>", textBlockContentToHtml(textBlock.toString()), "</p>");
-    }
-
-    function textBlockContentToHtml(string memory content) public view returns (string memory) {
-        content = content.replace("&", "&amp;");
-        content = content.replace("<", "&lt;");
-        content = content.replace(">", "&gt;");
-        content = content.replace("\n", "<br/>");
-        return content;
     }
 }
