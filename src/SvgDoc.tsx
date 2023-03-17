@@ -401,7 +401,7 @@ function svgDocStyle({
     ${selector} {
       --color: ${color};
       --contentColor: ${contentColor};
-      contain: size style paint;
+      contain: paint style${htmlMode ? "" : " size"};
     }
     ${selector} * {
       box-sizing: border-box;
