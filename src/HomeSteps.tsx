@@ -1,5 +1,5 @@
-import { useInView } from "react-cool-inview";
 import { a, useSpring } from "@react-spring/web";
+import { useInView } from "react-cool-inview";
 import { COLORS, HOME_STEPS } from "./constants";
 
 import home1 from "./home-1.svg";
@@ -34,7 +34,9 @@ export function HomeSteps() {
         width: "100%",
         margin: 0,
         padding: 0,
-        fontSize: 32,
+        fontSize: 52,
+        fontWeight: 600,
+        textTransform: "lowercase",
         "li": {
           listStyle: "none",
         },

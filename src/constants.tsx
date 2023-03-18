@@ -50,9 +50,9 @@ export const HOME_INTRO =
   "Onchain accountability from jolly commitments between friends and foes";
 
 export const HOME_STEPS = [
-  "Sign a promise with friends (foes work too). It will get stored entirely onchain, using an immutable contract.",
-  "Each participant receives a soulbound NFT, allowing to consult, or get haunted by, the promise from their wallets.",
-  "You can break a promise at any time, like in real life − except here, all participants need to do it. Less grudge overall.",
+  "Effortless and cutest way of co-signing messages onchain",
+  "As long as the ethereum network exists, your promise will be up",
+  "Get a soulbound NFT as a memento readable in full from a wallet",
 ];
 
 export const DOC_WIDTH = 800;
