@@ -1,8 +1,9 @@
 import type { ComponentPropsWithoutRef } from "react";
 
 import { renderToStaticMarkup } from "react-dom/server";
-import { DOC_WIDTH } from "./constants";
 import { SvgDoc } from "./SvgDoc";
+
+export const DOC_WIDTH = 800;
 
 export function SvgDocImg({ alt, ...props }: {
   alt: string;

@@ -66,7 +66,6 @@ export function App() {
                     />
                   )}
                 </Route>
-                <Route path="/nft/:id">{(p) => <NftScreen id={p.id ?? ""} />}</Route>
                 <Route path="/dev">
                   <DevScreen />
                 </Route>

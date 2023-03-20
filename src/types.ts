@@ -20,19 +20,6 @@ export type NetworkPrefix =
   | "O" // Optimism
   | "P"; // Polygon
 
-export type AppChain = {
-  prefix: NetworkPrefix;
-  name: string;
-  chainId: number;
-};
-
-export function isNetworkPrefix(prefix: string): prefix is NetworkPrefix {
-  return ["A", "B", "E", "G", "L", "O", "P"].indexOf(prefix) !== -1;
-}
-
-export type PromiseId = `${number}`;
-export type FullPromiseId = `${NetworkPrefix}-${PromiseId}`; // network prefix + promise identifier
-
 export type NetworkName =
   | "arbitrum"
   | "base"
@@ -42,15 +29,29 @@ export type NetworkName =
   | "optimism"
   | "polygon";
 
+export type Networks = {
+  [k in NetworkName]?: { contract: Address };
+};
+
+export function isNetworkPrefix(prefix: string): prefix is NetworkPrefix {
+  return ["A", "B", "E", "G", "L", "O", "P"].indexOf(prefix) !== -1;
+}
+
 export function isNetworkName(value: string): value is NetworkName {
   return value === "mainnet"
     || value === "polygon"
     || value === "goerli"
     || value === "local";
 }
-export type Networks = {
-  [k in NetworkName]?: { contract: Address };
+
+export type AppChain = {
+  prefix: NetworkPrefix;
+  name: string;
+  chainId: number;
 };
+
+export type PromiseId = `${number}`;
+export type FullPromiseId = `${NetworkPrefix}-${PromiseId}`; // network prefix + promise identifier
 
 function createIsEnumKeyFn<EnumKey extends number>(max: number) {
   return (value: number): value is EnumKey => (

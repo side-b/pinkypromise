@@ -55,8 +55,6 @@ export const HOME_STEPS = [
   "Get a soulbound NFT as a memento readable in full from a wallet",
 ];
 
-export const DOC_WIDTH = 800;
-
 export const PLACEHOLDER_TITLE = "Collab agreement";
 export const PLACEHOLDER_BODY =
   "We wish to associate as co-creators and partners in a prospective business adventure and will share all/any profits equally, realised from the sale of any products and/or services provided by this partnership.";

@@ -6,6 +6,7 @@
     { "source": "/promises/:page", "destination": "/" },
     { "source": "/mine", "destination": "/" },
     { "source": "/mine/:page", "destination": "/" },
-    { "source": "/promise/:id", "destination": "/" }
+    { "source": "/promise/:prefix-:id", "destination": "/" },
+    { "source": "/promise/:prefix-:id/:action", "destination": "/" }
   ]
 }
