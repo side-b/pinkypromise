@@ -22,7 +22,6 @@ import {
   usePinkyPromiseContractAddress,
 } from "../lib/contract-utils";
 import { useAccount } from "../lib/eth-utils";
-import { useResetScroll } from "../lib/react-utils";
 import {
   appChainFromId,
   blocksToText,
@@ -135,8 +134,6 @@ export const PromisesScreen = memo(function PromisesScreen({
     leave: { opacity: 0, immediate: true },
     config: { mass: 1, friction: 80, tension: 1800 },
   });
-
-  useResetScroll([page]);
 
   return (
     <div
@@ -262,7 +259,7 @@ const PromiseCard = memo(function PromiseCard({
   promiseId: string;
 }) {
   return (
-    <Link href={`/promise/${promiseId}`}>
+    <Link href={`/promise/${promiseId}`} legacyBehavior passHref>
       <a
         draggable="false"
         css={{

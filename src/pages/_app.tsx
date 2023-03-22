@@ -7,17 +7,6 @@ import { FocusVisible } from "../components/FocusVisible";
 import { GlobalStyles } from "../components/GlobalStyles";
 import { Header } from "../components/Header";
 
-// import { CreatePromiseScreen } from "../components/CreatePromiseScreen";
-// import { HomeScreen } from "../components/HomeScreen";
-// import { NotFoundScreen } from "../components/NotFoundScreen";
-// import { PromiseScreen } from "../components/PromiseScreen";
-// import { PromisesScreen } from "../components/PromisesScreen";
-
-// function pageFromParams(params: { page?: string }) {
-//   const page = Math.max(parseInt(params.page ?? "", 10), 1);
-//   return isNaN(page) ? 1 : page;
-// }
-
 const queryClient = new QueryClient();
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -69,39 +58,3 @@ export default function App({ Component, pageProps }: AppProps) {
     </>
   );
 }
-
-// <Router>
-//   <Switch>
-//     <Route path="/">
-//       <HomeScreen />
-//     </Route>
-//     <Route path="/new">
-//       <CreatePromiseScreen />
-//     </Route>
-//     <Route path="/promises/:page?">
-//       {(p) => <PromisesScreen page={pageFromParams(p)} />}
-//     </Route>
-//     <Route path="/mine/:page?">
-//       {(p) => (
-//         <PromisesScreen
-//           page={pageFromParams(p)}
-//           mineOnly={true}
-//         />
-//       )}
-//     </Route>
-//     <Route path="/promise/:prefix-:id/:action?">
-//       {(p) => (
-//         <PromiseScreen
-//           action={p.action ?? ""}
-//           id={`${p.prefix}-${p.id}` ?? ""}
-//         />
-//       )}
-//     </Route>
-//     <Route path="/dev">
-//       <DevScreen />
-//     </Route>
-//     <Route>
-//       <NotFoundScreen />
-//     </Route>
-//   </Switch>
-// </Router>
