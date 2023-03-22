@@ -2,45 +2,41 @@
   "name": "pinkypromise",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
   "scripts": {
-    "dev": "vite dev --port 3000",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
     "update-abi": "./scripts/update-abi.sh",
     "update-svg-contract": "tsx scripts/codegen-PinkyPromiseSvg.sol.tsx > contracts/src/PinkyPromiseSvg.sol && forge fmt contracts/src/PinkyPromiseSvg.sol",
-    "dev-node": "source ./.env && anvil --host 0.0.0.0 --chain-id 31337 --fork-url https://mainnet.infura.io/v3/$VITE_INFURA_KEY"
+    "dev-node": "source ./.env && anvil --host 0.0.0.0 --chain-id 31337 --fork-url https://mainnet.infura.io/v3/$NEXT_PUBLIC_INFURA_KEY"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@rainbow-me/rainbowkit": "^0.12.1",
     "@react-spring/web": "9.6.1",
     "@tanstack/react-query": "^4.26.1",
+    "@types/node": "18.15.3",
+    "@types/react": "18.0.28",
+    "@types/react-dom": "18.0.11",
     "abitype": "^0.7.1",
     "buffer": "^6.0.3",
     "colord": "^2.9.3",
     "dnum": "^2.3.2",
+    "eslint": "8.36.0",
+    "eslint-config-next": "13.2.4",
     "ethereum-blockies-base64": "^1.0.2",
     "ethers": "^5.7.2",
-    "react": "^18.2.0",
+    "lightningcss": "^1.19.0",
+    "next": "13.2.4",
+    "react": "18.2.0",
     "react-cool-dimensions": "^3.0.1",
     "react-cool-inview": "^3.0.1",
-    "react-dom": "^18.2.0",
+    "react-dom": "18.2.0",
     "ts-pattern": "^4.1.4",
-    "wagmi": "^0.12.1",
-    "wouter": "^2.10.0",
-    "zod": "^3.21.4"
-  },
-  "devDependencies": {
-    "@emotion/babel-plugin": "^11.10.5",
-    "@types/node": "^18.15.3",
-    "@types/react": "^18.0.28",
-    "@types/react-dom": "^18.0.10",
-    "@vitejs/plugin-react": "^3.1.0",
-    "lightningcss": "^1.19.0",
     "tsx": "^3.12.5",
-    "typescript": "^5.0.2",
-    "vite": "^4.2.0"
-  },
-  "packageManager": "pnpm@7.25.0"
+    "typescript": "5.0.2",
+    "wagmi": "^0.12.1",
+    "zod": "^3.21.4"
+  }
 }
