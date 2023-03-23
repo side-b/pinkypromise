@@ -15,6 +15,7 @@ import { useNetwork } from "wagmi";
 import { isNetworkName } from "../types";
 import { PinkyPromiseAbi } from "./abis";
 import { NETWORK_DEFAULT, NETWORKS } from "./environment";
+import { useReady } from "./react-utils";
 import { appChainFromId, appChainFromName } from "./utils";
 
 export function promiseIdFromTxLogs(logs: Log[]): string | null {
@@ -52,8 +53,9 @@ export function isColorEnumKey(key: number): key is ColorEnumKey {
 }
 
 export function useCurrentChainId() {
+  const ready = useReady();
   const { chain } = useNetwork();
-  return chain?.id;
+  return ready ? chain?.id : undefined;
 }
 
 export function useCurrentOrDefaultChainId() {
@@ -72,10 +74,15 @@ export function isChainIdSupported(id: number) {
 export function usePinkyPromiseContractAddress(
   chainId?: number,
 ): Address | undefined {
+  const ready = useReady();
   const network = useNetwork();
-  chainId ??= network.chain?.id;
+
+  if (ready) {
+    chainId ??= network.chain?.id;
+  }
 
   const chain = appChainFromId(chainId ?? -1);
+
   if (!chain) {
     return undefined;
   }

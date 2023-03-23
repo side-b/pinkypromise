@@ -84,7 +84,11 @@ export function useChainedProgress(
 }
 
 export function useExplorerBaseUrl(chainId?: number) {
+  const ready = useReady();
   const { chain, chains } = useNetwork();
+  if (!ready) {
+    return undefined;
+  }
   chainId ??= chain?.id;
   const chain_ = chains.find((chain) => chain.id === chainId);
   return chain_?.blockExplorers?.etherscan.url ?? undefined;
