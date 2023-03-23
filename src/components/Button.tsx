@@ -133,13 +133,13 @@ export function Button({
 
   const external = href && !href.startsWith("/");
 
-  const button = href
+  const button = href && !disabled
     ? (
       <Link href={href} passHref legacyBehavior>
         <a
-          className={className + (disabled ? " disabled" : "")}
+          className={className}
           draggable="false"
-          onClick={disabled ? undefined : onClick}
+          onClick={onClick}
           rel={external ? "nofollow" : undefined}
           target={external ? "_blank" : undefined}
           title={title}
@@ -171,15 +171,4 @@ export function Button({
     );
 
   return button;
-  // return href && !disabled
-  //   ? (
-  //     <Link href={href} passHref legacyBehavior>
-  //       {button}
-  //     </Link>
-  //   )
-  //   : button;
-
-  // return href && href.startsWith("/") && !disabled
-  //   ? <Link href={href} passHref legacyBehavior>{button}</Link>
-  //   : button;
 }
