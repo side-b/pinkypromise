@@ -143,6 +143,7 @@ export const TxSteps = {
   ),
 };
 
+/* eslint-disable react/jsx-key */
 export const FAQ_ITEMS = [
   [
     "What is a pinky promise?",
@@ -302,3 +303,4 @@ export const FAQ_ITEMS = [
     </p>,
   ],
 ] satisfies Array<[question: string, answer?: ReactNode]>;
+/* eslint-enable react/jsx-key */

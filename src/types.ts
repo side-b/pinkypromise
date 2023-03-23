@@ -1,7 +1,7 @@
 import type { AbiParameterToPrimitiveType, ExtractAbiFunction } from "abitype";
 
 import { usePrepareContractWrite, useWaitForTransaction } from "wagmi";
-import { PinkyPromiseAbi } from "./abis";
+import { PinkyPromiseAbi } from "./lib/abis";
 
 export type EnsName = `${string}.eth`;
 export type Address = `0x${string}`;

@@ -2,7 +2,12 @@ import fs from "fs";
 import * as css from "lightningcss";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { SvgDoc, SvgDocFingers, SvgDocSignature, SvgDocSignee } from "../src/SvgDoc";
+import {
+  SvgDoc,
+  SvgDocFingers,
+  SvgDocSignature,
+  SvgDocSignee,
+} from "../src/components/SvgDoc";
 
 const SOURCE_PATH = new URL(
   "../contracts/PinkyPromiseSvg.tpl.sol",
