@@ -46,6 +46,11 @@ export default function Promise({
         <meta property="og:image:type" content="image/png" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
+        <meta property="og:title" content={`${fullPromiseId}`} />
+        <meta
+          property="og:description"
+          content="Onchain accountability from jolly commitments between friends and foes"
+        />
       </Head>
       {Boolean(networkPrefix && promiseId) && (
         <PromiseScreen

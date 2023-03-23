@@ -14,8 +14,12 @@ export default function App({ Component, pageProps }: AppProps) {
     <>
       <Head>
         <title>Pinky Promise</title>
-        <meta name="description" content="Onchain promises" />
+        <meta
+          name="description"
+          content="Onchain accountability from jolly commitments between friends and foes"
+        />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta property="og:site_name" content="Pinky Promise" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="icon" href="data:," />
       </Head>
