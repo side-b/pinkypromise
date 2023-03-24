@@ -14,6 +14,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const [networkPrefix, promiseId] = parseFullPromiseId(id ?? "") ?? [null, null];
   const fullPromiseId = `${networkPrefix}-${promiseId}`;
 
+  if (!networkPrefix || !promiseId) {
+    return { notFound: true };
+  }
+
   return {
     props: {
       action,
@@ -49,7 +53,7 @@ export default function Promise({
         <meta property="og:title" content={`${fullPromiseId}`} />
         <meta
           property="og:description"
-          content="Onchain accountability from jolly commitments between friends and foes"
+          content="Onchain accountability from jolly commitments between friends and foes."
         />
       </Head>
       {Boolean(networkPrefix && promiseId) && (
