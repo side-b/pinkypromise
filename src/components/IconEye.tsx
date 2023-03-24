@@ -1,5 +1,5 @@
 import { a, useSpring } from "@react-spring/web";
-import { useUid } from "../lib/react-utils";
+import { useId } from "react";
 import { COLORS } from "../constants";
 
 export function IconEye({
@@ -19,7 +19,7 @@ export function IconEye({
     },
   });
 
-  const maskId = useUid();
+  const maskId = useId();
 
   return (
     <svg width="32" height="32" fill="none">

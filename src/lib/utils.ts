@@ -100,10 +100,6 @@ export function shortenAddress(address: string, charsLength = 4): string {
   ).toLowerCase();
 }
 
-export function uid(prefix = "uid"): string {
-  return `${prefix}-${Math.round(Math.random() * 10 ** 8)}`;
-}
-
 export function lerp(value: number, low: number, high: number): number {
   return (high - low) * value + low;
 }

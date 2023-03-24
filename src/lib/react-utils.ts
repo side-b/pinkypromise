@@ -2,9 +2,8 @@ import type { UseSpringProps } from "@react-spring/web";
 import type { Address } from "../types";
 
 import { useChain, useSpring, useSpringRef } from "@react-spring/web";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNetwork } from "wagmi";
-import { uid } from "./utils";
 
 function getWindowDimensions() {
   return typeof window === "undefined"
@@ -106,10 +105,6 @@ export function useContractUrl() {
   return useCallback((address: Address, file: number = 1, line: number = 1) => {
     return baseUrl ? `${baseUrl}/address/${address}#code#F${file}#L${line}` : null;
   }, [baseUrl]);
-}
-
-export function useUid(prefix = "uid"): string {
-  return useRef(uid(prefix)).current;
 }
 
 export function useResetScroll(dependencies: unknown[] = []) {
