@@ -394,13 +394,13 @@ function Arrow({ color }: { color: string }) {
     >
       <path
         fill={color}
-        fill-rule="evenodd"
+        fillRule="evenodd"
         d="M12 9.46a19.897 19.897 0 0 0-2.186 4.874L0 20l9.814 5.666A19.896 19.896 0 0 0 12 30.541V9.459Z"
         clip-rule="evenodd"
       />
       <path
         fill="#fff"
-        fill-rule="evenodd"
+        fillRule="evenodd"
         d="M12 9.46a19.897 19.897 0 0 0-2.186 4.874L0 20l9.814 5.666A19.896 19.896 0 0 0 12 30.541v-4.608a17.73 17.73 0 0 1-.268-.833l-.226-.766L4 20l7.506-4.334.226-.766c.083-.28.172-.558.268-.833V9.46Z"
         clip-rule="evenodd"
       />
