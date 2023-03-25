@@ -33,6 +33,7 @@
     "react-cool-dimensions": "^3.0.1",
     "react-cool-inview": "^3.0.1",
     "react-dom": "18.2.0",
+    "sharp": "^0.32.0",
     "ts-pattern": "^4.2.2",
     "tsx": "^3.12.6",
     "typescript": "5.0.2",
