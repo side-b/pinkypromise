@@ -9,7 +9,12 @@ import {
   useCurrentOrDefaultChainId,
   usePinkyPromiseContractAddress,
 } from "../lib/contract-utils";
-import { useChainedProgress, useExplorerBaseUrl } from "../lib/react-utils";
+import {
+  useBreakpoint,
+  useChainedProgress,
+  useExplorerBaseUrl,
+} from "../lib/react-utils";
+import { lerp } from "../lib/utils";
 
 import sideb from "../assets/side-b.png";
 
@@ -20,6 +25,9 @@ export function Footer() {
 
   const contractExplorerUrl = address && explorerUrl
     && `${explorerUrl}/address/${address}`;
+
+  const breakpoint = useBreakpoint();
+  const small = breakpoint === "small";
 
   const { observe, inView } = useInView({
     threshold: 0.8,
@@ -52,40 +60,61 @@ export function Footer() {
         css={{
           position: "relative",
           display: "flex",
-          gap: 48,
+          flexDirection: "column",
+          gap: small ? 12 : 48,
           justifyContent: "center",
           alignItems: "center",
-          height: 200,
+          height: small ? "auto" : 200,
+          padding: small ? "40px 0" : 0,
         }}
       >
-        <div css={{ position: "absolute", inset: "0 auto 0 0" }}>
+        <Appear spring={springs.sideb} small={small}>
+          <SideB label="Contract" url={SIDEB_URL} small={small} />
+        </Appear>
+        <div
+          css={{
+            position: small ? "static" : "absolute",
+            inset: "0 auto 0 0",
+            paddingTop: small ? 40 - 12 : 0,
+          }}
+        >
           <div
             css={{
-              position: "absolute",
+              position: small ? "static" : "absolute",
               inset: "0 48px 0 auto",
               display: "flex",
               alignItems: "center",
             }}
           >
-            <Appear spring={springs.leftBtn}>
-              <LinkButton label="Source" url={GH_REPO_URL} />
+            <Appear spring={springs.leftBtn} small={small}>
+              <LinkButton
+                label="Source"
+                url={GH_REPO_URL}
+                small={small}
+              />
             </Appear>
           </div>
         </div>
-        <Appear spring={springs.sideb}>
-          <SideB label="Contract" url={SIDEB_URL} />
-        </Appear>
-        <div css={{ position: "absolute", inset: "0 0 0 auto" }}>
+        <div
+          css={{
+            position: small ? "static" : "absolute",
+            inset: "0 0 0 auto",
+          }}
+        >
           <div
             css={{
-              position: "absolute",
+              position: small ? "static" : "absolute",
               inset: "0 auto 0 48px",
               display: "flex",
               alignItems: "center",
             }}
           >
-            <Appear spring={springs.rightBtn}>
-              <LinkButton label="Contract" url={contractExplorerUrl} />
+            <Appear spring={springs.rightBtn} small={small}>
+              <LinkButton
+                label="Contract"
+                url={contractExplorerUrl}
+                small={small}
+              />
             </Appear>
           </div>
         </div>
@@ -96,16 +125,21 @@ export function Footer() {
 
 function Appear({
   children,
+  small,
   spring,
 }: {
   children: ReactNode;
+  small?: boolean;
   spring: ReturnType<typeof useChainedProgress>[string];
 }) {
   return (
     <a.div
       style={{
+        opacity: spring.progress,
         transform: spring.progress.to((v: number) =>
-          `translate3d(0, ${(1 - v) * 200}px, 0)`
+          small
+            ? `scale3d(${lerp(v, 0.5, 1)}, ${lerp(v, 0.5, 1)}, 1)`
+            : `translate3d(0, ${(1 - v) * 200}px, 0)`
         ),
       }}
     >
@@ -116,9 +150,11 @@ function Appear({
 
 function LinkButton({
   label,
+  small,
   url,
 }: {
   label: string;
+  small?: boolean;
   url?: string;
 }) {
   return (
@@ -126,7 +162,7 @@ function LinkButton({
       color={COLORS.pink}
       href={url}
       label={label}
-      size="large"
+      size={small ? "regular" : "large"}
       disabled={!url}
     />
   );
@@ -135,9 +171,11 @@ function LinkButton({
 function SideB({
   label,
   url,
+  small,
 }: {
   label: string;
   url?: string;
+  small?: boolean;
 }) {
   return (
     <a
@@ -160,8 +198,8 @@ function SideB({
       <Image
         draggable="false"
         alt={label}
-        width={80}
-        height={80}
+        width={small ? 64 : 80}
+        height={small ? 64 : 80}
         src={sideb.src}
       />
     </a>

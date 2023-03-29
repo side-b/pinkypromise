@@ -2,6 +2,7 @@ import { a, useSpring } from "@react-spring/web";
 import Image from "next/image";
 import { useInView } from "react-cool-inview";
 import { COLORS, HOME_INTRO } from "../constants";
+import { useBreakpoint } from "../lib/react-utils";
 import { SvgDoc, SvgDocSignees } from "./SvgDoc";
 
 import fingersImg from "../assets/intro-fingers.svg";
@@ -30,6 +31,7 @@ export function HomeIntro() {
     },
     delay: 100,
   });
+  const breakpoint = useBreakpoint();
   return (
     <div
       ref={observe}
@@ -74,7 +76,7 @@ export function HomeIntro() {
           style={imageSpringStyles}
           css={{
             position: "absolute",
-            right: -300,
+            right: "calc(-840px + 30%)",
             zIndex: 2,
             display: "flex",
             filter: "drop-shadow(0 80px 120px rgba(43, 8, 28, 0.20))",

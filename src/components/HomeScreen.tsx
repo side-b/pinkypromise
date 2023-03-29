@@ -1,7 +1,13 @@
+import type { Dimensions } from "../types";
+
 import { a } from "@react-spring/web";
 import { useEffect, useState } from "react";
 import { COLORS, HOME_BUTTON, PROMISE_SYNONYMS } from "../constants";
-import { useChainedProgress, useWindowDimensions } from "../lib/react-utils";
+import {
+  useBreakpoint,
+  useChainedProgress,
+  useWindowDimensions,
+} from "../lib/react-utils";
 import { lerp } from "../lib/utils";
 import { AnimatableFingers } from "./AnimatableFingers";
 import { Button } from "./Button";
@@ -30,7 +36,11 @@ export function HomeScreen() {
     props: { config: { mass: 2, friction: 70, tension: 1200 } },
   });
 
-  const dimensions = useWindowDimensions();
+  const [winDims, setWinDims] = useState<Dimensions>({ width: 0, height: 0 });
+  useWindowDimensions(setWinDims);
+
+  const breakpoint = useBreakpoint();
+  const fingersSize = breakpoint === "medium" ? 120 : 64;
 
   useEffect(() => {
     const cl = document.documentElement.classList;
@@ -42,7 +52,7 @@ export function HomeScreen() {
     <>
       <div
         css={{
-          flexGrow: "1",
+          flexGrow: 1,
           display: "flex",
           flexDirection: "column",
         }}
@@ -50,19 +60,21 @@ export function HomeScreen() {
         <div
           css={{
             overflow: "hidden",
-            flexGrow: "1",
-            flexShrink: "0",
+            flexGrow: 1,
+            flexShrink: 0,
             position: "relative",
-            marginTop: "-120px",
-            zIndex: "1",
+            marginTop: -120,
+            zIndex: 1,
           }}
         >
           <a.div
             style={{
               transform: springs.reveal.progress.to((p: number) => `
-              translateY(${lerp(p, -120, 40)}px)
-              scale(${lerp(p, 1, 120 / (dimensions.height * 1.8))})
-            `),
+                translateY(${
+                lerp(p, -fingersSize, breakpoint === "medium" ? 40 : 24)
+              }px)
+                scale(${lerp(p, 1, fingersSize / (winDims.height * 1.8))})
+              `),
             }}
             css={{
               display: "grid",
@@ -74,7 +86,7 @@ export function HomeScreen() {
             <div
               css={{
                 position: "absolute",
-                top: "0",
+                top: 0,
                 left: "50%",
                 transform: "translateX(-50%)",
               }}
@@ -85,8 +97,8 @@ export function HomeScreen() {
                   leftFingerAppear: springs.leftFinger.progress,
                   rightFingerAppear: springs.rightFinger.progress,
                 }}
-                openDistance={dimensions.width / 3}
-                size={dimensions.height * 1.8}
+                openDistance={winDims.width / 3}
+                size={winDims.height * 1.8}
               />
             </div>
           </a.div>
@@ -95,30 +107,43 @@ export function HomeScreen() {
               display: fingersAnimRunning ? "none" : "flex",
               flexDirection: "column",
               alignItems: "center",
-              marginTop: "224px",
             }}
             style={{
               opacity: springs.reveal.progress.to([0, 0.2, 1], [0, 1, 1]),
               transform: springs.reveal.progress
                 .to([0, 0.8, 1], [0, 0, 1])
-                .to((p: number) => `translateY(${lerp(p, dimensions.height, 0)}px)`),
+                .to((p: number) => `translateY(${lerp(p, winDims.height, 0)}px)`),
             }}
           >
+            {breakpoint === "small" && (
+              <div
+                css={{
+                  color: COLORS.white,
+                  paddingTop: 96,
+                  textTransform: "lowercase",
+                  fontWeight: 500,
+                  fontSize: 24,
+                }}
+              >
+                Pinky Promise
+              </div>
+            )}
             <div
               css={{
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                paddingBottom: 112,
+                marginTop: breakpoint === "medium" ? 224 : 48,
+                paddingBottom: breakpoint === "medium" ? 112 : 48,
               }}
             >
               <div
                 css={{
                   paddingBottom: 48,
                   textAlign: "center",
-                  fontSize: 200,
-                  fontWeight: 500,
-                  lineHeight: 1,
+                  fontSize: breakpoint === "medium" ? 200 : 64,
+                  fontWeight: breakpoint === "medium" ? 500 : 600,
+                  lineHeight: breakpoint === "medium" ? 1 : 1.1,
                   textTransform: "uppercase",
                   color: "#FFF",
                   userSelect: "none",
@@ -127,8 +152,15 @@ export function HomeScreen() {
                   },
                 }}
               >
-                <div css={{ fontSize: 160 }}>Onchain</div>
+                <div
+                  css={{
+                    fontSize: breakpoint === "medium" ? 160 : 64,
+                  }}
+                >
+                  Onchain
+                </div>
                 <WordsLoop
+                  height={breakpoint === "medium" ? 200 : 48}
                   animate={animateWords}
                   word="Promises"
                   words={PROMISE_SYNONYMS}
@@ -138,7 +170,7 @@ export function HomeScreen() {
                 color={COLORS.blue}
                 href="/new"
                 label={HOME_BUTTON}
-                size="giant"
+                size={breakpoint === "medium" ? "giant" : "large"}
               />
             </div>
             <div
@@ -147,7 +179,7 @@ export function HomeScreen() {
                 width: "100%",
               }}
             >
-              <HomeIntro />
+              {breakpoint !== "small" && <HomeIntro />}
               <HomeSteps />
               <HomeFaq />
               <Footer />

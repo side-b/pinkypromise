@@ -5,16 +5,18 @@ import { useState } from "react";
 import useDimensions from "react-cool-dimensions";
 import { useInView } from "react-cool-inview";
 import { COLORS, FAQ_ITEMS } from "../constants";
+import { useBreakpoint } from "../lib/react-utils";
 import { PlusMinusButton } from "./PlusMinusButton";
 
 const QUESTION_HEIGHT = 64;
 
 export function HomeFaq() {
   const [openedItem, setOpenedItem] = useState(-1);
+  const breakpoint = useBreakpoint();
   return (
     <div
       css={{
-        padding: "128px 0",
+        padding: breakpoint === "small" ? "64px 0" : "128px 0",
         background: "#FFD372",
       }}
     >
@@ -23,9 +25,9 @@ export function HomeFaq() {
           display: "flex",
           flexDirection: "column",
           gap: 12,
-          width: 800,
+          maxWidth: 848,
           margin: "0 auto",
-          padding: 0,
+          padding: "0 24px",
         }}
       >
         {FAQ_ITEMS.map(([question, answer], index) => (
@@ -37,6 +39,7 @@ export function HomeFaq() {
               setOpenedItem((index_) => index_ === index ? -1 : index);
             }}
             question={question}
+            small={breakpoint === "small"}
           />
         ))}
       </ul>
@@ -49,11 +52,13 @@ function HomeFaqItem({
   onToggle,
   opened,
   question,
+  small,
 }: {
   answer: ReactNode;
   onToggle: () => void;
   opened: boolean;
   question: string;
+  small?: boolean;
 }) {
   const { observe, inView } = useInView({
     threshold: 1,
@@ -111,86 +116,100 @@ function HomeFaqItem({
     delay: 100,
   });
   return (
-    <a.li
+    <li
       ref={observe}
-      style={{
-        opacity: spring.opacity,
-        height: spring.itemHeight,
-        transform: spring.itemTransform,
-      }}
       css={{
         overflow: "hidden",
-        position: "relative",
-        background: COLORS.grey,
-        borderRadius: 32,
         listStyle: "none",
       }}
     >
-      <label
+      <a.div
+        style={{
+          opacity: spring.opacity,
+          height: spring.itemHeight,
+          transform: spring.itemTransform,
+        }}
         css={{
-          display: "block",
-          cursor: "pointer",
+          position: "relative",
+          background: COLORS.grey,
+          borderRadius: 32,
         }}
       >
-        <a.div
-          style={{
-            opacity: buttonSpring.opacity,
-            transform: buttonSpring.transform,
-          }}
+        <label
           css={{
-            position: "absolute",
-            inset: "0 12px auto auto",
-            display: "flex",
-            alignItems: "center",
-            height: QUESTION_HEIGHT,
+            display: "block",
+            cursor: "pointer",
           }}
         >
-          <PlusMinusButton
-            mode={opened ? "minus" : "plus"}
-            title={opened ? "Close" : "Open"}
-            color={COLORS.black}
-            onClick={onToggle}
-          />
-        </a.div>
-        <h2
-          css={{
-            display: "flex",
-            alignItems: "center",
-            height: QUESTION_HEIGHT,
-            padding: "0 24px",
-            fontSize: 24,
-            fontWeight: 400,
-            userSelect: "none",
-          }}
-        >
-          {question}
-        </h2>
-      </label>
-      <div ref={answerDimensions.observe}>
-        <a.div
-          style={{ visibility: spring.visibility }}
-          css={{
-            padding: "0 64px 24px 24px",
-            "p:not(:first-of-type)": {
-              marginTop: 16,
-            },
-            "a:focus-visible": {
-              outline: `2px solid ${COLORS.black}`,
-              outlineOffset: 2,
-              borderRadius: 2,
-            },
-            "code": {
-              padding: "0 4px",
-              marginRight: 1,
-              color: COLORS.white,
-              background: COLORS.black,
-              borderRadius: 4,
-            },
-          }}
-        >
-          {answer}
-        </a.div>
-      </div>
-    </a.li>
+          <a.div
+            style={{
+              opacity: buttonSpring.opacity,
+              transform: buttonSpring.transform,
+            }}
+            css={{
+              position: "absolute",
+              inset: "0 12px auto auto",
+              display: "flex",
+              alignItems: "center",
+              height: QUESTION_HEIGHT,
+            }}
+          >
+            <PlusMinusButton
+              mode={opened ? "minus" : "plus"}
+              title={opened ? "Close" : "Open"}
+              color={COLORS.black}
+              onClick={onToggle}
+            />
+          </a.div>
+          <h2
+            title={question}
+            css={{
+              display: "flex",
+              alignItems: "center",
+              height: QUESTION_HEIGHT,
+              padding: "0 60px 0 24px",
+              fontSize: small ? 20 : 24,
+              fontWeight: 400,
+              userSelect: "none",
+            }}
+          >
+            <span
+              css={{
+                textOverflow: "ellipsis",
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {question}
+            </span>
+          </h2>
+        </label>
+        <div ref={answerDimensions.observe}>
+          <a.div
+            style={{ visibility: spring.visibility }}
+            css={{
+              padding: "0 24px 24px",
+              "p:not(:first-of-type)": {
+                marginTop: 16,
+              },
+              "a:focus-visible": {
+                outline: `2px solid ${COLORS.black}`,
+                outlineOffset: 2,
+                borderRadius: 2,
+              },
+              "code": {
+                padding: "0 4px",
+                marginRight: 1,
+                color: COLORS.white,
+                background: COLORS.black,
+                borderRadius: 4,
+              },
+            }}
+          >
+            {answer}
+          </a.div>
+        </div>
+      </a.div>
+    </li>
   );
 }

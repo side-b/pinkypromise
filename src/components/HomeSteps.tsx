@@ -2,31 +2,53 @@ import { a, useSpring } from "@react-spring/web";
 import Image from "next/image";
 import { useInView } from "react-cool-inview";
 import { COLORS, HOME_STEPS } from "../constants";
+import { useBreakpoint } from "../lib/react-utils";
 
 import home1 from "../assets/home-1.svg";
 import home2 from "../assets/home-2.svg";
 import home3 from "../assets/home-3.svg";
 
-type ImgGeometry = { w: number; h: number; yShift: number; xShift: number };
+type ImgGeometry = {
+  w: number;
+  h: number;
+  shift: { y: number; x: number; r?: number };
+  compactShift: { y: number; x: number; r?: number };
+};
 const STEPS = [
   {
-    geometry: { w: 494, h: 761, yShift: 100, xShift: 60 },
+    geometry: {
+      w: 494,
+      h: 761,
+      shift: { y: 100, x: 60 },
+      compactShift: { y: 30, x: 40 },
+    },
     img: home1.src,
     description: HOME_STEPS[0],
   },
   {
-    geometry: { w: 989, h: 519, yShift: 100, xShift: 85 },
+    geometry: {
+      w: 989,
+      h: 519,
+      shift: { y: 100, x: 85 },
+      compactShift: { y: 20, x: 140 },
+    },
     img: home2.src,
     description: HOME_STEPS[1],
   },
   {
-    geometry: { w: 746, h: 834, yShift: 100, xShift: 84 },
+    geometry: {
+      w: 746,
+      h: 834,
+      shift: { y: 100, x: 84, r: 0 },
+      compactShift: { y: -20, x: 120, r: 15 },
+    },
     img: home3.src,
     description: HOME_STEPS[2],
   },
 ] satisfies { description: string; geometry: ImgGeometry; img: string }[];
 
 export function HomeSteps() {
+  const breakpoint = useBreakpoint();
   return (
     <ol
       css={{
@@ -35,7 +57,7 @@ export function HomeSteps() {
         width: "100%",
         margin: 0,
         padding: 0,
-        fontSize: 52,
+        fontSize: breakpoint === "small" ? 32 : 52,
         fontWeight: 600,
         textTransform: "lowercase",
         "li": {
@@ -45,7 +67,11 @@ export function HomeSteps() {
     >
       {STEPS.map((step, index) => (
         <li key={index}>
-          <Step {...step} index={index} />
+          <Step
+            {...step}
+            compact={breakpoint === "small"}
+            index={index}
+          />
         </li>
       ))}
     </ol>
@@ -53,11 +79,13 @@ export function HomeSteps() {
 }
 
 function Step({
+  compact,
   description,
-  geometry: { w, h, xShift, yShift },
+  geometry: { w, h, shift, compactShift },
   img,
   index,
 }: {
+  compact: boolean;
   description: string;
   geometry: ImgGeometry;
   img: string;
@@ -82,6 +110,7 @@ function Step({
     <div
       ref={observe}
       css={{
+        position: "relative",
         display: "flex",
         justifyContent: "center",
         width: "100%",
@@ -98,7 +127,8 @@ function Step({
           flexDirection: revert ? "row-reverse" : "row",
           justifyContent: "space-between",
           maxWidth: 1440,
-          height: 800,
+          height: compact ? "auto" : 800,
+          padding: compact ? "280px 0 64px" : 0,
         }}
       >
         <a.div
@@ -109,21 +139,31 @@ function Step({
               .to((v) => `translate3d(${v}%, 0, 0)`),
           }}
           css={{
+            position: compact ? "absolute" : "static",
+            top: 0,
+            left: revert ? "auto" : 0,
+            right: !revert ? "auto" : 0,
             display: "flex",
             alignItems: "center",
             justifyContent: revert ? "flex-start" : "flex-end",
-            width: 480,
-            borderRight: revert ? 0 : `10px solid ${color}`,
-            borderLeft: revert ? `10px solid ${color}` : 0,
+            width: compact ? "auto" : 480,
+            borderColor: color,
+            borderStyle: "solid",
+            borderWidth: 0,
+            borderRightWidth: revert || compact ? 0 : 10,
+            borderLeftWidth: !revert || compact ? 0 : 10,
           }}
         >
           <div
             css={{
               display: "flex",
-              transform: `translate(
-                ${xShift * (revert ? 1 : -1)}px,
-                ${yShift}px
-              )`,
+              transform: `
+                translate(
+                  ${(compact ? compactShift : shift).x * (revert ? 1 : -1)}px,
+                  ${(compact ? compactShift : shift).y}px
+                )
+                rotate(${(compact ? compactShift : shift).r ?? 0}deg)
+              `,
             }}
           >
             <Image
@@ -131,6 +171,10 @@ function Step({
               height={h}
               src={img}
               width={w}
+              css={{
+                width: compact ? w / 2 : "auto",
+                height: "auto",
+              }}
             />
           </div>
         </a.div>
@@ -148,15 +192,15 @@ function Step({
             justifyContent: "center",
             alignItems: "center",
             width: "100%",
-            marginLeft: 120,
-            marginRight: 120,
+            paddingLeft: compact ? 24 : 120,
+            paddingRight: compact ? 24 : 120,
           }}
         >
           <div
             css={{
               display: "flex",
               flexDirection: "column",
-              alignItems: "flex-start",
+              alignItems: compact ? "center" : "flex-start",
               justifyContent: "center",
             }}
           >
@@ -165,19 +209,27 @@ function Step({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                width: 190,
-                height: 120,
-                marginBottom: 40,
-                fontSize: 80,
+                width: compact ? 90 : 190,
+                height: compact ? 48 : 120,
+                marginBottom: compact ? 16 : 40,
                 fontWeight: 500,
-                borderRadius: 120,
-                border: `10px solid ${color}`,
+                fontSize: compact ? 32 : 80,
+                borderRadius: compact ? 64 : 120,
+                borderWidth: compact ? 4 : 10,
+                borderColor: color,
+                borderStyle: "solid",
               }}
             >
-              {index + 1}
+              {`0${index + 1}`}
             </div>
-            <div css={{ maxWidth: 640 }}>
-              {description.trim()}
+            <div
+              css={{
+                maxWidth: compact ? 400 : 640,
+                textAlign: compact ? "center" : "left",
+                lineHeight: compact ? 1.3 : 1.5,
+              }}
+            >
+              {description}
             </div>
           </div>
         </a.div>

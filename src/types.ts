@@ -98,3 +98,8 @@ export type TxBag = {
   successLabel: string;
   title: string;
 };
+
+export type Dimensions = {
+  height: number;
+  width: number;
+};

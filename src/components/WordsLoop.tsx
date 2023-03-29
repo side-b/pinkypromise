@@ -4,11 +4,13 @@ import { COLORS } from "../constants";
 
 export const WordsLoop = memo(function WordsLoop({
   animate,
+  height = 200,
   interval = 250,
   word,
   words,
 }: {
   animate: boolean;
+  height?: number;
   interval?: number;
   word: string;
   words: string[];
@@ -68,17 +70,12 @@ export const WordsLoop = memo(function WordsLoop({
   }, [animate, index]);
 
   return (
-    <div
-      css={{
-        position: "relative",
-        height: "200px",
-      }}
-    >
+    <div css={{ position: "relative", height }}>
       {transitions((styles, index) => (
         <div
           css={{
             position: "absolute",
-            top: "0",
+            top: 0,
             left: "50%",
             transform: "translateX(-50%)",
             color,

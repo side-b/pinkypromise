@@ -53,7 +53,7 @@ export const HOME_STEPS = [
   "Effortless and cutest way of co-signing messages onchain",
   "As long as the ethereum network exists, your promise will be up",
   "Get a soulbound NFT as a memento readable in full from a wallet",
-];
+].map((s) => s.trim());
 
 export const PLACEHOLDER_TITLE = "Collab agreement";
 export const PLACEHOLDER_BODY =

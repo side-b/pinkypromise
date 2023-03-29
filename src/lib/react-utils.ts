@@ -1,29 +1,56 @@
 import type { UseSpringProps } from "@react-spring/web";
-import type { Address } from "../types";
+import type { Address, Dimensions } from "../types";
 
 import { useChain, useSpring, useSpringRef } from "@react-spring/web";
 import { useCallback, useEffect, useState } from "react";
+import useDimensions from "react-cool-dimensions";
+import { useThrottledCallback } from "use-debounce";
 import { useNetwork } from "wagmi";
 
-function getWindowDimensions() {
+type UseWindowDimensionsCallback = (dimensions: Dimensions) => void;
+
+function getWindowDimensions(): Dimensions {
   return typeof window === "undefined"
     ? { height: 0, width: 0 }
     : { height: window.innerHeight, width: window.innerWidth };
 }
 
-export function useWindowDimensions() {
-  const [dimensions, set] = useState({ height: 0, width: 0 });
+export function useWindowDimensions(
+  callback: UseWindowDimensionsCallback,
+  { delay = 300 }: { delay?: number } = {},
+): void {
+  const onResize = useThrottledCallback(() => {
+    callback(getWindowDimensions());
+  }, delay);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      set(getWindowDimensions());
-      const onResize = () => set(getWindowDimensions());
+      onResize();
       window.addEventListener("resize", onResize);
       return () => window.removeEventListener("resize", onResize);
     }
-  }, []);
+  }, [onResize]);
+}
 
-  return dimensions;
+const BREAKPOINTS = { small: 0, medium: 1140 };
+
+type BreakpointName = keyof typeof BREAKPOINTS;
+
+export function isBreakpointName(bp: string): bp is BreakpointName {
+  return Object.keys(BREAKPOINTS).includes(bp);
+}
+
+export function useBreakpoint(): BreakpointName {
+  const { currentBreakpoint, observe } = useDimensions({
+    breakpoints: BREAKPOINTS,
+    updateOnBreakpointChange: true,
+  });
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      observe(document.body);
+    }
+  }, [observe]);
+  return isBreakpointName(currentBreakpoint) ? currentBreakpoint : "small";
 }
 
 export function useProgress(springProps?: UseSpringProps, enabled: boolean = true) {

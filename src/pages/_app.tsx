@@ -32,7 +32,7 @@ export default function App({ Component, pageProps }: AppProps) {
                   display: "flex",
                   flexDirection: "column",
                   minHeight: "100vh",
-                  minWidth: 1140,
+                  minWidth: 360,
                 }}
               >
                 <div
