@@ -1,5 +1,11 @@
 import type { ReactNode } from "react";
-import type { Address, NetworkPrefix, SigningStateEnumKey, TxBag } from "../types";
+import type {
+  Address,
+  Dimensions,
+  NetworkPrefix,
+  SigningStateEnumKey,
+  TxBag,
+} from "../types";
 
 import { useTransition } from "@react-spring/web";
 import { BigNumber } from "ethers";
@@ -503,7 +509,9 @@ function Action({
 }
 
 function BackgroundFingers() {
-  const dimensions = useWindowDimensions();
+  const [dimensions, setDimensions] = useState<Dimensions>({ width: 0, height: 0 });
+  useWindowDimensions(setDimensions);
+
   const springs = useChainedProgress([
     [0, "leftFinger"],
     [0.3, "rightFinger"],
@@ -512,6 +520,7 @@ function BackgroundFingers() {
     duration: 600,
     props: { config: { mass: 2, friction: 70, tension: 1200 } },
   });
+
   return (
     <div
       css={{

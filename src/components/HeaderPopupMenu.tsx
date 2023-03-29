@@ -20,9 +20,9 @@ export function HeaderPopupMenu() {
   });
 
   const items = [
-    ["Create new promise", <IconPlus color={COLORS.white} />, "/new"],
-    ["All promises", <IconSquares color={COLORS.white} />, "/promises"],
-    ["My promises", <IconSquares color={COLORS.white} />, "/mine"],
+    ["Create new promise", <IconPlus color={COLORS.white} key="create" />, "/new"],
+    ["All promises", <IconSquares color={COLORS.white} key="all" />, "/promises"],
+    ["My promises", <IconSquares color={COLORS.white} key="mine" />, "/mine"],
   ] satisfies Array<[string, ReactNode, string | (() => void)]>;
 
   const transition = useTransition(opened, {

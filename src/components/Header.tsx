@@ -125,7 +125,7 @@ export function Header() {
             }}
           >
             <ConnectButton
-              mode="disc"
+              discMode={true}
               onClick={() => {}}
             />
             <HeaderPopupMenu />

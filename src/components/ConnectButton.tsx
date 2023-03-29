@@ -12,11 +12,10 @@ import { SplitButton } from "./SplitButton";
 
 export function ConnectButton(
   props:
-    & Omit<Partial<ComponentPropsWithoutRef<typeof Button>>, "mode">
-    & { mode: "button" | "disc" },
+    & Partial<ComponentPropsWithoutRef<typeof Button>>
+    & { discMode?: boolean },
 ) {
-  const { mode, ...buttonProps } = props;
-  const discMode = mode === "disc";
+  const { discMode, ...buttonProps } = props;
   return (
     <RKConnectButton.Custom>
       {({
