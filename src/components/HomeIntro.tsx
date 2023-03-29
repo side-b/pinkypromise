@@ -89,6 +89,7 @@ export function HomeIntro() {
           src={fingersImg}
           alt=""
           width={1800}
+          priority={true}
           css={{
             position: "absolute",
             zIndex: 1,
