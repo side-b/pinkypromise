@@ -124,10 +124,7 @@ export function Header() {
               gap: 12,
             }}
           >
-            <ConnectButton
-              discMode={true}
-              onClick={() => {}}
-            />
+            <ConnectButton discMode={true} />
             <HeaderPopupMenu />
           </div>
         )
