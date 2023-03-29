@@ -1,10 +1,11 @@
+import type { Address } from "../types";
+
 import blockie from "ethereum-blockies-base64";
 import Image from "next/image";
 import { useMemo } from "react";
-import { isAddress } from "../lib/utils";
 
 type EthIconProps = {
-  address: string;
+  address: Address;
   round?: boolean;
   size?: number;
 };
@@ -14,15 +15,13 @@ export function EthIcon({
   round = false,
   size = 32,
 }: EthIconProps) {
-  if (!isAddress(address)) {
-    throw new Error(`Incorrect address: ${address}`);
-  }
-
   const uri = useMemo(() => blockie(address), [address]);
 
   return (
     <div
       css={{
+        flexShrink: 0,
+        flexGrow: 0,
         overflow: "hidden",
         display: "flex",
         width: size,
@@ -38,6 +37,8 @@ export function EthIcon({
     >
       <Image
         src={uri}
+        width={size}
+        height={size}
         alt=""
       />
     </div>

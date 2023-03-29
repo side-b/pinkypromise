@@ -71,7 +71,7 @@ export function HomeScreen() {
             style={{
               transform: springs.reveal.progress.to((p: number) => `
                 translateY(${
-                lerp(p, -fingersSize, breakpoint === "medium" ? 40 : 24)
+                lerp(p, -fingersSize, breakpoint === "medium" ? 40 : 64)
               }px)
                 scale(${lerp(p, 1, fingersSize / (winDims.height * 1.8))})
               `),
@@ -119,10 +119,11 @@ export function HomeScreen() {
               <div
                 css={{
                   color: COLORS.white,
-                  paddingTop: 96,
+                  paddingTop: 96 + 40,
                   textTransform: "lowercase",
                   fontWeight: 500,
                   fontSize: 24,
+                  userSelect: "none",
                 }}
               >
                 Pinky Promise

@@ -29,6 +29,7 @@ export const COLORS = {
   red: "#FF5262",
   white: "#FFFFFF",
   grey: "#F6F6F6",
+  green: "#7DFF00",
 } as const;
 
 export const PROMISE_COLORS: Record<ColorId, string> = {

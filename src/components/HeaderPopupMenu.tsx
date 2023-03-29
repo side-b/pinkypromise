@@ -6,11 +6,10 @@ import FocusTrap from "focus-trap-react";
 import Link from "next/link";
 import { useState } from "react";
 import { COLORS } from "../constants";
-import { useAccount } from "../lib/eth-utils";
 import { useWindowDimensions } from "../lib/react-utils";
+import { DiscButton } from "./DiscButton";
 import { IconPlus } from "./IconPlus";
 import { IconSquares } from "./IconSquares";
-import { IconWallet } from "./IconWallet";
 
 export function HeaderPopupMenu() {
   const [wideMode, setWideMode] = useState(false);
@@ -20,21 +19,8 @@ export function HeaderPopupMenu() {
     setWideMode(width < 500);
   });
 
-  const { isConnected } = useAccount();
-
   const items = [
     ["Create new promise", <IconPlus color={COLORS.white} />, "/new"],
-    isConnected
-      ? [
-        "Disconnect account",
-        <IconWallet color={COLORS.white} />,
-        () => {},
-      ]
-      : [
-        "Connect account",
-        <IconWallet />,
-        () => {},
-      ],
     ["All promises", <IconSquares color={COLORS.white} />, "/promises"],
     ["My promises", <IconSquares color={COLORS.white} />, "/mine"],
   ] satisfies Array<[string, ReactNode, string | (() => void)]>;
@@ -51,35 +37,13 @@ export function HeaderPopupMenu() {
   });
 
   return (
-    <div
-      css={{
-        position: "absolute",
-        inset: "20px 24px auto auto",
-      }}
-    >
-      <button
+    <div>
+      <DiscButton
+        title="Menu"
         onClick={() => setOpened(true)}
-        css={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: 40,
-          height: 40,
-          background: COLORS.white,
-          borderRadius: "50%",
-          cursor: "pointer",
-          border: 0,
-          "&:focus-visible": {
-            outline: `2px solid ${COLORS.white}`,
-            outlineOffset: 3,
-          },
-          "&:active": {
-            transform: "translate3d(1px, 1px, 0)",
-          },
-        }}
-      >
-        <ThreeDots />
-      </button>
+        color={COLORS.white}
+        icon={<ThreeDots />}
+      />
       <FocusTrap
         active={opened}
         focusTrapOptions={{

@@ -21,7 +21,7 @@ export function Header() {
     setReady(true);
   }, []);
 
-  const breakpoint = useBreakpoint();
+  const small = useBreakpoint() === "small";
 
   const springs = useChainedProgress([
     [0.3, "logo"],
@@ -44,13 +44,12 @@ export function Header() {
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        height: "120px",
-        padding: "0 60px",
+        height: small ? 80 : 120,
+        padding: small ? "0 24px" : "0 60px",
         userSelect: "none",
       }}
     >
-      {(breakpoint === "medium"
-        || (breakpoint === "small" && router.pathname !== "/")) && (
+      {(!small || (small && router.pathname !== "/")) && (
         <div
           css={{
             display: "flex",
@@ -86,7 +85,7 @@ export function Header() {
               >
                 <h1
                   css={{
-                    fontSize: "32px",
+                    fontSize: small ? 24 : 32,
                     whiteSpace: "nowrap",
                   }}
                 >
@@ -95,26 +94,44 @@ export function Header() {
               </a>
             </Link>
           </a.div>
-          <a.div
-            style={{
-              opacity: springs.new.progress,
-              transform: springs.new.progress.to((v: number) => (
-                `translate3d(0, ${(1 - v) * -120}px, 0)`
-              )),
-            }}
-          >
-            <Button
-              href="/new"
-              label="new"
-              color={COLORS.white}
-              labelColor={COLORS[color]}
-              mode="primary"
-            />
-          </a.div>
+          {!small && (
+            <a.div
+              style={{
+                opacity: springs.new.progress,
+                transform: springs.new.progress.to((v: number) => (
+                  `translate3d(0, ${(1 - v) * -120}px, 0)`
+                )),
+              }}
+            >
+              <Button
+                href="/new"
+                label="new"
+                color={COLORS.white}
+                labelColor={COLORS[color]}
+                mode="primary"
+              />
+            </a.div>
+          )}
         </div>
       )}
-      {breakpoint === "medium"
+      {small
         ? (
+          <div
+            css={{
+              position: "absolute",
+              inset: "20px 24px auto auto",
+              display: "flex",
+              gap: 12,
+            }}
+          >
+            <ConnectButton
+              mode="disc"
+              onClick={() => {}}
+            />
+            <HeaderPopupMenu />
+          </div>
+        )
+        : (
           <div
             css={{
               display: "flex",
@@ -161,8 +178,7 @@ export function Header() {
               <ConnectButton />
             </a.div>
           </div>
-        )
-        : <HeaderPopupMenu />}
+        )}
     </div>
   );
 }
