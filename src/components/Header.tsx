@@ -124,7 +124,7 @@ export function Header() {
               gap: 12,
             }}
           >
-            <ConnectButton discMode={true} />
+            {router.pathname !== "/" && <ConnectButton discMode={true} />}
             <HeaderPopupMenu />
           </div>
         )
