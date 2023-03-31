@@ -22,6 +22,7 @@ export function Button({
   size = "regular",
   title,
   type,
+  wide,
 }: {
   className?: string;
   color?: string;
@@ -39,6 +40,7 @@ export function Button({
   size?: "regular" | "large" | "giant";
   title?: string;
   type?: ComponentPropsWithoutRef<"button">["type"];
+  wide?: boolean;
 }) {
   gap ??= icon ? 12 : 0;
 
@@ -63,6 +65,7 @@ export function Button({
     alignItems: "center",
     justifyContent: "center",
     gap,
+    width: wide ? "100%" : "auto",
     height: match(size)
       .with("regular", () => "40px")
       .with("large", () => "64px")

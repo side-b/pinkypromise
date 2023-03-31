@@ -17,7 +17,7 @@ import {
   usePinkyPromiseContractAddress,
 } from "../lib/contract-utils";
 import { useAccount } from "../lib/eth-utils";
-import { useResetScroll } from "../lib/react-utils";
+import { useBreakpoint, useResetScroll } from "../lib/react-utils";
 import {
   appChainFromId,
   blocksToHtml,
@@ -47,6 +47,7 @@ type PromiseData = {
 
 export function NewPromiseScreen() {
   const account = useAccount();
+  const small = useBreakpoint() === "small";
   const [mode, setMode] = useState<"editor" | "preview" | "transaction">("editor");
   const [svgHeight, setSvgHeight] = useState(0);
 
@@ -112,9 +113,11 @@ export function NewPromiseScreen() {
 
   const modeTransitions = useTransition({ mode, editorColor: editorData.color }, {
     keys: ({ mode, editorColor }) => String(mode + editorColor),
+    initial: { opacity: 1, transform: "scale3d(1, 1, 1)" },
     from: { opacity: 0, transform: "scale3d(0.9, 0.9, 1)" },
     enter: { opacity: 1, transform: "scale3d(1, 1, 1)" },
     leave: { opacity: 0, immediate: true },
+    immediate: small,
     config: {
       mass: 2,
       friction: 80,
@@ -130,11 +133,48 @@ export function NewPromiseScreen() {
         flexGrow: 1,
         display: "grid",
         overflow: "hidden",
-        paddingTop: 16,
+        paddingTop: small ? 12 : 16,
       }}
     >
       {modeTransitions((style, { mode }) =>
         match(mode)
+          .with("editor", () => (
+            <Appear appear={style}>
+              <div
+                css={{
+                  display: "grid",
+                  transformOrigin: "50% 50%",
+                  width: "100%",
+                  padding: small ? "12px 8px 0" : "16px 8px 0",
+                }}
+              >
+                <Editor
+                  data={editorData}
+                  onChange={setEditorData}
+                  submitEnabled={submitEnabled}
+                  onSubmit={() => setMode("transaction")}
+                  feeEstimate={feeEstimate}
+                  aboveAction={small && (
+                    <div css={{ paddingBottom: 8 }}>
+                      <EditorBar
+                        color={editorData.color}
+                        inline={true}
+                        onColor={(color) => {
+                          setEditorData((data) => ({ ...data, color }));
+                        }}
+                        onPreviewToggle={() => {
+                          setMode((mode) =>
+                            mode === "preview" ? "editor" : "preview"
+                          );
+                        }}
+                        preview={mode === "preview"}
+                      />
+                    </div>
+                  )}
+                />
+              </div>
+            </Appear>
+          ))
           .with("preview", () => (
             <Appear appear={style}>
               <div
@@ -143,8 +183,7 @@ export function NewPromiseScreen() {
                   placeItems: "center",
                   transformOrigin: "50% 50%",
                   position: "relative",
-                  paddingTop: 16,
-                  paddingBottom: 80,
+                  padding: "16px 8px 80px",
                 }}
               >
                 <Container
@@ -152,7 +191,7 @@ export function NewPromiseScreen() {
                   drawer={
                     <ActionBox
                       info={"Review your promise before initiating a transaction that will create the promise and sign it on chain."}
-                      infoColor="#7B7298"
+                      infoColor={COLORS.blueGrey}
                       button={
                         <Button
                           color={COLORS[editorData.color]}
@@ -185,25 +224,6 @@ export function NewPromiseScreen() {
                     {...svgDocColors}
                   />
                 </Container>
-              </div>
-            </Appear>
-          ))
-          .with("editor", () => (
-            <Appear appear={style}>
-              <div
-                css={{
-                  display: "grid",
-                  transformOrigin: "50% 50%",
-                  paddingTop: 16,
-                }}
-              >
-                <Editor
-                  data={editorData}
-                  onChange={setEditorData}
-                  submitEnabled={submitEnabled}
-                  onSubmit={() => setMode("transaction")}
-                  feeEstimate={feeEstimate}
-                />
               </div>
             </Appear>
           ))
@@ -246,7 +266,7 @@ export function NewPromiseScreen() {
           )
           .exhaustive()
       )}
-      {mode !== "transaction" && (
+      {mode !== "transaction" && !small && (
         <div
           css={{
             position: "relative",

@@ -7,12 +7,14 @@ export function DiscButton({
   color = COLORS.pink,
   icon,
   onClick,
+  size = 40,
   title,
 }: {
   className?: string;
   color?: string;
   icon: ReactNode;
   onClick?: () => void;
+  size?: number;
   title: string;
 }) {
   return (
@@ -25,8 +27,9 @@ export function DiscButton({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        width: 40,
-        height: 40,
+        width: size,
+        height: size,
+        padding: 0,
         color: COLORS.white,
         background: color,
         border: 0,

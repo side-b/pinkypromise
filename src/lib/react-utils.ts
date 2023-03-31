@@ -3,9 +3,9 @@ import type { Address, Dimensions } from "../types";
 
 import { useChain, useSpring, useSpringRef } from "@react-spring/web";
 import { useCallback, useEffect, useState } from "react";
-import useDimensions from "react-cool-dimensions";
 import { useThrottledCallback } from "use-debounce";
 import { useNetwork } from "wagmi";
+export { useBreakpoint } from "../components/Breakpoint";
 
 type UseWindowDimensionsCallback = (dimensions: Dimensions) => void;
 
@@ -30,27 +30,6 @@ export function useWindowDimensions(
       return () => window.removeEventListener("resize", onResize);
     }
   }, [onResize]);
-}
-
-const BREAKPOINTS = { small: 0, medium: 1140 };
-
-type BreakpointName = keyof typeof BREAKPOINTS;
-
-export function isBreakpointName(bp: string): bp is BreakpointName {
-  return Object.keys(BREAKPOINTS).includes(bp);
-}
-
-export function useBreakpoint(): BreakpointName {
-  const { currentBreakpoint, observe } = useDimensions({
-    breakpoints: BREAKPOINTS,
-    updateOnBreakpointChange: true,
-  });
-  useEffect(() => {
-    if (typeof document !== "undefined") {
-      observe(document.body);
-    }
-  }, [observe]);
-  return isBreakpointName(currentBreakpoint) ? currentBreakpoint : "small";
 }
 
 export function useProgress(springProps?: UseSpringProps, enabled: boolean = true) {

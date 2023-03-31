@@ -2,6 +2,7 @@ import type { AppProps } from "next/app";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Head from "next/head";
+import { Breakpoint } from "../components/Breakpoint";
 import { Ethereum } from "../components/Ethereum";
 import { FocusVisible } from "../components/FocusVisible";
 import { GlobalStyles } from "../components/GlobalStyles";
@@ -25,38 +26,40 @@ export default function App({ Component, pageProps }: AppProps) {
       </Head>
       <QueryClientProvider client={queryClient}>
         <Ethereum>
-          <FocusVisible>
-            <GlobalStyles>
-              <div
-                css={{
-                  display: "flex",
-                  flexDirection: "column",
-                  minHeight: "100vh",
-                  minWidth: 360,
-                }}
-              >
+          <Breakpoint>
+            <FocusVisible>
+              <GlobalStyles>
                 <div
                   css={{
-                    position: "relative",
-                    zIndex: 2,
-                  }}
-                >
-                  <Header />
-                </div>
-                <div
-                  css={{
-                    flexGrow: 1,
-                    position: "relative",
-                    zIndex: 1,
                     display: "flex",
                     flexDirection: "column",
+                    minHeight: "100vh",
+                    minWidth: 360,
                   }}
                 >
-                  <Component {...pageProps} />
+                  <div
+                    css={{
+                      position: "relative",
+                      zIndex: 2,
+                    }}
+                  >
+                    <Header />
+                  </div>
+                  <div
+                    css={{
+                      flexGrow: 1,
+                      position: "relative",
+                      zIndex: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Component {...pageProps} />
+                  </div>
                 </div>
-              </div>
-            </GlobalStyles>
-          </FocusVisible>
+              </GlobalStyles>
+            </FocusVisible>
+          </Breakpoint>
         </Ethereum>
       </QueryClientProvider>
     </>

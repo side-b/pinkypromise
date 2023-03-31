@@ -12,17 +12,28 @@ import { PlusMinusButton } from "./PlusMinusButton";
 
 export function AddressInput({
   accentColor,
+  fontSize = 18,
+  height = 64,
   onChange,
   onRemove,
+  vPadding = 14,
+  hPadding = 24,
   value,
 }: {
   accentColor?: ColorId;
+  fontSize?: number;
+  height?: number;
   onChange: (value: string) => void;
   onRemove: () => void;
+  hPadding?: number;
+  vPadding?: number;
   value: string;
 }) {
-  const resolveAddress = useResolveAddress(value, onChange);
+  const buttonSize = height - vPadding * 2 + 4;
+  const buttonXY = height / 2 - buttonSize / 2;
+  const inputPaddingRight = buttonXY * 2 + buttonSize;
 
+  const resolveAddress = useResolveAddress(value, onChange);
   const loadingTransition = useTransition(resolveAddress.isLoading, {
     from: {
       opacity: "0",
@@ -42,9 +53,8 @@ export function AddressInput({
       tension: 2000,
     },
   });
-
   return (
-    <div css={{ position: "relative", height: "64px" }}>
+    <div css={{ position: "relative", height }}>
       <input
         name="ethereum-account"
         className="signee"
@@ -53,8 +63,14 @@ export function AddressInput({
         spellCheck={false}
         {...resolveAddress.bind}
         css={{
-          height: "64px",
-          padding: "14px 24px",
+          height,
+          padding: `
+            ${vPadding}px
+            ${inputPaddingRight}px
+            ${vPadding}px
+            ${hPadding}px
+          `,
+          fontSize,
         }}
       />
       {loadingTransition((styles, isLoading) =>
@@ -64,10 +80,10 @@ export function AddressInput({
               style={styles}
               css={{
                 position: "absolute",
-                inset: "12px 12px auto auto",
+                inset: `${buttonXY}px ${buttonXY}px auto auto`,
               }}
             >
-              <Loader size={40} />
+              <Loader size={buttonSize} />
             </a.div>
           )
           : (
@@ -75,14 +91,15 @@ export function AddressInput({
               style={styles}
               css={{
                 position: "absolute",
-                inset: "12px 12px auto auto",
+                inset: `${buttonXY}px ${buttonXY}px auto auto`,
               }}
             >
               <PlusMinusButton
                 color={COLORS[accentColor ?? "pink"]}
                 mode="minus"
-                title="Remove"
                 onClick={() => onRemove()}
+                size={buttonSize}
+                title="Remove"
               />
             </a.div>
           )

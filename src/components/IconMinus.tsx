@@ -2,15 +2,17 @@ import { COLORS } from "../constants";
 
 export function IconMinus({
   color = COLORS.white,
+  size = 40,
 }: {
   color?: string;
+  size?: number;
 }) {
   return (
     <svg
       fill="none"
-      height={40}
+      height={size}
       viewBox="0 0 40 40"
-      width={40}
+      width={size}
     >
       <path
         d="M9 20 h22"

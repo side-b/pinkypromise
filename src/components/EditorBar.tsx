@@ -21,11 +21,13 @@ export function EditorBar({
   color,
   onColor,
   onPreviewToggle,
+  inline = false,
   preview,
 }: {
   color: ColorId;
   onColor: (id: ColorId) => void;
   onPreviewToggle: () => void;
+  inline?: boolean;
   preview: boolean;
 }) {
   const buttons = useMemo<
@@ -58,6 +60,7 @@ export function EditorBar({
       opacity: 1,
       transform: "scale3d(1, 1, 1)",
     },
+    immediate: inline,
     config: {
       mass: 2,
       friction: 80,
@@ -68,36 +71,37 @@ export function EditorBar({
   const {
     springs: buttonsAppear,
     ref: buttonsAppearRef,
-  } = useButtonsAppear(buttons, ([id]) => id);
+  } = useButtonsAppear(buttons, ([id]) => id, inline);
 
-  useChain([buttonsAppearRef, barAppearRef], [0, 0.1], 800);
+  useChain([buttonsAppearRef, barAppearRef], inline ? [0, 0] : [0, 0.1], 800);
 
   const barTop = useBarTop();
 
   return (
     <div
       css={{
-        width: 128,
-        paddingLeft: 64,
+        width: inline ? "auto" : 128,
+        paddingLeft: inline ? 0 : 64,
       }}
     >
       <a.div
         style={{ top: barTop, ...barAppear }}
         css={{
-          position: "fixed",
+          position: inline ? "static" : "fixed",
           left: 64,
-          height: 304,
           transformOrigin: "50% 50%",
         }}
       >
         <div
           css={{
             display: "flex",
-            flexDirection: "column",
+            flexDirection: inline ? "row" : "column",
             alignItems: "center",
-            width: 64,
-            padding: "16px 0",
-            background: COLORS.grey,
+            justifyContent: inline ? "space-between" : "center",
+            width: inline ? "100%" : 64,
+            height: inline ? 64 : 312,
+            padding: inline ? "0 8px" : "16px 0",
+            background: inline ? COLORS.white : COLORS.grey,
             borderRadius: 64,
           }}
         >
@@ -108,6 +112,7 @@ export function EditorBar({
                 {id === "preview"
                   ? (
                     <PreviewButton
+                      inline={inline}
                       onClick={() => onPreviewToggle()}
                       preview={preview}
                       title={preview ? "Edit" : "Preview"}
@@ -116,10 +121,9 @@ export function EditorBar({
                   : (
                     <ColorButton
                       color={background}
+                      inline={inline}
+                      onClick={() => onColor(id)}
                       selected={id === color}
-                      onClick={() => {
-                        onColor(id);
-                      }}
                       title={label}
                     />
                   )}
@@ -134,11 +138,13 @@ export function EditorBar({
 
 function ColorButton({
   color,
+  inline,
   onClick,
   selected,
   title,
 }: {
   color: string;
+  inline: boolean;
   onClick: () => void;
   selected: boolean;
   title: string;
@@ -162,13 +168,14 @@ function ColorButton({
       <button
         type="button"
         aria-label={title}
+        title={inline ? title : undefined}
         onClick={onClick}
         {...buttonProps}
         css={{
           position: "relative",
           display: "grid",
           placeItems: "center",
-          width: 64,
+          width: inline ? 56 : 64,
           height: 56,
           padding: 0,
           border: 0,
@@ -222,17 +229,19 @@ function ColorButton({
           </svg>
         </div>
       </button>
-      {tooltip}
+      {!inline && tooltip}
     </div>
   );
 }
 
 function PreviewButton({
   onClick,
+  inline,
   preview,
   title,
 }: {
   onClick: () => void;
+  inline: boolean;
   preview: boolean;
   title: string;
 }) {
@@ -242,12 +251,13 @@ function PreviewButton({
       <button
         onClick={onClick}
         aria-label={title}
+        title={inline ? title : undefined}
         {...buttonProps}
         css={{
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          width: 64,
+          width: inline ? 56 : 64,
           height: 56,
           padding: 0,
           background: "transparent",
@@ -279,7 +289,7 @@ function PreviewButton({
           <IconEye opened={preview} />
         </div>
       </button>
-      {tooltip}
+      {!inline && tooltip}
     </div>
   );
 }
@@ -396,13 +406,13 @@ function Arrow({ color }: { color: string }) {
         fill={color}
         fillRule="evenodd"
         d="M12 9.46a19.897 19.897 0 0 0-2.186 4.874L0 20l9.814 5.666A19.896 19.896 0 0 0 12 30.541V9.459Z"
-        clip-rule="evenodd"
+        clipRule="evenodd"
       />
       <path
         fill="#fff"
         fillRule="evenodd"
         d="M12 9.46a19.897 19.897 0 0 0-2.186 4.874L0 20l9.814 5.666A19.896 19.896 0 0 0 12 30.541v-4.608a17.73 17.73 0 0 1-.268-.833l-.226-.766L4 20l7.506-4.334.226-.766c.083-.28.172-.558.268-.833V9.46Z"
-        clip-rule="evenodd"
+        clipRule="evenodd"
       />
     </svg>
   );
@@ -456,20 +466,25 @@ function useBarTop() {
   return topSpring;
 }
 
-function useButtonsAppear<T>(items: T[], key: (v: T) => string) {
+function useButtonsAppear<T>(
+  items: T[],
+  key: (v: T) => string,
+  immediate: boolean = false,
+) {
   const ref = useSpringRef();
   const springs = useTransition(items, {
     ref,
     key,
-    delay: 200,
+    delay: immediate ? 0 : 200,
     from: { opacity: 0, transform: `scale3d(0.5, 0.5, 1)` },
     enter: { opacity: 1, transform: `scale3d(1, 1, 1)` },
+    immediate,
     config: {
       mass: 2,
       friction: 80,
       tension: 1200,
     },
-    trail: 50,
+    trail: immediate ? 0 : 50,
   });
   return { springs, ref };
 }

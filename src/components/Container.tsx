@@ -1,24 +1,31 @@
+import type { CSSObject } from "@emotion/react";
 import type { ReactNode } from "react";
 
 import { a, useSpring } from "@react-spring/web";
 import { useInView } from "react-cool-inview";
 import { COLORS } from "../constants";
+import { useBreakpoint } from "../lib/react-utils";
 
 export function Container({
   children,
   color = COLORS.grey,
   contentColor = "inherit",
   drawer,
-  maxWidth = 832,
-  padding = "80px 80px 24px",
+  maxWidth,
+  padding,
 }: {
   children: ReactNode;
   color?: string;
   contentColor?: string;
   drawer?: ReactNode;
-  maxWidth?: number;
+  maxWidth?: CSSObject["maxWidth"];
   padding?: number | string;
 }) {
+  const small = useBreakpoint() === "small";
+
+  padding ??= small ? 16 : "80px 80px 24px";
+  maxWidth ??= small ? "none" : 832;
+
   return (
     <>
       <div
@@ -37,12 +44,13 @@ export function Container({
             display: "flex",
             flexDirection: "column",
             gap: 8,
+            width: "100%",
             maxWidth,
             margin: "0 auto",
             padding,
             color: contentColor,
             background: color,
-            borderRadius: 64,
+            borderRadius: small ? 40 : 64,
             boxShadow: "0 80px 120px rgba(43, 8, 28, 0.20)",
           }}
         >

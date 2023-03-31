@@ -64,6 +64,7 @@ export function HeaderPopupMenu() {
                   background: COLORS.grey,
                   borderRadius: 40,
                   transformOrigin: "100% 0",
+                  boxShadow: "0 80px 120px rgba(43, 8, 28, 0.20)",
                 }}
               >
                 <div
@@ -165,7 +166,12 @@ function MenuItem({
 
 function ThreeDots() {
   return (
-    <svg width={28} height={28} fill="none">
+    <svg
+      fill="none"
+      height={28}
+      width={28}
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         stroke={COLORS.pink}
         strokeMiterlimit={10}

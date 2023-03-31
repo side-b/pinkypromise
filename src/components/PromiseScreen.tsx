@@ -493,7 +493,7 @@ function Action({
   return (
     <ActionBox
       info={info}
-      infoColor="#7B7298"
+      infoColor={COLORS.blueGrey}
       button={buttonLabel && (
         <Button
           color={color}

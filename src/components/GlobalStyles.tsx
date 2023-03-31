@@ -6,6 +6,7 @@ import { a, useTransition } from "@react-spring/web";
 import { Space_Grotesk } from "next/font/google";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { COLORS } from "../constants";
+import { useBreakpoint } from "../lib/react-utils";
 
 export const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -37,11 +38,14 @@ export function GlobalStyles({ children }: { children: ReactNode }) {
     color: colorId,
   }), [colorId]);
 
+  const small = useBreakpoint() === "small";
+
   const colorTransition = useTransition(colorId, {
     initial: { transform: "scale(1)", borderRadius: "0vw", opacity: 1 },
     from: { transform: "scale(0.5)", borderRadius: "100vw", opacity: 0 },
     enter: { transform: "scale(1)", borderRadius: "0vw", opacity: 1 },
     leave: { transform: "scale(1)", borderRadius: "0vw", opacity: 1 },
+    immediate: small,
     onRest: () => {
       // overscroll color
       document.body.style.background = COLORS[colorId];

@@ -1,4 +1,5 @@
 import type { Dnum } from "dnum";
+import type { ReactNode } from "react";
 import type { ColorId } from "../types";
 
 import { a, useTransition } from "@react-spring/web";
@@ -10,6 +11,7 @@ import {
   PLACEHOLDER_BODY,
   PLACEHOLDER_TITLE,
 } from "../constants";
+import { useBreakpoint } from "../lib/react-utils";
 import { ActionBox } from "./ActionBox";
 import { AddressInput } from "./AddressInput";
 import { Button } from "./Button";
@@ -23,18 +25,21 @@ export type EditorData = {
 };
 
 export function Editor({
+  aboveAction,
   data,
   feeEstimate,
   onChange,
   onSubmit,
   submitEnabled,
 }: {
+  aboveAction?: ReactNode;
   data: EditorData;
   feeEstimate: Dnum;
   onChange: (data: EditorData) => void;
   submitEnabled?: boolean;
   onSubmit: (data: EditorData) => void;
 }) {
+  const small = useBreakpoint() === "small";
   const [signeeFocusRequest, setSigneeFocusRequest] = useState<number>(-1);
 
   const addFormSignee = () => {
@@ -78,11 +83,11 @@ export function Editor({
   }, [signeeFocusRequest]);
 
   const signeesTransitions = useTransition(data.signees, {
-    keys: ([_, id]) => id,
-    initial: { height: "72px", opacity: 1 },
-    from: { height: "0", opacity: 1 },
-    enter: { height: "72px", opacity: 1 },
-    leave: { height: "0", opacity: 0 },
+    keys: ([_, id]) => id + small,
+    initial: { height: small ? 56 : 72, opacity: 1 },
+    from: { height: 0, opacity: 1 },
+    enter: { height: small ? 56 : 72, opacity: 1 },
+    leave: { height: 0, opacity: 0 },
     config: {
       mass: 1,
       friction: 100,
@@ -106,15 +111,18 @@ export function Editor({
             width: "100%",
             fontWeight: 400,
             background: COLORS.white,
-            borderRadius: "20px",
+            borderRadius: small ? 32 : 20,
             border: 0,
             "&:focus-visible": {
               outline: `2px solid ${COLORS.pink}`,
             },
+            "&::placeholder": {
+              color: "#555",
+            },
           },
         }}
       >
-        <div css={{ paddingBottom: 80 }}>
+        <div css={{ paddingBottom: small ? 40 : 80 }}>
           <Container>
             <div>
               <input
@@ -125,9 +133,9 @@ export function Editor({
                 placeholder={PLACEHOLDER_TITLE}
                 value={data.title}
                 css={{
-                  height: "64px",
-                  padding: "14px 24px",
-                  fontSize: "24px",
+                  height: small ? 48 : 64,
+                  padding: small ? "10px 16px" : "14px 24px",
+                  fontSize: small ? 20 : 24,
                 }}
               />
             </div>
@@ -139,13 +147,14 @@ export function Editor({
                 placeholder={PLACEHOLDER_BODY}
                 value={data.body}
                 css={{
-                  padding: "24px",
-                  height: "240px",
+                  padding: small ? 16 : 24,
+                  height: 240,
+                  fontSize: small ? 16 : 18,
                   resize: "none",
                 }}
               />
             </div>
-            <div css={{ marginTop: "-6px" }}>
+            <div css={{ marginTop: small ? -6 : -6 }}>
               {signeesTransitions((style, [address, id]) => (
                 <a.div
                   key={id}
@@ -161,17 +170,17 @@ export function Editor({
                     css={{
                       position: "absolute",
                       inset: "auto 4px 2px 4px",
-                      paddingTop: "6px",
+                      paddingTop: 6,
                     }}
                   >
                     <AddressInput
                       accentColor={data.color}
-                      onChange={(value) => {
-                        updateFormSignee(id, value);
-                      }}
-                      onRemove={() => {
-                        removeFormSignee(id);
-                      }}
+                      fontSize={small ? 20 : 18}
+                      hPadding={small ? 16 : 24}
+                      height={small ? 48 : 64}
+                      onChange={(value) => updateFormSignee(id, value)}
+                      onRemove={() => removeFormSignee(id)}
+                      vPadding={small ? 10 : 14}
                       value={address}
                     />
                   </div>
@@ -183,7 +192,7 @@ export function Editor({
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                padding: "16px 0 48px",
+                padding: small ? "16px 0 24px" : "16px 0 48px",
               }}
             >
               <Button
@@ -201,22 +210,23 @@ export function Editor({
                   color: COLORS[data.color],
                 }}
               >
-                {dn.gt(feeEstimate, 0)
-                  && (
-                    <span
-                      title={`Estimated transaction fee: ${
-                        dn.format(feeEstimate, 4)
-                      } ETH`}
-                    >
-                      <span>tx fee</span> ~{dn.format(feeEstimate, 4)} ETH
-                    </span>
-                  )}
+                {dn.gt(feeEstimate, 0) && !small && (
+                  <span
+                    title={`Estimated transaction fee: ${
+                      dn.format(feeEstimate, 4)
+                    } ETH`}
+                  >
+                    <span>tx fee</span> ~{dn.format(feeEstimate, 4)} ETH
+                  </span>
+                )}
               </div>
             </div>
-            <div css={{ margin: "0 -48px" }}>
+            {aboveAction && <div>{aboveAction}</div>}
+            <div css={{ margin: small ? 0 : "0 -48px" }}>
               <ActionBox
+                compact={small}
                 info={EDITOR_CONFIRM_NOTICE}
-                infoColor={COLORS[data.color]}
+                infoColor={small ? COLORS.blueGrey : COLORS[data.color]}
                 button={
                   <Button
                     color={COLORS[data.color]}
@@ -225,6 +235,7 @@ export function Editor({
                     mode="primary"
                     size="large"
                     type="submit"
+                    wide={small}
                   />
                 }
               />

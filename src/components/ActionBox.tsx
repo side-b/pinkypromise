@@ -4,10 +4,12 @@ import { COLORS } from "../constants";
 
 export function ActionBox({
   button,
+  compact = false,
   info,
   infoColor = COLORS.pink,
 }: {
   button: ReactNode;
+  compact?: boolean;
   info: ReactNode;
   infoColor: string;
 }) {
@@ -15,11 +17,12 @@ export function ActionBox({
     <div
       css={{
         display: "flex",
-        alignItems: "center",
-        gap: "24px",
-        padding: "32px 40px",
+        flexDirection: compact ? "column" : "row",
+        alignItems: compact ? "stretch" : "center",
+        gap: 24,
+        padding: compact ? "24px 16px" : "32px 40px",
         background: COLORS.white,
-        borderRadius: "64px",
+        borderRadius: compact ? 32 : 64,
       }}
     >
       <div css={{ color: infoColor }}>{info}</div>

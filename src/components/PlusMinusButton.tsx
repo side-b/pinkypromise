@@ -8,12 +8,14 @@ export function PlusMinusButton({
   color = COLORS.pink,
   mode,
   onClick,
+  size = 40,
   title,
 }: {
   className?: string;
   color?: string;
   mode: "plus" | "minus";
   onClick?: () => void;
+  size?: number;
   title: string;
 }) {
   return (
@@ -21,9 +23,10 @@ export function PlusMinusButton({
       className={className}
       color={color}
       icon={mode === "plus"
-        ? <IconPlus color={COLORS.white} />
-        : <IconMinus color={COLORS.white} />}
+        ? <IconPlus color={COLORS.white} size={size} />
+        : <IconMinus color={COLORS.white} size={size} />}
       onClick={onClick}
+      size={size}
       title={title}
     />
   );
