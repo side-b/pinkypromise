@@ -2,7 +2,6 @@ import { a, useSpring } from "@react-spring/web";
 import Image from "next/image";
 import { useInView } from "react-cool-inview";
 import { COLORS, HOME_INTRO } from "../constants";
-import { useBreakpoint } from "../lib/react-utils";
 import { SvgDoc, SvgDocSignees } from "./SvgDoc";
 
 import fingersImg from "../assets/intro-fingers.svg";
@@ -31,7 +30,6 @@ export function HomeIntro() {
     },
     delay: 100,
   });
-  const breakpoint = useBreakpoint();
   return (
     <div
       ref={observe}

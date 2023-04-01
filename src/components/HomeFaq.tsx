@@ -13,7 +13,7 @@ const QUESTION_HEIGHT = 64;
 export function HomeFaq() {
   const [openedItem, setOpenedItem] = useState(-1);
   const breakpoint = useBreakpoint();
-  return (
+  return breakpoint && (
     <div
       css={{
         padding: breakpoint === "small" ? "64px 0" : "128px 0",

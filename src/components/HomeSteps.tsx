@@ -49,7 +49,7 @@ const STEPS = [
 
 export function HomeSteps() {
   const breakpoint = useBreakpoint();
-  return (
+  return breakpoint && (
     <ol
       css={{
         overflow: "hidden",

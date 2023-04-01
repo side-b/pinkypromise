@@ -47,7 +47,7 @@ type PromiseData = {
 
 export function NewPromiseScreen() {
   const account = useAccount();
-  const small = useBreakpoint() === "small";
+  const breakpoint = useBreakpoint();
   const [mode, setMode] = useState<"editor" | "preview" | "transaction">("editor");
   const [svgHeight, setSvgHeight] = useState(0);
 
@@ -58,6 +58,8 @@ export function NewPromiseScreen() {
     signees: [["", ""]],
     title: "",
   });
+
+  const small = breakpoint === "small";
 
   // Fill the signees with the account on connect or account change
   useEffect(() => {
@@ -113,11 +115,10 @@ export function NewPromiseScreen() {
 
   const modeTransitions = useTransition({ mode, editorColor: editorData.color }, {
     keys: ({ mode, editorColor }) => String(mode + editorColor),
-    initial: { opacity: 1, transform: "scale3d(1, 1, 1)" },
     from: { opacity: 0, transform: "scale3d(0.9, 0.9, 1)" },
     enter: { opacity: 1, transform: "scale3d(1, 1, 1)" },
     leave: { opacity: 0, immediate: true },
-    immediate: small,
+    immediate: small || breakpoint === null,
     config: {
       mass: 2,
       friction: 80,
@@ -127,7 +128,7 @@ export function NewPromiseScreen() {
 
   useResetScroll([mode]);
 
-  return (
+  return breakpoint && (
     <div
       css={{
         flexGrow: 1,

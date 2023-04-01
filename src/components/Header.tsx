@@ -21,7 +21,8 @@ export function Header() {
     setReady(true);
   }, []);
 
-  const small = useBreakpoint() === "small";
+  const breakpoint = useBreakpoint();
+  const small = breakpoint === "small";
 
   const springs = useChainedProgress([
     [0.3, "logo"],
@@ -38,7 +39,7 @@ export function Header() {
   const isPromises = router.pathname.startsWith("/promises");
   const isMine = router.pathname.startsWith("/mine");
 
-  return (
+  return breakpoint && (
     <div
       css={{
         display: "flex",

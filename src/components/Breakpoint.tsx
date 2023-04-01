@@ -7,39 +7,33 @@ export const BREAKPOINTS = {
   medium: 1140,
 };
 
-export type BreakpointName = keyof typeof BREAKPOINTS;
+export type BreakpointName = keyof typeof BREAKPOINTS | null;
 
-const BreakPointContext = createContext<{ breakpointName: BreakpointName }>({
-  breakpointName: "medium",
+const BreakPointContext = createContext<{
+  breakpointName: BreakpointName;
+}>({
+  breakpointName: null,
 });
 
-export function isBreakpointName(bp: string): bp is BreakpointName {
-  return Object.keys(BREAKPOINTS).includes(bp);
-}
-
-export function useBreakpoint(): BreakpointName {
+export function useBreakpoint(): BreakpointName | null {
   const { breakpointName } = useContext(BreakPointContext);
-  console.log("useBreakpoint", breakpointName);
   return breakpointName;
 }
 
 function getBreakpointName(): BreakpointName {
-  if (typeof window === "undefined") return "small";
+  if (typeof window === "undefined") return null;
   if (window.innerWidth >= BREAKPOINTS.medium) return "medium";
   return "small";
 }
 
 export function Breakpoint({ children }: { children: ReactNode }) {
-  const [breakpointName, setBreakpointName] = useState<BreakpointName>(
-    "medium",
-  );
+  const [breakpointName, setBreakpointName] = useState<BreakpointName>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const onResize = () => {
       const bp = getBreakpointName();
       if (bp !== breakpointName) {
-        console.log("SET", bp);
         setBreakpointName(bp);
       }
     };

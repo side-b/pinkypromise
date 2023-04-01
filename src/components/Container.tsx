@@ -21,12 +21,13 @@ export function Container({
   maxWidth?: CSSObject["maxWidth"];
   padding?: number | string;
 }) {
-  const small = useBreakpoint() === "small";
+  const breakpoint = useBreakpoint();
+  const small = breakpoint === "small";
 
   padding ??= small ? 16 : "80px 80px 24px";
   maxWidth ??= small ? "none" : 832;
 
-  return (
+  return breakpoint && (
     <>
       <div
         css={{

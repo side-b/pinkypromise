@@ -39,7 +39,7 @@ export function Editor({
   submitEnabled?: boolean;
   onSubmit: (data: EditorData) => void;
 }) {
-  const small = useBreakpoint() === "small";
+  const breakpoint = useBreakpoint();
   const [signeeFocusRequest, setSigneeFocusRequest] = useState<number>(-1);
 
   const addFormSignee = () => {
@@ -82,6 +82,8 @@ export function Editor({
     }
   }, [signeeFocusRequest]);
 
+  const small = breakpoint === "small";
+
   const signeesTransitions = useTransition(data.signees, {
     keys: ([_, id]) => id + small,
     initial: { height: small ? 56 : 72, opacity: 1 },
@@ -95,7 +97,7 @@ export function Editor({
     },
   });
 
-  return (
+  return breakpoint && (
     <form
       onSubmit={(event) => {
         event.preventDefault();
