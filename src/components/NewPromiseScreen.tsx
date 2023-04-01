@@ -189,31 +189,60 @@ export function NewPromiseScreen() {
               >
                 <Container
                   color={svgDocColors.color}
-                  drawer={
-                    <ActionBox
-                      info={"Review your promise before initiating a transaction that will create the promise and sign it on chain."}
-                      infoColor={COLORS.blueGrey}
-                      button={
-                        <Button
-                          color={COLORS[editorData.color]}
-                          disabled={!submitEnabled}
-                          label="All good"
-                          mode="primary"
-                          size="large"
-                          type="submit"
-                          onClick={() => setMode("transaction")}
-                        />
-                      }
-                    />
+                  secondary={
+                    <>
+                      {small && (
+                        <div
+                          css={{
+                            display: "flex",
+                            justifyContent: "center",
+                            paddingTop: 24,
+                            paddingBottom: 16,
+                          }}
+                        >
+                          <EditorBar
+                            color={editorData.color}
+                            inline={true}
+                            onColor={(color) => {
+                              setEditorData((data) => ({ ...data, color }));
+                            }}
+                            onPreviewToggle={() => {
+                              setMode((mode) =>
+                                mode === "preview" ? "editor" : "preview"
+                              );
+                            }}
+                            preview={mode === "preview"}
+                          />
+                        </div>
+                      )}
+                      <ActionBox
+                        compact={small}
+                        info={"Review your promise before initiating a transaction that will create the promise and sign it on chain."}
+                        infoColor={COLORS.blueGrey}
+                        button={
+                          <Button
+                            color={COLORS[editorData.color]}
+                            disabled={!submitEnabled}
+                            label="All good"
+                            mode="primary"
+                            size="large"
+                            type="submit"
+                            onClick={() => setMode("transaction")}
+                            wide={small}
+                          />
+                        }
+                      />
+                    </>
                   }
-                  padding="56px 56px 56px"
+                  secondaryMode={small ? "inside" : "drawer"}
+                  padding={small ? 16 : "56px 56px 56px"}
                 >
                   <SvgDoc
                     bodyHtml={previewBodyHtml}
                     classPrefix="svg-preview"
                     htmlMode={true}
-                    padding={[0, 0, 0]}
-                    promiseId="001"
+                    padding={small ? [8, 8, 0] : [0, 0, 0]}
+                    promiseId={`${chainPrefix}-1`}
                     signedOn={signedOn}
                     signees={
                       <SvgDocSignees

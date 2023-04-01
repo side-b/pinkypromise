@@ -422,9 +422,9 @@ function svgDocStyle({
     ${selector} .main {
       display: flex;
       flex-direction: column;
-      width: ${CONTENT_WIDTH}px;
       height: 100%;
-      ${htmlMode ? `min-height: ${CONTENT_WIDTH}px;` : ""}
+      ${htmlMode ? `width: ${CONTENT_WIDTH}px;` : ""};
+      ${/*htmlMode ? `min-height: ${CONTENT_WIDTH}px;` : ""*/ ""}
     }
     ${selector} .header {
       flex-shrink: 0;

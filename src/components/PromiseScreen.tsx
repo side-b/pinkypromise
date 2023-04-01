@@ -255,7 +255,7 @@ export function PromiseScreen({
                     <div css={{ padding: "40px 0 80px" }}>
                       <Container
                         color={color}
-                        drawer={match([
+                        secondary={match([
                           promiseData.connectedSigningState,
                           promiseData.state,
                         ])

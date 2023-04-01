@@ -156,7 +156,7 @@ export function Editor({
                 }}
               />
             </div>
-            <div css={{ marginTop: small ? -6 : -6 }}>
+            <div css={{ marginTop: small ? -8 : -6 }}>
               {signeesTransitions((style, [address, id]) => (
                 <a.div
                   key={id}

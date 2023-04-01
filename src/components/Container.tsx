@@ -10,14 +10,16 @@ export function Container({
   children,
   color = COLORS.grey,
   contentColor = "inherit",
-  drawer,
+  secondary,
+  secondaryMode = "drawer",
   maxWidth,
   padding,
 }: {
   children: ReactNode;
   color?: string;
   contentColor?: string;
-  drawer?: ReactNode;
+  secondary?: ReactNode;
+  secondaryMode?: "drawer" | "inside";
   maxWidth?: CSSObject["maxWidth"];
   padding?: number | string;
 }) {
@@ -35,7 +37,7 @@ export function Container({
           zIndex: 2,
           display: "grid",
           placeItems: "center",
-          paddingBottom: drawer ? 80 : 0,
+          paddingBottom: secondary ? 80 : 0,
         }}
       >
         <div
@@ -56,9 +58,10 @@ export function Container({
           }}
         >
           {children}
+          {secondary && secondaryMode === "inside" && <div>{secondary}</div>}
         </div>
       </div>
-      {drawer && (
+      {secondary && secondaryMode === "drawer" && (
         <div
           css={{
             display: "flex",
@@ -66,7 +69,7 @@ export function Container({
             maxWidth,
           }}
         >
-          <ContainerDrawer>{drawer}</ContainerDrawer>
+          <ContainerDrawer>{secondary}</ContainerDrawer>
         </div>
       )}
     </>
