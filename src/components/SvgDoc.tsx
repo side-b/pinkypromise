@@ -423,8 +423,7 @@ function svgDocStyle({
       display: flex;
       flex-direction: column;
       height: 100%;
-      ${htmlMode ? `width: ${CONTENT_WIDTH}px;` : ""};
-      ${/*htmlMode ? `min-height: ${CONTENT_WIDTH}px;` : ""*/ ""}
+      ${htmlMode ? `max-width: ${CONTENT_WIDTH}px;` : ""};
     }
     ${selector} .header {
       flex-shrink: 0;
@@ -486,7 +485,7 @@ function svgDocStyle({
       flex-shrink: 0;
       display: flex;
       flex-direction: column;
-      padding-top: ${fixedHeight ? 0 : 40}px;
+      padding-top: ${fixedHeight ? 0 : (htmlMode ? 20 : 40)}px;
       padding-bottom: 112px;
     }
     ${selector} .signee {

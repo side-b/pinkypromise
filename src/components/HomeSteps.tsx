@@ -95,7 +95,7 @@ function Step({
   const color = revert ? COLORS.blue : COLORS.pink;
   const background = revert ? COLORS.pink : COLORS.blue;
   const { observe, inView } = useInView({
-    threshold: 0.5,
+    threshold: compact ? 0.1 : 0.5,
     unobserveOnEnter: true,
   });
   const { appear } = useSpring({

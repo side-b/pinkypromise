@@ -11,7 +11,12 @@ import {
 } from "wagmi";
 import { COLORS, GH_REPO_URL, TxSteps } from "../constants";
 import { useAccount } from "../lib/eth-utils";
-import { useChainedProgress, useContractUrl, useTxUrl } from "../lib/react-utils";
+import {
+  useBreakpoint,
+  useChainedProgress,
+  useContractUrl,
+  useTxUrl,
+} from "../lib/react-utils";
 import { isAddress, shortenAddress } from "../lib/utils";
 import { AnimatableFingers } from "./AnimatableFingers";
 import { Button } from "./Button";
@@ -26,6 +31,9 @@ export function Transaction({
   successLabel,
   title,
 }: TxBag) {
+  const breakpoint = useBreakpoint();
+  const small = breakpoint === "small";
+
   const { chain } = useNetwork();
   const account = useAccount();
   const { switchNetwork } = useSwitchNetwork();
@@ -47,7 +55,7 @@ export function Transaction({
 
   const contractCode = [
     config.address,
-    `${GH_REPO_URL}/contracts/PinkyPromise.sol`,
+    `${GH_REPO_URL}/tree/main/contracts/src/PinkyPromise.sol`,
   ] as const;
 
   const fingersSprings = useChainedProgress([
@@ -60,7 +68,7 @@ export function Transaction({
   });
 
   return (
-    <div css={{ paddingBottom: 80 }}>
+    <div css={{ padding: "0 8px 80px" }}>
       <Container
         color={COLORS.pink}
         contentColor={COLORS.white}
@@ -72,8 +80,8 @@ export function Transaction({
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            width: 600 - 48 * 2,
-            height: 600 - 48,
+            maxWidth: 600 - 48 * 2,
+            height: small ? "auto" : 600 - 48,
           }}
         >
           <div
@@ -83,15 +91,15 @@ export function Transaction({
               display: "grid",
               justifyContent: "center",
               width: "100%",
-              paddingTop: 28,
-              paddingBottom: 40,
+              paddingTop: small ? 8 : 28,
+              paddingBottom: small ? 32 : 40,
             }}
           >
             <div
               css={{
                 position: "relative",
-                width: 200,
-                height: 200,
+                width: small ? 152 : 200,
+                height: small ? 152 : 200,
               }}
             >
               <div
@@ -109,7 +117,7 @@ export function Transaction({
                     rightFingerAppear: fingersSprings.rightFinger.progress,
                   }}
                   openDistance={600}
-                  size={200}
+                  size={small ? 152 : 200}
                 />
               </div>
             </div>
@@ -125,7 +133,8 @@ export function Transaction({
             <h1
               css={{
                 paddingBottom: 16,
-                fontSize: "40px",
+                fontSize: small ? 20 : 40,
+                fontWeight: 500,
               }}
             >
               {title}
@@ -268,6 +277,9 @@ function TxControls({
     githubUrl: string,
   ];
 }) {
+  const breakpoint = useBreakpoint();
+  const small = breakpoint === "small";
+
   const contractUrl = useContractUrl();
   const contractCodeExplorerUrl = (
     contractCode[0] && contractUrl(contractCode[0], 20)
@@ -278,8 +290,8 @@ function TxControls({
       <p
         css={{
           overflow: "hidden",
-          height: 60,
-          fontSize: 20,
+          height: small ? "auto" : 60,
+          fontSize: small ? 16 : 20,
           a: {
             color: COLORS.white,
           },

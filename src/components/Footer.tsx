@@ -30,7 +30,7 @@ export function Footer() {
   const small = breakpoint === "small";
 
   const { observe, inView } = useInView({
-    threshold: 0.8,
+    threshold: small ? 0.5 : 0.8,
     unobserveOnEnter: true,
   });
 
