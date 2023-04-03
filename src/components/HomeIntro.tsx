@@ -124,7 +124,7 @@ function IntroPromise() {
       `}
         classPrefix="intro"
         height={800}
-        htmlMode={true}
+        mode="html"
         padding={[0, 0, 0]}
         promiseId={"E-12"}
         signedOn={"test"}

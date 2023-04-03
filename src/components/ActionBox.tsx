@@ -19,8 +19,8 @@ export function ActionBox({
         display: "flex",
         flexDirection: compact ? "column" : "row",
         alignItems: compact ? "stretch" : "center",
-        gap: 24,
-        padding: compact ? "24px 16px" : "32px 40px",
+        gap: compact ? 16 : 24,
+        padding: compact ? 24 : "32px 40px",
         background: COLORS.white,
         borderRadius: compact ? 32 : 64,
       }}

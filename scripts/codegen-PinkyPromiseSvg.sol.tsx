@@ -28,12 +28,12 @@ function getPromiseSvgWrapperCode() {
       contentColor: "_CONTENT_COLOR_",
       fingersMarker: "_FINGERS_",
       height: "_HEIGHT_",
+      mode: "svg-wrapper",
       promiseId: "_PROMISE_ID_",
       signedOn: "_SIGNED_ON_",
       signees: "_SIGNEES_",
       status: "_STATUS_",
       title: "_TITLE_",
-      restrict: "wrapper",
     }),
   ).replace(/&quot;/g, "\"").replace(/&gt;/g, ">");
 
@@ -67,12 +67,12 @@ function getPromiseSvgCodeContent() {
       color: "_COLOR_",
       contentColor: "_CONTENT_COLOR_",
       height: "_HEIGHT_",
+      mode: "svg-main",
       promiseId: "_PROMISE_ID_",
       signedOn: "_SIGNED_ON_",
       signees: "_SIGNEES_",
       status: "_STATUS_",
       title: "_TITLE_",
-      restrict: "main",
     }),
   );
 

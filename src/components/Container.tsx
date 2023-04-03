@@ -67,6 +67,7 @@ export function Container({
             display: "flex",
             justifyContent: "center",
             maxWidth,
+            margin: "0 auto",
           }}
         >
           <ContainerDrawer>{secondary}</ContainerDrawer>
@@ -77,10 +78,14 @@ export function Container({
 }
 
 function ContainerDrawer({ children }: { children: ReactNode }) {
+  const breakpoint = useBreakpoint();
+  const small = breakpoint === "small";
+
   const { observe, inView } = useInView({
     threshold: 0.1,
     unobserveOnEnter: true,
   });
+
   const { appear } = useSpring({
     appear: Number(inView),
     config: {
@@ -89,6 +94,7 @@ function ContainerDrawer({ children }: { children: ReactNode }) {
       tension: 800,
     },
   });
+
   return (
     <div
       ref={observe}
@@ -104,7 +110,7 @@ function ContainerDrawer({ children }: { children: ReactNode }) {
         css={{
           overflow: "hidden",
           width: "100%",
-          paddingTop: 24,
+          paddingTop: small ? 16 : 24,
         }}
       >
         <a.div

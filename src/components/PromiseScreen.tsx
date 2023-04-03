@@ -31,6 +31,7 @@ import {
 } from "../lib/contract-utils";
 import { useAccount } from "../lib/eth-utils";
 import {
+  useBreakpoint,
   useChainedProgress,
   useReady,
   useResetScroll,
@@ -67,6 +68,9 @@ export function PromiseScreen({
   networkPrefix: NetworkPrefix;
   promiseId: number;
 }) {
+  const breakpoint = useBreakpoint();
+  const small = breakpoint === "small";
+
   const router = useRouter();
 
   const chainId = (
@@ -223,159 +227,158 @@ export function PromiseScreen({
           position: "relative",
         }}
       >
-        {loadingTransition((style, data) => {
-          return (
-            match(data)
-              .with(
-                { txBag: P.when(Boolean) },
-                ({ txBag }) => (
-                  txBag && (
-                    <Appear appear={style}>
-                      <div css={{ paddingTop: 40 }}>
-                        <Transaction {...txBag} />
-                      </div>
-                    </Appear>
-                  )
-                ),
-              )
-              .with(
-                { status: P.union("loading", "idle") },
-                () => (
+        {loadingTransition((style, data) => (
+          match(data)
+            .with(
+              { txBag: P.when(Boolean) },
+              ({ txBag }) => (
+                txBag && (
                   <Appear appear={style}>
-                    <div css={{ paddingTop: 80 }}>
-                      <LoadingFingers />
+                    <div css={{ paddingTop: 40 }}>
+                      <Transaction {...txBag} />
                     </div>
                   </Appear>
-                ),
-              )
-              .with(
-                { status: "success" },
-                () => (
-                  <Appear appear={style}>
-                    <div css={{ padding: "40px 0 80px" }}>
-                      <Container
-                        color={color}
-                        secondary={match([
-                          promiseData.connectedSigningState,
-                          promiseData.state,
-                        ])
-                          .with([P.any, "Discarded"], () => (
+                )
+              ),
+            )
+            .with(
+              { status: P.union("loading", "idle") },
+              () => (
+                <Appear appear={style}>
+                  <div css={{ paddingTop: 80 }}>
+                    <LoadingFingers />
+                  </div>
+                </Appear>
+              ),
+            )
+            .with(
+              { status: "success" },
+              () => (
+                <Appear appear={style}>
+                  <div css={{ padding: "40px 8px 80px" }}>
+                    <Container
+                      color={color}
+                      maxWidth={small ? 600 : undefined}
+                      padding={small ? "16px 16px 24px" : "56px 56px 56px"}
+                      secondary={match([
+                        promiseData.connectedSigningState,
+                        promiseData.state,
+                      ])
+                        .with([P.any, "Discarded"], () => (
+                          <Action
+                            color={buttonColor}
+                            info={PROMISE_NOTICE_DISCARDED[0]}
+                          />
+                        ))
+                        // The connected user has not signed yet
+                        .with(["Pending", "Draft"], () => (
+                          <Action
+                            buttonLabel={PROMISE_NOTICE_DRAFT_UNSIGNED[1]}
+                            color={buttonColor}
+                            info={PROMISE_NOTICE_DRAFT_UNSIGNED[0]}
+                            onButtonClick={() => {
+                              router.push(`/promise/${fullPromiseId}/sign`);
+                            }}
+                          />
+                        ))
+                        // The connected user has signed but other signatures are missing
+                        .with(["Signed", "Draft"], () => (
+                          <Action
+                            buttonLabel={PROMISE_NOTICE_DRAFT_SIGNED[1]}
+                            color={buttonColor}
+                            info={PROMISE_NOTICE_DRAFT_SIGNED[0]}
+                            onButtonClick={() => {
+                              router.push(`/promise/${fullPromiseId}/break`);
+                            }}
+                          />
+                        ))
+                        // The connected user requested to nullify and the contract is fully signed
+                        .with(
+                          ["NullRequest", "Signed"],
+                          () => (
                             <Action
+                              buttonLabel={PROMISE_NOTICE_NULLREQUEST[1]}
                               color={buttonColor}
-                              info={PROMISE_NOTICE_DISCARDED[0]}
-                            />
-                          ))
-                          // The connected user has not signed yet
-                          .with(["Pending", "Draft"], () => (
-                            <Action
-                              buttonLabel={PROMISE_NOTICE_DRAFT_UNSIGNED[1]}
-                              color={buttonColor}
-                              info={PROMISE_NOTICE_DRAFT_UNSIGNED[0]}
+                              info={PROMISE_NOTICE_NULLREQUEST[0]}
                               onButtonClick={() => {
-                                router.push(`/promise/${fullPromiseId}/sign`);
+                                router.push(`/promise/${fullPromiseId}/unbreak`);
                               }}
                             />
-                          ))
-                          // The connected user has signed but other signatures are missing
-                          .with(["Signed", "Draft"], () => (
+                          ),
+                        )
+                        // The connected user is a signee and the contract is fully signed
+                        .with(
+                          ["Signed", "Signed"],
+                          () => (
                             <Action
-                              buttonLabel={PROMISE_NOTICE_DRAFT_SIGNED[1]}
+                              buttonLabel={PROMISE_NOTICE_SIGNED[1]}
                               color={buttonColor}
-                              info={PROMISE_NOTICE_DRAFT_SIGNED[0]}
+                              info={PROMISE_NOTICE_SIGNED[0]}
                               onButtonClick={() => {
                                 router.push(`/promise/${fullPromiseId}/break`);
                               }}
                             />
-                          ))
-                          // The connected user requested to nullify and the contract is fully signed
-                          .with(
-                            ["NullRequest", "Signed"],
-                            () => (
-                              <Action
-                                buttonLabel={PROMISE_NOTICE_NULLREQUEST[1]}
-                                color={buttonColor}
-                                info={PROMISE_NOTICE_NULLREQUEST[0]}
-                                onButtonClick={() => {
-                                  router.push(`/promise/${fullPromiseId}/unbreak`);
-                                }}
-                              />
-                            ),
-                          )
-                          // The connected user is a signee and the contract is fully signed
-                          .with(
-                            ["Signed", "Signed"],
-                            () => (
-                              <Action
-                                buttonLabel={PROMISE_NOTICE_SIGNED[1]}
-                                color={buttonColor}
-                                info={PROMISE_NOTICE_SIGNED[0]}
-                                onButtonClick={() => {
-                                  router.push(`/promise/${fullPromiseId}/break`);
-                                }}
-                              />
-                            ),
-                          )
-                          .otherwise(() => null)}
-                        padding="56px 56px 56px"
-                      >
-                        <SvgDoc
-                          bodyHtml={promiseData.bodyHtml}
-                          classPrefix="svg-preview"
+                          ),
+                        )
+                        .otherwise(() => null)}
+                    >
+                      <SvgDoc
+                        bodyHtml={promiseData.bodyHtml}
+                        classPrefix="svg-preview"
+                        height={promiseData.height}
+                        mode={small ? "html-compact" : "html"}
+                        padding={small ? [8, 8, 0] : [0, 0, 0]}
+                        promiseId={fullPromiseId}
+                        signedOn={promiseData.signedOn}
+                        signees={
+                          <SvgDocSignees
+                            chainId={chainId}
+                            signees={promiseData.signeesWithStates}
+                          />
+                        }
+                        status={formatPromiseState(promiseData.state)}
+                        title={promiseData.title}
+                        {...promiseData.colors}
+                      />
+                      {(promiseData.state === "Nullified"
+                        || promiseData.state === "Discarded") && (
+                        <SvgDocTape
+                          width={832}
                           height={promiseData.height}
-                          htmlMode={true}
-                          padding={[0, 0, 0]}
-                          promiseId={fullPromiseId}
-                          signedOn={promiseData.signedOn}
-                          signees={
-                            <SvgDocSignees
-                              chainId={chainId}
-                              signees={promiseData.signeesWithStates}
-                            />
-                          }
-                          status={formatPromiseState(promiseData.state)}
-                          title={promiseData.title}
                           {...promiseData.colors}
                         />
-                        {(promiseData.state === "Nullified"
-                          || promiseData.state === "Discarded") && (
-                          <SvgDocTape
-                            width={832}
-                            height={promiseData.height}
-                            {...promiseData.colors}
-                          />
-                        )}
-                      </Container>
-                    </div>
-                  </Appear>
-                ),
-              )
-              .with({ status: "error" }, () => (
-                <Appear appear={style}>
-                  <div
-                    css={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      gap: 18,
-                      color: COLORS.white,
-                    }}
-                  >
-                    <LoadingFingers
-                      color={COLORS.red}
-                      label="Error loading promise"
-                    />
-                    <Button
-                      label="Retry"
-                      color={COLORS.red}
-                      onClick={refetch}
-                      size="large"
-                    />
+                      )}
+                    </Container>
                   </div>
                 </Appear>
-              ))
-              .exhaustive()
-          );
-        })}
+              ),
+            )
+            .with({ status: "error" }, () => (
+              <Appear appear={style}>
+                <div
+                  css={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 18,
+                    color: COLORS.white,
+                  }}
+                >
+                  <LoadingFingers
+                    color={COLORS.red}
+                    label="Error loading promise"
+                  />
+                  <Button
+                    label="Retry"
+                    color={COLORS.red}
+                    onClick={refetch}
+                    size="large"
+                  />
+                </div>
+              </Appear>
+            ))
+            .exhaustive()
+        ))}
       </div>
       {null && <BackgroundFingers />}
     </>
@@ -490,8 +493,10 @@ function Action({
   buttonLabel?: ReactNode;
   onButtonClick?: () => void;
 }) {
+  const small = useBreakpoint() === "small";
   return (
     <ActionBox
+      compact={small}
       info={info}
       infoColor={COLORS.blueGrey}
       button={buttonLabel && (
@@ -502,6 +507,11 @@ function Action({
           onClick={onButtonClick}
           size="large"
           type="submit"
+          wide={small}
+          css={{
+            height: small ? 48 : 64,
+            fontSize: small ? 32 : 40,
+          }}
         />
       )}
     />

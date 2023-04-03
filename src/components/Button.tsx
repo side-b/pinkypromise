@@ -67,9 +67,9 @@ export function Button({
     gap,
     width: wide ? "100%" : "auto",
     height: match(size)
-      .with("regular", () => "40px")
-      .with("large", () => "64px")
-      .with("giant", () => "136px")
+      .with("regular", () => 40)
+      .with("large", () => 64)
+      .with("giant", () => 136)
       .exhaustive(),
     padding: size === "giant" ? "0 48px" : "0 24px",
     textTransform: "lowercase" as const,

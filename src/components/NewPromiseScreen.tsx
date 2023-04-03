@@ -229,6 +229,10 @@ export function NewPromiseScreen() {
                             type="submit"
                             onClick={() => setMode("transaction")}
                             wide={small}
+                            css={{
+                              height: small ? 48 : 64,
+                              fontSize: small ? 32 : 40,
+                            }}
                           />
                         }
                       />
@@ -240,7 +244,7 @@ export function NewPromiseScreen() {
                   <SvgDoc
                     bodyHtml={previewBodyHtml}
                     classPrefix="svg-preview"
-                    htmlMode={true}
+                    mode="html"
                     padding={small ? [8, 8, 0] : [0, 0, 0]}
                     promiseId={`${chainPrefix}-1`}
                     signedOn={signedOn}

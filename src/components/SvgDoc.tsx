@@ -2,8 +2,8 @@
 // representation of a promise as SVG or HTML. It serves both the
 // React app and the Solidity contract, which requires to only use
 // dynamic features (react app) in a way that is compatible with
-// static features (solidity), e.g. by avoiding css={} when htmlMode
-// is not true.
+// static features (solidity), e.g. by avoiding the css prop when
+// "svg*" modes are used.
 //
 // The term “marker” is used to refer to search & replace markers used
 // by the solidity generation script. These can be rendered without
@@ -19,7 +19,7 @@ import { createElement, useEffect, useMemo, useRef } from "react";
 import { useEnsName } from "wagmi";
 import { spaceGrotesk } from "../components/GlobalStyles";
 import { PLACEHOLDER_TITLE } from "../constants";
-import { useExplorerBaseUrl } from "../lib/react-utils";
+import { useBreakpoint, useExplorerBaseUrl } from "../lib/react-utils";
 import { isAddress } from "../types";
 
 const CONTENT_WIDTH = 720;
@@ -31,11 +31,10 @@ export function SvgDoc({
   contentColor,
   fingersMarker,
   height,
-  htmlMode = false,
+  mode = "svg",
   onHeight,
   padding = [40, 40, 32],
   promiseId,
-  restrict = false,
   signedOn,
   signees,
   status,
@@ -50,14 +49,18 @@ export function SvgDoc({
   fingersMarker?: string;
 
   height?: number | string;
-  htmlMode?: boolean;
+
   onHeight?: (height: number) => void;
   padding?: [top: number, side: number, bottom: number];
   promiseId: string;
   signedOn: string;
 
-  // restrict to either the wrapper or the content (this is only to circumvent the 8 string vars limit in Solidity)
-  restrict?: false | "main" | "wrapper";
+  mode?:
+    | "svg"
+    | "svg-main" // restrict to the content only (8 string vars limit in Solidity)
+    | "svg-wrapper" // restrict to the wrapper only (8 string vars limit in Solidity)
+    | "html"
+    | "html-compact";
 
   // string type is used by
   // scripts/codegen-PinkyPromiseSVg.sol.tsx
@@ -67,6 +70,9 @@ export function SvgDoc({
   title: string;
 }) {
   const contentRef = useRef<HTMLDivElement>(null);
+
+  const htmlMode = mode.startsWith("html");
+  const compact = mode === "html-compact";
 
   const [paddingTop, paddingSide, paddingBottom] = padding;
 
@@ -114,13 +120,14 @@ export function SvgDoc({
     </div>
   );
 
-  if (restrict === "main") {
+  if (mode === "svg-main") {
     return main;
   }
 
   const style = svgDocStyle({
     color,
     contentColor,
+    compact,
     fixedHeight: !measureMode && !htmlMode,
     htmlMode,
     paddingBottom,
@@ -133,7 +140,7 @@ export function SvgDoc({
   const rootIn = (
     <>
       <style dangerouslySetInnerHTML={{ __html: style }} />
-      {restrict === "wrapper" ? "_MAIN_" : main}
+      {mode === "svg-wrapper" ? "_MAIN_" : main}
     </>
   );
 
@@ -153,7 +160,10 @@ export function SvgDoc({
             },
           }}
         >
-          <SvgDocFingers color={contentColor} />
+          <SvgDocFingers
+            color={contentColor}
+            compact={compact}
+          />
         </div>
       </div>
     )
@@ -211,6 +221,8 @@ export function SvgDocSignees({
   signees: Array<readonly [Address | EnsName, boolean | string]>;
 }) {
   const explorerBaseUrl = useExplorerBaseUrl(chainId);
+  const breakpoint = useBreakpoint();
+  const small = breakpoint === "small";
   return (
     <div
       css={{
@@ -227,7 +239,7 @@ export function SvgDocSignees({
           address={signee}
           explorerBaseUrl={explorerBaseUrl}
           signature={signState === true
-            ? <SvgDocSignature />
+            ? <SvgDocSignature compact={small} />
             : <span className="signature">{signState}</span>}
         />
       ))}
@@ -300,11 +312,17 @@ export function SvgDocSigneeEns({
   );
 }
 
-export function SvgDocSignature() {
+export function SvgDocSignature({ compact }: { compact?: boolean }) {
   return (
     <div className="signature">
       <div>
-        <svg fill="none" height={14} width={38} xmlns="http://www.w3.org/2000/svg">
+        <svg
+          fill="none"
+          height={compact ? 9 : 14}
+          width={compact ? 24 : 38}
+          viewBox="0 0 38 14"
+          xmlns="http://www.w3.org/2000/svg"
+        >
           <path d="m.516 9.758-.118-1.05L0 6.592l.317-1.057.459-.302-.023-.314.201.197.224-.147 1.115.126.725.66.77 1.138L4.8 8.631l.594-1.26.697-1.308.538-.855.6-.799.667-.673.848-.551.843-.223.627.045.486.15.557.35.444.432.406.57.455.842.733 1.932.637 2.071 1.65-2.232 1.357-1.631.823-.781.892-.692.825-.485 1.017-.422.792-.204.797-.082 1.056.058.72.18.922.457.45.375.136-.183.957-1.182.527-.573.784-.68.754-.525.774-.379 1.071-.296.85-.077.689.047.808.169.76.257.702.357.762.532.577.487.555.622.841.062.757.669.237 1.004-.374.978-1.011.603-.38.18-.987-.038-.804-.74-.126-.528-.118-.341-.213-.334-.293-.338-.373-.302-.404-.262-.426-.193-.705-.2-.384-.044-.677.07-.65.204-.543.315-.574.478-.505.564-.553.772-.675 1.171-.716 1.52-.852.487-.903-.065-.726-.643-.194-.819.08-.576-.007-.017-.158-.224-.212-.156-.506-.196-.42-.046-.64.048-.69.19-.527.225-.636.378-.498.393-.657.62-.6.7-.717.944-2.322 3.489-.493.476-.756.385-.919-.138-.61-.558-.233-.448-1.077-3.74-.39-1.123-.315-.769-.478-.825-.067-.075-.115.041-.24.177L9 6.32l-.556.8-.42.757-.476.989-.965 2.266-.476.687-.768.502-1.017-.088-.71-.628-.18-.286-.068.2-.861.567-1-.074-.77-.681-.18-.766-.037-.807Z" />
         </svg>
       </div>
@@ -313,18 +331,25 @@ export function SvgDocSignature() {
   );
 }
 
-export function SvgDocFingers({ color, x, y }: {
+export function SvgDocFingers({
+  color,
+  compact,
+  x,
+  y,
+}: {
   color: string;
+  compact?: boolean;
   x?: number | string;
   y?: number | string;
 }) {
   return (
     <svg
       fill={color}
-      height="80"
-      width="80"
+      height={compact ? 40 : 80}
+      width={compact ? 40 : 80}
       x={x}
       y={y}
+      viewBox="0 0 80 80"
     >
       <path
         clipRule="evenodd"
@@ -376,6 +401,7 @@ function brokenLabelUri(color: string) {
 function svgDocStyle({
   color,
   contentColor,
+  compact,
   fixedHeight,
   height,
   htmlMode,
@@ -386,6 +412,7 @@ function svgDocStyle({
 }: {
   color: string;
   contentColor: string;
+  compact: boolean;
   fixedHeight: boolean;
   height: string;
   htmlMode: boolean;
@@ -395,7 +422,7 @@ function svgDocStyle({
   selector: string;
 }) {
   const font = htmlMode
-    ? `300 20px/1.5 ${spaceGrotesk.style.fontFamily}, sans-serif`
+    ? `300 ${compact ? 16 : 20}px/1.5 ${spaceGrotesk.style.fontFamily}, sans-serif`
     : `400 19px/28px "Courier New", monospace`;
 
   return `
@@ -431,14 +458,18 @@ function svgDocStyle({
       display: flex;
       justify-content: space-between;
       width: 100%;
-      height: 70px;
+      height: ${htmlMode ? "auto" : "70px"};
       padding-bottom: 16px;
-      font-size: 18px;
+      font-size: ${compact ? 14 : 18}px;
       text-transform: uppercase;
       border-bottom: 2px solid var(--contentColor);
     }
     ${selector} .header > div + div {
       text-align: right;
+    }
+    ${selector} .header > div > div:nth-child(2) {
+      ${compact ? "font-size: 18px;" : ""}
+      ${compact ? "font-weight: 600;" : ""}
     }
     ${selector} .content {
       flex-grow: ${fixedHeight || htmlMode ? 1 : 0};
@@ -448,36 +479,36 @@ function svgDocStyle({
       height: ${fixedHeight ? "100%" : "auto"};
     }
     ${selector} .title {
-      padding-top: 40px;
+      padding-top: ${compact ? 16 : 40}px;
       flex-grow: 0;
       flex-shrink: 0;
       line-height: ${htmlMode ? 1.3 : "38px"};
-      font-size: 32px;
+      font-size: ${compact ? 20 : 32}px;
       font-weight: 400;
     }
     ${selector} .body {
       flex-grow: 1;
       flex-shrink: 0;
       overflow: hidden;
-      padding-top: 24px;
+      padding-top: ${compact ? 8 : 24}px;
     }
     ${selector} .body p {
-      margin: 24px 0;
+      margin: ${compact ? 8 : 24}px 0;
     }
     ${selector} .body p:first-child {
       margin-top: 0;
     }
     ${selector} .body h1 {
-      margin: 32px 0;
+      margin: ${compact ? 8 : 32}px 0;
       padding-bottom: 5px;
-      line-height: 36px;
-      font-size: 26px;
+      line-height: ${htmlMode ? "1.5" : "36px"};
+      font-size: ${compact ? 18 : 26}px;
       font-weight: 400;
     }
     ${selector} .body h2 {
-      margin: 24px 0;
-      line-height: 32px;
-      font-size: 22px;
+      margin: ${compact ? 8 : 24}px 0;
+      line-height: ${htmlMode ? "1.5" : "32px"};
+      font-size: ${compact ? 18 : 22}px;
       font-weight: 400;
     }
     ${selector} .signees {
@@ -486,7 +517,7 @@ function svgDocStyle({
       display: flex;
       flex-direction: column;
       padding-top: ${fixedHeight ? 0 : (htmlMode ? 20 : 40)}px;
-      padding-bottom: 112px;
+      padding-bottom: ${compact ? 64 : 112}px;
     }
     ${selector} .signee {
       display: flex;
@@ -494,6 +525,7 @@ function svgDocStyle({
       align-items: center;
       justify-content: space-between;
       height: 40px;
+      ${compact ? "font-size: 18px;" : ""};
     }
     ${selector} .signee .account {
       overflow: hidden;
@@ -516,8 +548,8 @@ function svgDocStyle({
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 50px;
-      height: 28px;
+      width: ${compact ? 40 : 50}px;
+      height: ${compact ? 21 : 28}px;
       background: var(--contentColor);
       border-radius: 64px;
     }

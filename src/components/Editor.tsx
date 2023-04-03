@@ -238,6 +238,10 @@ export function Editor({
                     size="large"
                     type="submit"
                     wide={small}
+                    css={{
+                      height: small ? 48 : 64,
+                      fontSize: small ? 32 : 40,
+                    }}
                   />
                 }
               />
