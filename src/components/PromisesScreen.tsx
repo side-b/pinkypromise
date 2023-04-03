@@ -22,6 +22,7 @@ import {
   usePinkyPromiseContractAddress,
 } from "../lib/contract-utils";
 import { useAccount } from "../lib/eth-utils";
+import { useBreakpoint } from "../lib/react-utils";
 import {
   appChainFromId,
   blocksToText,
@@ -43,7 +44,7 @@ type PromiseCardData = {
   title: string;
 };
 
-const WIDTH = 400 * 3 + 40 * 2;
+const CARD_SIZE = 400;
 
 export const PromisesScreen = memo(function PromisesScreen({
   mineOnly = false,
@@ -52,6 +53,9 @@ export const PromisesScreen = memo(function PromisesScreen({
   mineOnly?: boolean;
   page: number;
 }) {
+  const breakpoint = useBreakpoint();
+  const small = breakpoint === "small";
+
   const chainId = useCurrentOrDefaultChainId();
   const contractAddress = usePinkyPromiseContractAddress(chainId);
   const router = useRouter();
@@ -136,125 +140,130 @@ export const PromisesScreen = memo(function PromisesScreen({
   });
 
   return (
-    <div
-      css={{
-        flexGrow: 1,
-        display: "flex",
-        flexDirection: "column",
-        width: WIDTH,
-        margin: "0 auto",
-        position: "relative",
-      }}
-    >
-      {loadingTransition((style, {
-        cards,
-        connectPlease,
-        hasNextPage,
-        status,
-      }) => (
-        match(connectPlease ? "connect-please" as const : status)
-          .with("connect-please", () => (
-            <Appear appear={style}>
-              <div css={{ color: COLORS.white }}>
-                Connect your account to see your promises
-              </div>
-            </Appear>
-          ))
-          .with(P.union("loading", "idle"), () => (
-            <Appear appear={style}>
-              <div css={{ paddingTop: 80 }}>
-                <LoadingFingers />
-              </div>
-            </Appear>
-          ))
-          .with("error", () => (
-            <Appear appear={style}>
-              <div
-                css={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: 18,
-                  color: COLORS.white,
-                }}
-              >
-                <LoadingFingers
-                  color={COLORS.red}
-                  label="Error loading promises"
-                />
-                <Button
-                  label="Retry"
-                  color={COLORS.red}
-                  onClick={refetch}
-                  size="large"
-                />
-              </div>
-            </Appear>
-          ))
-          .with("success", () => (
-            cards.length > 0
-              ? (
-                <Appear appear={style}>
-                  <div
-                    css={{
-                      paddingTop: 24,
-                      paddingBottom: 80,
-                    }}
-                  >
-                    <PromisesGrid
-                      cards={cards}
-                      onNextPage={hasNextPage && (() => {
-                        router.push(
-                          `/${mineOnly ? "mine" : "promises"}/${page + 1}`,
-                        );
-                      })}
-                      onPrevPage={page > 1 && (() => {
-                        router.push(
-                          `/${mineOnly ? "mine" : "promises"}/${page - 1}`,
-                        );
-                      })}
-                      page={page}
-                    />
-                  </div>
-                </Appear>
-              )
-              : (
-                <Appear appear={style}>
-                  <div
-                    css={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      gap: 18,
-                      color: COLORS.white,
-                    }}
-                  >
-                    <LoadingFingers
-                      color={COLORS.white}
-                      label="No promises"
-                    />
-                    <Button
-                      label="New"
-                      color={COLORS.white}
-                      onClick={() => {
-                        router.push("/new");
+    <div>
+      <div
+        css={{
+          flexGrow: 1,
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          width: "100%",
+          maxWidth: CARD_SIZE * 3 + 40 * 2 + (small ? 16 : 48),
+          margin: "0 auto",
+        }}
+      >
+        {loadingTransition((style, {
+          cards,
+          connectPlease,
+          hasNextPage,
+          status,
+        }) => (
+          match(connectPlease ? "connect-please" as const : status)
+            .with("connect-please", () => (
+              <Appear appear={style}>
+                <div css={{ color: COLORS.white }}>
+                  Connect your account to see your promises
+                </div>
+              </Appear>
+            ))
+            .with(P.union("loading", "idle"), () => (
+              <Appear appear={style}>
+                <div css={{ paddingTop: 80 }}>
+                  <LoadingFingers />
+                </div>
+              </Appear>
+            ))
+            .with("error", () => (
+              <Appear appear={style}>
+                <div
+                  css={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 18,
+                    color: COLORS.white,
+                  }}
+                >
+                  <LoadingFingers
+                    color={COLORS.red}
+                    label="Error loading promises"
+                  />
+                  <Button
+                    label="Retry"
+                    color={COLORS.red}
+                    onClick={refetch}
+                    size="large"
+                  />
+                </div>
+              </Appear>
+            ))
+            .with("success", () => (
+              cards.length > 0
+                ? (
+                  <Appear appear={style}>
+                    <div
+                      css={{
+                        paddingTop: small ? 12 : 24,
+                        paddingBottom: 80,
                       }}
-                      size="large"
-                    />
-                  </div>
-                </Appear>
-              )
-          ))
-          .exhaustive()
-      ))}
+                    >
+                      <PromisesGrid
+                        cards={cards}
+                        onNextPage={hasNextPage && (() => {
+                          router.push(
+                            `/${mineOnly ? "mine" : "promises"}/${page + 1}`,
+                          );
+                        })}
+                        onPrevPage={page > 1 && (() => {
+                          router.push(
+                            `/${mineOnly ? "mine" : "promises"}/${page - 1}`,
+                          );
+                        })}
+                        page={page}
+                      />
+                    </div>
+                  </Appear>
+                )
+                : (
+                  <Appear appear={style}>
+                    <div
+                      css={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: 18,
+                        color: COLORS.white,
+                      }}
+                    >
+                      <LoadingFingers
+                        color={COLORS.white}
+                        label="No promises"
+                      />
+                      <Button
+                        label="New"
+                        color={COLORS.white}
+                        onClick={() => {
+                          router.push("/new");
+                        }}
+                        size="large"
+                      />
+                    </div>
+                  </Appear>
+                )
+            ))
+            .exhaustive()
+        ))}
+      </div>
     </div>
   );
 });
 
 const PromiseCard = memo(function PromiseCard({
+  compact,
   promiseData,
   promiseId,
 }: {
+  compact?: boolean;
   promiseData: PromiseCardData;
   promiseId: string;
 }) {
@@ -270,7 +279,7 @@ const PromiseCard = memo(function PromiseCard({
           textDecoration: "none",
           color: promiseData.colors.contentColor,
           background: promiseData.colors.color,
-          borderRadius: 64,
+          borderRadius: compact ? 40 : 64,
           boxShadow: "0 40px 40px rgba(43, 8, 28, 0.10)",
           userSelect: "none",
           "&:focus-visible": {
@@ -286,7 +295,7 @@ const PromiseCard = memo(function PromiseCard({
           css={{
             display: "flex",
             flexDirection: "column",
-            height: 400,
+            height: CARD_SIZE,
             padding: "32px 32px 24px",
           }}
         >
@@ -376,8 +385,8 @@ const PromiseCard = memo(function PromiseCard({
           || promiseData.state === "Discarded")
           && (
             <SvgDocTape
-              width={400}
-              height={400}
+              width={CARD_SIZE}
+              height={CARD_SIZE}
               {...promiseData.colors}
             />
           )}
@@ -403,6 +412,9 @@ function PromisesGrid({
   const chainId = useCurrentOrDefaultChainId();
   const networkPrefix = appChainFromId(chainId)?.prefix ?? "";
 
+  const breakpoint = useBreakpoint();
+  const small = breakpoint === "small";
+
   const transitions = useTransition(cards, {
     keys: (card) => card.key,
     from: {
@@ -425,21 +437,27 @@ function PromisesGrid({
       css={{
         display: "grid",
         placeItems: "center",
+        width: "100%",
         height: "100%",
       }}
     >
       <div
         css={{
           display: "grid",
-          gridTemplateColumns: "repeat(3, 400px)",
-          gap: 40,
+          gridTemplateColumns: small
+            ? `repeat(auto-fill, minmax(${360 - 16}px, ${CARD_SIZE}px))`
+            : `repeat(auto-fill, ${CARD_SIZE}px)`,
+          gap: small ? 24 : 40,
+          justifyContent: "center",
+          width: "100%",
+          padding: small ? "0 8px" : "0 24px",
         }}
       >
         {transitions((style, card) => (
           <div
             css={{
               position: "relative",
-              height: 400,
+              height: CARD_SIZE,
             }}
           >
             <a.div
@@ -452,6 +470,7 @@ function PromisesGrid({
               }}
             >
               <PromiseCard
+                compact={small}
                 promiseId={`${networkPrefix}-${card.promise.id}`}
                 promiseData={card.promise.data}
               />

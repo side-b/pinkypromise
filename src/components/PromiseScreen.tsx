@@ -255,7 +255,13 @@ export function PromiseScreen({
               { status: "success" },
               () => (
                 <Appear appear={style}>
-                  <div css={{ padding: "40px 8px 80px" }}>
+                  <div
+                    css={{
+                      padding: small
+                        ? "12px 8px 80px"
+                        : "40px 8px 80px",
+                    }}
+                  >
                     <Container
                       color={color}
                       maxWidth={small ? 600 : undefined}
