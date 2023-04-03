@@ -43,4 +43,11 @@ if [[ -z $CONTRACT_ADDRESS ]]; then
     exit 1
 fi
 
+echo ""
+echo "  ChainID: $CHAIN_ID"
+echo "  PinkyPromise Contract: $CONTRACT_ADDRESS"
+echo ""
+echo "Creating demos…"
+echo ""
+
 PINKY_PROMISE_ADDRESS=$CONTRACT_ADDRESS forge script script/CreateDemoPromises.s.sol:CreateDemoPromisesScript --rpc-url $RPC_URL --broadcast

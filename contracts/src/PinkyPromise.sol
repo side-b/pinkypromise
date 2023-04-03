@@ -22,9 +22,9 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
     /// @notice The latest promise ID.
     /// Note that the promise ID is NOT equivalent to a token ID, as a promise can have many signees,
     /// and each one of them will receive a separate NFT, corresponding to the promise.
-    uint256 public latestPromiseId; // 0
+    uint256 public latestPromiseId;
     /// @notice The latest token ID.
-    uint256 public latestTokenId; // 0
+    uint256 public latestTokenId;
 
     mapping(uint256 => Promise) public promises;
     /// @notice Mapping of a certain token ID to the promise it's associated with.
