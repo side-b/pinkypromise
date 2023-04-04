@@ -140,120 +140,118 @@ export const PromisesScreen = memo(function PromisesScreen({
   });
 
   return (
-    <div>
-      <div
-        css={{
-          flexGrow: 1,
-          position: "relative",
-          display: "flex",
-          flexDirection: "column",
-          width: "100%",
-          maxWidth: CARD_SIZE * 3 + 40 * 2 + (small ? 16 : 48),
-          margin: "0 auto",
-        }}
-      >
-        {loadingTransition((style, {
-          cards,
-          connectPlease,
-          hasNextPage,
-          status,
-        }) => (
-          match(connectPlease ? "connect-please" as const : status)
-            .with("connect-please", () => (
-              <Appear appear={style}>
-                <div css={{ color: COLORS.white }}>
-                  Connect your account to see your promises
-                </div>
-              </Appear>
-            ))
-            .with(P.union("loading", "idle"), () => (
-              <Appear appear={style}>
-                <div css={{ paddingTop: 80 }}>
-                  <LoadingFingers />
-                </div>
-              </Appear>
-            ))
-            .with("error", () => (
-              <Appear appear={style}>
-                <div
-                  css={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: 18,
-                    color: COLORS.white,
-                  }}
-                >
-                  <LoadingFingers
-                    color={COLORS.red}
-                    label="Error loading promises"
-                  />
-                  <Button
-                    label="Retry"
-                    color={COLORS.red}
-                    onClick={refetch}
-                    size="large"
-                  />
-                </div>
-              </Appear>
-            ))
-            .with("success", () => (
-              cards.length > 0
-                ? (
-                  <Appear appear={style}>
-                    <div
-                      css={{
-                        paddingTop: small ? 12 : 24,
-                        paddingBottom: 80,
+    <div
+      css={{
+        flexGrow: 1,
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        width: "100%",
+        maxWidth: CARD_SIZE * 3 + 40 * 2 + (small ? 16 : 48),
+        margin: "0 auto",
+      }}
+    >
+      {loadingTransition((style, {
+        cards,
+        connectPlease,
+        hasNextPage,
+        status,
+      }) => (
+        match(connectPlease ? "connect-please" as const : status)
+          .with("connect-please", () => (
+            <Appear appear={style}>
+              <div css={{ color: COLORS.white }}>
+                Connect your account to see your promises
+              </div>
+            </Appear>
+          ))
+          .with(P.union("loading", "idle"), () => (
+            <Appear appear={style}>
+              <div css={{ paddingTop: 80 }}>
+                <LoadingFingers />
+              </div>
+            </Appear>
+          ))
+          .with("error", () => (
+            <Appear appear={style}>
+              <div
+                css={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 18,
+                  color: COLORS.white,
+                }}
+              >
+                <LoadingFingers
+                  color={COLORS.red}
+                  label="Error loading promises"
+                />
+                <Button
+                  label="Retry"
+                  color={COLORS.red}
+                  onClick={refetch}
+                  size="large"
+                />
+              </div>
+            </Appear>
+          ))
+          .with("success", () => (
+            cards.length > 0
+              ? (
+                <Appear appear={style}>
+                  <div
+                    css={{
+                      paddingTop: small ? 12 : 24,
+                      paddingBottom: 80,
+                    }}
+                  >
+                    <PromisesGrid
+                      cards={cards}
+                      onNextPage={hasNextPage && (() => {
+                        router.push(
+                          `/${mineOnly ? "mine" : "promises"}/${page + 1}`,
+                        );
+                      })}
+                      onPrevPage={page > 1 && (() => {
+                        router.push(
+                          `/${mineOnly ? "mine" : "promises"}/${page - 1}`,
+                        );
+                      })}
+                      page={page}
+                    />
+                  </div>
+                </Appear>
+              )
+              : (
+                <Appear appear={style}>
+                  <div
+                    css={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      gap: 18,
+                      color: COLORS.white,
+                    }}
+                  >
+                    <LoadingFingers
+                      color={COLORS.white}
+                      label="No promises"
+                    />
+                    <Button
+                      label="New"
+                      color={COLORS.white}
+                      onClick={() => {
+                        router.push("/new");
                       }}
-                    >
-                      <PromisesGrid
-                        cards={cards}
-                        onNextPage={hasNextPage && (() => {
-                          router.push(
-                            `/${mineOnly ? "mine" : "promises"}/${page + 1}`,
-                          );
-                        })}
-                        onPrevPage={page > 1 && (() => {
-                          router.push(
-                            `/${mineOnly ? "mine" : "promises"}/${page - 1}`,
-                          );
-                        })}
-                        page={page}
-                      />
-                    </div>
-                  </Appear>
-                )
-                : (
-                  <Appear appear={style}>
-                    <div
-                      css={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        gap: 18,
-                        color: COLORS.white,
-                      }}
-                    >
-                      <LoadingFingers
-                        color={COLORS.white}
-                        label="No promises"
-                      />
-                      <Button
-                        label="New"
-                        color={COLORS.white}
-                        onClick={() => {
-                          router.push("/new");
-                        }}
-                        size="large"
-                      />
-                    </div>
-                  </Appear>
-                )
-            ))
-            .exhaustive()
-        ))}
-      </div>
+                      size="large"
+                    />
+                  </div>
+                </Appear>
+              )
+          ))
+          .exhaustive()
+      ))}
     </div>
   );
 });

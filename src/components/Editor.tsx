@@ -4,7 +4,7 @@ import type { ColorId } from "../types";
 
 import { a, useTransition } from "@react-spring/web";
 import * as dn from "dnum";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   COLORS,
   EDITOR_CONFIRM_NOTICE,
@@ -20,7 +20,8 @@ import { Container } from "./Container";
 export type EditorData = {
   body: string;
   color: ColorId;
-  signees: [string, string][];
+  erroredSignees: string[];
+  signees: [address: string, key: string][];
   title: string;
 };
 
@@ -115,6 +116,9 @@ export function Editor({
             background: COLORS.white,
             borderRadius: small ? 32 : 20,
             border: 0,
+            "&.error": {
+              outline: `2px solid ${COLORS.red}`,
+            },
             "&:focus-visible": {
               outline: `2px solid ${COLORS.pink}`,
             },
@@ -184,6 +188,7 @@ export function Editor({
                       onRemove={() => removeFormSignee(id)}
                       vPadding={small ? 10 : 14}
                       value={address}
+                      errored={data.erroredSignees.includes(id)}
                     />
                   </div>
                 </a.div>

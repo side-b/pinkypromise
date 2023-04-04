@@ -12,20 +12,22 @@ import { PlusMinusButton } from "./PlusMinusButton";
 
 export function AddressInput({
   accentColor,
+  errored,
   fontSize = 18,
+  hPadding = 24,
   height = 64,
   onChange,
   onRemove,
   vPadding = 14,
-  hPadding = 24,
   value,
 }: {
   accentColor?: ColorId;
+  errored?: boolean;
   fontSize?: number;
+  hPadding?: number;
   height?: number;
   onChange: (value: string) => void;
   onRemove: () => void;
-  hPadding?: number;
   vPadding?: number;
   value: string;
 }) {
@@ -57,7 +59,7 @@ export function AddressInput({
     <div css={{ position: "relative", height }}>
       <input
         name="ethereum-account"
-        className="signee"
+        className={"signee" + (errored && !resolveAddress.isLoading ? " error" : "")}
         type="text"
         placeholder="0x…"
         spellCheck={false}

@@ -48,6 +48,7 @@ type PromiseData = {
 export function NewPromiseScreen() {
   const account = useAccount();
   const breakpoint = useBreakpoint();
+  const small = breakpoint === "small";
   const [mode, setMode] = useState<"editor" | "preview" | "transaction">("editor");
   const [svgHeight, setSvgHeight] = useState(0);
 
@@ -55,11 +56,19 @@ export function NewPromiseScreen() {
   const [editorData, setEditorData] = useState<EditorData>({
     body: "",
     color: "pink",
+    erroredSignees: [],
     signees: [["", ""]],
     title: "",
   });
 
-  const small = breakpoint === "small";
+  const handleEditorChange = (data: EditorData) => {
+    setEditorData({
+      ...data,
+      erroredSignees: data.signees
+        .filter(([address]) => address.trim() && !isAddress(address))
+        .map(([_, key]) => key),
+    });
+  };
 
   // Fill the signees with the account on connect or account change
   useEffect(() => {
@@ -105,7 +114,8 @@ export function NewPromiseScreen() {
   const submitEnabled = Boolean(
     newPromiseData.title.length > 0
       && newPromiseData.body.length > 0
-      && newPromiseData.signees.length > 0,
+      && newPromiseData.signees.length > 0
+      && editorData.erroredSignees.length === 0,
   );
 
   const background = useBackground();
@@ -151,7 +161,7 @@ export function NewPromiseScreen() {
               >
                 <Editor
                   data={editorData}
-                  onChange={setEditorData}
+                  onChange={handleEditorChange}
                   submitEnabled={submitEnabled}
                   onSubmit={() => setMode("transaction")}
                   feeEstimate={feeEstimate}
