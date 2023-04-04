@@ -379,15 +379,22 @@ const PromiseCard = memo(function PromiseCard({
             </div>
           </div>
         </section>
-        {(promiseData.state === "Nullified"
-          || promiseData.state === "Discarded")
-          && (
-            <SvgDocTape
-              width={CARD_SIZE}
-              height={CARD_SIZE}
-              {...promiseData.colors}
-            />
-          )}
+        {promiseData.state === "Nullified" && (
+          <SvgDocTape
+            mode="broken"
+            width={CARD_SIZE}
+            height={CARD_SIZE}
+            {...promiseData.colors}
+          />
+        )}
+        {promiseData.state === "Discarded" && (
+          <SvgDocTape
+            mode="discarded"
+            width={CARD_SIZE}
+            height={CARD_SIZE}
+            {...promiseData.colors}
+          />
+        )}
       </a>
     </Link>
   );

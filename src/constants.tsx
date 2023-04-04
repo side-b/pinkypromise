@@ -74,17 +74,17 @@ export const PROMISE_NOTICE_DISCARDED = [
 export const PROMISE_NOTICE_DRAFT_UNSIGNED = [
   `
   You can share the link to this promise with the other signees for them to sign
-  it, or break this promise to discard it.
+  it, or discard this promise.
   `.trim(),
-  "Sign",
+  "Sign", // sign()
 ];
 
 export const PROMISE_NOTICE_DRAFT_SIGNED = [
   `
   You can share the link to this promise with the other signees for them to sign
-  it, or break this promise to discard it.
+  it, or discard this promise.
 `.trim(),
-  "Break", // discard()
+  "Discard", // discard()
 ];
 
 export const PROMISE_NOTICE_NULLREQUEST = [
@@ -232,8 +232,8 @@ export const FAQ_ITEMS = [
         contract).
       </p>
       <p>
-        Any signee can break the promise while it is still a draft (i.e. before it
-        gets fully signed), without requiring the others to do it.
+        Any signee also has the possibility to discard a promise while it is still a
+        draft (before it gets signed by all).
       </p>
     </>,
   ],

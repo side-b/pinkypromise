@@ -1,5 +1,5 @@
 import type { CSSObject } from "@emotion/react";
-import type { ReactNode } from "react";
+import type { ReactNode, RefCallback, RefObject } from "react";
 
 import { a, useSpring } from "@react-spring/web";
 import { useInView } from "react-cool-inview";
@@ -10,6 +10,7 @@ export function Container({
   children,
   color = COLORS.grey,
   contentColor = "inherit",
+  containerRef,
   secondary,
   secondaryMode = "drawer",
   maxWidth,
@@ -18,6 +19,7 @@ export function Container({
   children: ReactNode;
   color?: string;
   contentColor?: string;
+  containerRef?: RefObject<HTMLDivElement> | RefCallback<HTMLDivElement>;
   secondary?: ReactNode;
   secondaryMode?: "drawer" | "inside";
   maxWidth?: CSSObject["maxWidth"];
@@ -41,6 +43,7 @@ export function Container({
         }}
       >
         <div
+          ref={containerRef}
           css={{
             position: "relative",
             overflow: "hidden",

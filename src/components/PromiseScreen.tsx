@@ -11,6 +11,7 @@ import { useTransition } from "@react-spring/web";
 import { BigNumber } from "ethers";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
+import useDimensions from "react-cool-dimensions";
 import { match, P } from "ts-pattern";
 import { useContractRead } from "wagmi";
 import {
@@ -217,6 +218,12 @@ export function PromiseScreen({
     return contentColor;
   }, [color, contentColor]);
 
+  const containerDimensions = useDimensions();
+  const tapeDimensions = {
+    width: containerDimensions.width + (small ? 32 : 112),
+    height: containerDimensions.height + (small ? 40 : 112),
+  };
+
   return (
     <>
       <div
@@ -264,8 +271,9 @@ export function PromiseScreen({
                   >
                     <Container
                       color={color}
+                      containerRef={containerDimensions.observe}
                       maxWidth={small ? 600 : undefined}
-                      padding={small ? "16px 16px 24px" : "56px 56px 56px"}
+                      padding={small ? "16px 16px 24px" : 56}
                       secondary={match([
                         promiseData.connectedSigningState,
                         promiseData.state,
@@ -346,11 +354,17 @@ export function PromiseScreen({
                         title={promiseData.title}
                         {...promiseData.colors}
                       />
-                      {(promiseData.state === "Nullified"
-                        || promiseData.state === "Discarded") && (
+                      {promiseData.state === "Nullified" && (
                         <SvgDocTape
-                          width={832}
-                          height={promiseData.height}
+                          mode="broken"
+                          {...tapeDimensions}
+                          {...promiseData.colors}
+                        />
+                      )}
+                      {promiseData.state === "Discarded" && (
+                        <SvgDocTape
+                          mode="discarded"
+                          {...tapeDimensions}
                           {...promiseData.colors}
                         />
                       )}

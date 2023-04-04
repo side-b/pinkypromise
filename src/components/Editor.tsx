@@ -4,7 +4,7 @@ import type { ColorId } from "../types";
 
 import { a, useTransition } from "@react-spring/web";
 import * as dn from "dnum";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   COLORS,
   EDITOR_CONFIRM_NOTICE,
