@@ -23,6 +23,7 @@ import { useBreakpoint, useExplorerBaseUrl } from "../lib/react-utils";
 import { isAddress } from "../types";
 
 const CONTENT_WIDTH = 720;
+const MIN_HEIGHT_LARGE = 640;
 
 export function SvgDoc({
   bodyHtml,
@@ -451,6 +452,7 @@ function svgDocStyle({
       flex-direction: column;
       height: 100%;
       ${htmlMode ? `max-width: ${CONTENT_WIDTH}px;` : ""};
+      ${htmlMode && !compact ? `min-height: ${MIN_HEIGHT_LARGE}px;` : ""}
     }
     ${selector} .header {
       flex-shrink: 0;
