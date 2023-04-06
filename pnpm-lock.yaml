@@ -5,8 +5,8 @@ dependencies:
     specifier: ^11.10.5
     version: 11.10.6(@types/react@18.0.33)(react@18.2.0)
   '@rainbow-me/rainbowkit':
-    specifier: ^0.12.6
-    version: 0.12.6(@types/react@18.0.33)(ethers@5.7.2)(react-dom@18.2.0)(react@18.2.0)(wagmi@0.12.9)
+    specifier: ^0.12.7
+    version: 0.12.7(@types/react@18.0.33)(ethers@5.7.2)(react-dom@18.2.0)(react@18.2.0)(wagmi@0.12.9)
   '@react-spring/web':
     specifier: 9.6.1
     version: 9.6.1(react-dom@18.2.0)(react@18.2.0)
@@ -80,8 +80,8 @@ dependencies:
     specifier: 5.0.3
     version: 5.0.3
   use-debounce:
-    specifier: ^9.0.3
-    version: 9.0.3(react@18.2.0)
+    specifier: ^9.0.4
+    version: 9.0.4(react@18.2.0)
   wagmi:
     specifier: ^0.12.9
     version: 0.12.9(@babel/core@7.21.4)(@types/node@18.15.11)(ethers@5.7.2)(react-dom@18.2.0)(react@18.2.0)(typescript@5.0.3)(zod@3.21.4)
@@ -1411,8 +1411,8 @@ packages:
       tslib: 2.5.0
     dev: false
 
-  /@rainbow-me/rainbowkit@0.12.6(@types/react@18.0.33)(ethers@5.7.2)(react-dom@18.2.0)(react@18.2.0)(wagmi@0.12.9):
-    resolution: {integrity: sha512-O96vD3UQmhqbxygnMYsfie0vec1yFlqMFHsFo36gWn7pkyn0vhWLLiqiOypGqtvX2dcMJ+U6bBxNtAXhH6ke4w==}
+  /@rainbow-me/rainbowkit@0.12.7(@types/react@18.0.33)(ethers@5.7.2)(react-dom@18.2.0)(react@18.2.0)(wagmi@0.12.9):
+    resolution: {integrity: sha512-TQGcClMC2reO2uOkIM6MrsQjKQ2gSM3Wo9g3WeSD8OtOfMbrngq3GQpKpHoQqBmvJIysMSnYUu0r9HZELhbKJA==}
     engines: {node: '>=12.4'}
     peerDependencies:
       ethers: '>=5.5.1'
@@ -6132,8 +6132,8 @@ packages:
       tslib: 2.5.0
     dev: false
 
-  /use-debounce@9.0.3(react@18.2.0):
-    resolution: {integrity: sha512-FhtlbDtDXILJV7Lix5OZj5yX/fW1tzq+VrvK1fnT2bUrPOGruU9Rw8NCEn+UI9wopfERBEZAOQ8lfeCJPllgnw==}
+  /use-debounce@9.0.4(react@18.2.0):
+    resolution: {integrity: sha512-6X8H/mikbrt0XE8e+JXRtZ8yYVvKkdYRfmIhWZYsP8rcNs9hk3APV8Ua2mFkKRLcJKVdnX2/Vwrmg2GWKUQEaQ==}
     engines: {node: '>= 10.0.0'}
     peerDependencies:
       react: '>=16.8.0'

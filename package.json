@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
-    "@rainbow-me/rainbowkit": "^0.12.6",
+    "@rainbow-me/rainbowkit": "^0.12.7",
     "@react-spring/web": "9.6.1",
     "@tanstack/react-query": "^4.26.1",
     "@types/node": "18.15.11",
@@ -38,7 +38,7 @@
     "ts-pattern": "^4.2.2",
     "tsx": "^3.12.6",
     "typescript": "5.0.3",
-    "use-debounce": "^9.0.3",
+    "use-debounce": "^9.0.4",
     "wagmi": "^0.12.9",
     "zod": "^3.21.4"
   },
