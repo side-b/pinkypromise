@@ -266,7 +266,7 @@ const PromiseCard = memo(function PromiseCard({
   promiseId: string;
 }) {
   return (
-    <Link href={`/promise/${promiseId}`} legacyBehavior passHref>
+    <Link href={`/${promiseId}`} legacyBehavior passHref>
       <a
         draggable="false"
         css={{

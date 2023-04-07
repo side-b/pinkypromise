@@ -316,9 +316,8 @@ contract PinkyPromise is ERC721, IERC5192, Owned {
         Promise storage promise_ = promises[promiseId];
         string memory name = promise_.data.title;
         string memory image = promiseImageURI(promiseId);
-        string memory description = "On-chain accountability from jolly commitments between friends and foes.";
-        string memory external_url =
-            string.concat("https://pinkypromise.gg/promise/", networkPrefix, "-", promiseId.toString());
+        string memory description = "Onchain accountability from jolly commitments between friends and foes.";
+        string memory external_url = string.concat("https://pinkypromise.gg/", networkPrefix, "-", promiseId.toString());
         string memory background_color = PinkyPromiseSvg.promiseContentColor(promise_.data.color);
         string memory flavor = PinkyPromiseSvg.promiseColorName(promise_.data.color);
         return string.concat(

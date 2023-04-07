@@ -298,7 +298,7 @@ export function NewPromiseScreen() {
                     title="Creating pinky promise"
                     successLabel="View Promise"
                     successAction={({ logs }) => (
-                      `/promise/${chainPrefix}-${promiseIdFromTxLogs(logs)}`
+                      `/${chainPrefix}-${promiseIdFromTxLogs(logs)}`
                     )}
                     onCancel={() => {
                       setMode("editor");

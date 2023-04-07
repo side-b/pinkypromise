@@ -127,9 +127,9 @@ export function PromiseScreen({
             },
             title: `Break promise ${fullPromiseId}`,
             successLabel: "View promise",
-            successAction: () => `/promise/${fullPromiseId}`,
+            successAction: () => `/${fullPromiseId}`,
             onCancel: () => {
-              router.push(`/promise/${fullPromiseId}`);
+              router.push(`/${fullPromiseId}`);
             },
           });
         },
@@ -149,9 +149,9 @@ export function PromiseScreen({
             },
             title: "Unbreak pinky promise",
             successLabel: "View promise",
-            successAction: () => `/promise/${fullPromiseId}`,
+            successAction: () => `/${fullPromiseId}`,
             onCancel: () => {
-              router.push(`/promise/${fullPromiseId}`);
+              router.push(`/${fullPromiseId}`);
             },
           });
         },
@@ -171,15 +171,15 @@ export function PromiseScreen({
             },
             title: "Sign pinky promise",
             successLabel: "View promise",
-            successAction: () => `/promise/${fullPromiseId}`,
+            successAction: () => `/${fullPromiseId}`,
             onCancel: () => {
-              router.push(`/promise/${fullPromiseId}`);
+              router.push(`/${fullPromiseId}`);
             },
           });
         },
       )
       .with([P.union("break", "unbreak", "sign"), P.any], () => {
-        router.push(`/promise/${fullPromiseId}`);
+        router.push(`/${fullPromiseId}`);
       })
       .otherwise(() => {
         setTxBag(null);
@@ -291,7 +291,7 @@ export function PromiseScreen({
                             color={buttonColor}
                             info={PROMISE_NOTICE_DRAFT_UNSIGNED[0]}
                             onButtonClick={() => {
-                              router.push(`/promise/${fullPromiseId}/sign`);
+                              router.push(`/${fullPromiseId}/sign`);
                             }}
                           />
                         ))
@@ -302,7 +302,7 @@ export function PromiseScreen({
                             color={buttonColor}
                             info={PROMISE_NOTICE_DRAFT_SIGNED[0]}
                             onButtonClick={() => {
-                              router.push(`/promise/${fullPromiseId}/break`);
+                              router.push(`/${fullPromiseId}/break`);
                             }}
                           />
                         ))
@@ -315,7 +315,7 @@ export function PromiseScreen({
                               color={buttonColor}
                               info={PROMISE_NOTICE_NULLREQUEST[0]}
                               onButtonClick={() => {
-                                router.push(`/promise/${fullPromiseId}/unbreak`);
+                                router.push(`/${fullPromiseId}/unbreak`);
                               }}
                             />
                           ),
@@ -329,7 +329,7 @@ export function PromiseScreen({
                               color={buttonColor}
                               info={PROMISE_NOTICE_SIGNED[0]}
                               onButtonClick={() => {
-                                router.push(`/promise/${fullPromiseId}/break`);
+                                router.push(`/${fullPromiseId}/break`);
                               }}
                             />
                           ),
