@@ -35,7 +35,9 @@ function getPromiseSvgWrapperCode() {
       status: "_STATUS_",
       title: "_TITLE_",
     }),
-  ).replace(/&quot;/g, "\"").replace(/&gt;/g, ">");
+  )
+    .replace(/&quot;/g, "\"")
+    .replace(/&gt;/g, ">");
 
   // compress css
   const styleStart = wrapper.indexOf("<style>");

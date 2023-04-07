@@ -17,7 +17,6 @@ import type { Address, EnsName } from "../types";
 
 import { createElement, useEffect, useMemo, useRef } from "react";
 import { useEnsName } from "wagmi";
-import { spaceGrotesk } from "../components/GlobalStyles";
 import { PLACEHOLDER_TITLE } from "../constants";
 import { useBreakpoint, useExplorerBaseUrl } from "../lib/react-utils";
 import { isAddress } from "../types";
@@ -436,9 +435,15 @@ function svgDocStyle({
   paddingTop: number;
   selector: string;
 }) {
-  const font = htmlMode
-    ? `300 ${compact ? 16 : 20}px/1.5 ${spaceGrotesk.style.fontFamily}, sans-serif`
-    : `400 19px/28px "Courier New", monospace`;
+  const fontStyle = htmlMode
+    ? `
+      font-size: ${compact ? "16px" : "20px"};
+      font-weight: 300;
+      line-height: 1.5;
+    `
+    : `
+      font: 400 19px/28px "Courier New", monospace;
+    `;
 
   return `
     ${selector} {
@@ -453,7 +458,7 @@ function svgDocStyle({
     ${selector} .root {
       height: ${height};
       padding: ${paddingTop}px ${paddingSide}px ${paddingBottom}px;
-      font: ${font};
+      ${fontStyle};
       color: var(--contentColor);
       background: var(--color);
     }

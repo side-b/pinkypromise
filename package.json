@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "update-abi": "./scripts/update-abi.sh",
-    "update-svg-contract": "tsx scripts/codegen-PinkyPromiseSvg.sol.tsx > contracts/src/PinkyPromiseSvg.sol && forge fmt contracts/src/PinkyPromiseSvg.sol",
+    "update-svg-contract": "./scripts/update-svg-contract.sh",
     "dev-node": "source ./.env && anvil --host 0.0.0.0 --chain-id 31337 --fork-url https://mainnet.infura.io/v3/$NEXT_PUBLIC_INFURA_KEY"
   },
   "dependencies": {

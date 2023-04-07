@@ -73,8 +73,7 @@ export function GlobalStyles({ children }: { children: ReactNode }) {
             overflow: "hidden",
           },
           "body": {
-            font: "400 18px/1.5 monospace",
-            fontFamily: `${spaceGrotesk.style.fontFamily}, sans-serif`,
+            font: `400 18px/1.5 ${spaceGrotesk.style.fontFamily}, sans-serif`,
           },
           "body, a, input, button": {
             color: COLORS.black,
