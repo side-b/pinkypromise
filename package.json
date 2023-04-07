@@ -24,12 +24,12 @@
     "colord": "^2.9.3",
     "dnum": "^2.3.2",
     "eslint": "8.37.0",
-    "eslint-config-next": "13.2.4",
+    "eslint-config-next": "13.3.0",
     "ethereum-blockies-base64": "^1.0.2",
     "ethers": "^5.7.2",
     "focus-trap-react": "^10.1.1",
     "lightningcss": "^1.19.0",
-    "next": "13.2.4",
+    "next": "13.3.0",
     "react": "18.2.0",
     "react-cool-dimensions": "^3.0.1",
     "react-cool-inview": "^3.0.1",
@@ -39,7 +39,7 @@
     "tsx": "^3.12.6",
     "typescript": "5.0.3",
     "use-debounce": "^9.0.4",
-    "wagmi": "^0.12.9",
+    "wagmi": "^0.12.10",
     "zod": "^3.21.4"
   },
   "packageManager": "pnpm@7.30.0"
