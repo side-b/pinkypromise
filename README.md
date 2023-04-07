@@ -1,6 +1,6 @@
 # Pinky Promise
 
-On-chain accountability from jolly commitments between friends and foes.
+Onchain accountability from jolly commitments between friends and foes.
 
 ## Build the Pinky Promise app
 
