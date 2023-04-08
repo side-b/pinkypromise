@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ComponentPropsWithoutRef, ReactNode } from "react";
 
 import { COLORS } from "../constants";
 
@@ -13,7 +13,7 @@ export function DiscButton({
   className?: string;
   color?: string;
   icon: ReactNode;
-  onClick?: () => void;
+  onClick?: ComponentPropsWithoutRef<"button">["onClick"];
   size?: number;
   title: string;
 }) {

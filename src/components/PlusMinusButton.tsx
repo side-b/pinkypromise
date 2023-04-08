@@ -1,3 +1,5 @@
+import type { ComponentPropsWithoutRef } from "react";
+
 import { COLORS } from "../constants";
 import { DiscButton } from "./DiscButton";
 import { IconMinus } from "./IconMinus";
@@ -14,7 +16,7 @@ export function PlusMinusButton({
   className?: string;
   color?: string;
   mode: "plus" | "minus";
-  onClick?: () => void;
+  onClick?: ComponentPropsWithoutRef<typeof DiscButton>["onClick"];
   size?: number;
   title: string;
 }) {

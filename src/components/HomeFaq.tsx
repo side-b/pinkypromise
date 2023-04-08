@@ -158,7 +158,10 @@ function HomeFaqItem({
               mode={opened ? "minus" : "plus"}
               title={opened ? "Close" : "Open"}
               color={COLORS.black}
-              onClick={onToggle}
+              onClick={(event) => {
+                event.preventDefault();
+                onToggle();
+              }}
             />
           </a.div>
           <h2
