@@ -1,53 +1,30 @@
-import type { GetServerSideProps } from "next";
-import type { NetworkPrefix } from "../types";
-
 import Head from "next/head";
+import { useRouter } from "next/router";
+import { ErrorScreen } from "../components/ErrorScreen";
 import { PromiseScreen } from "../components/PromiseScreen";
 import { parseFullPromiseId } from "../lib/utils";
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { query, res } = context;
+type Action = "discard" | "sign" | "";
+function isAction(action: string): action is Action {
+  return action === "discard" || action === "sign" || action === "";
+}
 
-  res.setHeader(
-    "Cache-Control",
-    "public, s-maxage=31536000, stale-while-revalidate",
-  );
+export default function Promise() {
+  const router = useRouter();
 
-  const promiseQuery = Array.isArray(query.promise) ? query.promise : [];
+  const promiseQuery = Array.isArray(router.query.promise)
+    ? router.query.promise
+    : [];
+
   const [id = "", action = ""] = promiseQuery;
 
   const [networkPrefix, promiseId] = parseFullPromiseId(id ?? "") ?? [null, null];
   const fullPromiseId = `${networkPrefix}-${promiseId}`;
 
-  if (!networkPrefix || !promiseId) {
-    return { notFound: true };
+  if (!networkPrefix || !promiseId || !isAction(action)) {
+    return <ErrorScreen message="Promise not found" />;
   }
 
-  if (action && action !== "discard" && action !== "sign") {
-    return { notFound: true };
-  }
-
-  return {
-    props: {
-      action,
-      networkPrefix,
-      promiseId,
-      fullPromiseId,
-    },
-  };
-};
-
-export default function Promise({
-  action,
-  fullPromiseId,
-  networkPrefix,
-  promiseId,
-}: {
-  action: "" | "discard" | "sign";
-  fullPromiseId: string;
-  networkPrefix: NetworkPrefix;
-  promiseId: number;
-}) {
   return (
     <>
       <Head>
