@@ -12,6 +12,12 @@ pnpm install          # 2. install the dependencies
 pnpm export           # 3. build the app as static files
 ```
 
+Alternatively:
+
+```sh
+pnpm dev              # 3. run the local dev server
+```
+
 ## Build and deploy the contracts
 
 ```sh
