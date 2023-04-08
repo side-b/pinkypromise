@@ -389,7 +389,7 @@ export function SvgDocTape({
         height: 40,
         background: `${contentColor} url(${background}) repeat-x 0 50%`,
         transformOrigin: "100% 0",
-        transform: `rotate(-${Math.atan(height / width)}rad)`,
+        transform: `rotate3d(0, 0, 1, -${Math.atan(height / width)}rad)`,
       }}
     >
     </div>
