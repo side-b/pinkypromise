@@ -135,6 +135,7 @@ export function PromiseScreen({
         () => {
           setTxBag({
             config: {
+              chainId,
               address: contractAddress,
               abi: PinkyPromiseAbi,
               functionName: "sign",
