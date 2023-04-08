@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "export": "EXPORT=true next build",
     "start": "next start",
     "lint": "next lint",
     "update-abi": "./scripts/update-abi.sh",
