@@ -1,18 +1,11 @@
-import type { GetServerSideProps } from "next";
+import type { NextPageContext } from "next";
 import type { NetworkPrefix } from "../types";
 
 import Head from "next/head";
 import { PromiseScreen } from "../components/PromiseScreen";
 import { parseFullPromiseId } from "../lib/utils";
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { query, res } = context;
-
-  res.setHeader(
-    "Cache-Control",
-    "public, s-maxage=31536000, stale-while-revalidate",
-  );
-
+export const getInitialProps = async ({ query }: NextPageContext) => {
   const promiseQuery = Array.isArray(query.promise) ? query.promise : [];
   const [id = "", action = ""] = promiseQuery;
 
