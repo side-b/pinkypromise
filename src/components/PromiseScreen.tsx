@@ -19,7 +19,6 @@ import {
   PROMISE_NOTICE_DISCARDED,
   PROMISE_NOTICE_DRAFT_SIGNED,
   PROMISE_NOTICE_DRAFT_UNSIGNED,
-  PROMISE_NOTICE_NULLREQUEST,
   PROMISE_NOTICE_SIGNED,
 } from "../constants";
 import { PinkyPromiseAbi } from "../lib/abis";
@@ -64,7 +63,7 @@ export function PromiseScreen({
   networkPrefix,
   promiseId,
 }: {
-  action: string;
+  action: "" | "discard" | "sign";
   fullPromiseId: string;
   networkPrefix: NetworkPrefix;
   promiseId: number;
@@ -112,20 +111,17 @@ export function PromiseScreen({
   useEffect(() => {
     match([action, promiseData] as const)
       .with(
-        ["break", {
-          connectedSigningState: "Signed",
-          state: P.union("Draft", "Signed"),
-        }],
-        ([_, { state }]) => {
+        ["discard", { connectedSigningState: "Signed", state: "Draft" }],
+        () => {
           setTxBag({
             config: {
               chainId,
               address: contractAddress,
               abi: PinkyPromiseAbi,
-              functionName: state === "Signed" ? "nullify" : "discard",
+              functionName: "discard",
               args: [promiseId],
             },
-            title: `Break promise ${fullPromiseId}`,
+            title: `Discard promise ${fullPromiseId}`,
             successLabel: "View promise",
             successAction: () => `/${fullPromiseId}`,
             onCancel: () => {
@@ -135,32 +131,7 @@ export function PromiseScreen({
         },
       )
       .with(
-        ["unbreak", {
-          connectedSigningState: "NullRequest",
-          state: "Signed",
-        }],
-        () => {
-          setTxBag({
-            config: {
-              address: contractAddress,
-              abi: PinkyPromiseAbi,
-              functionName: "cancelNullify",
-              args: [promiseId],
-            },
-            title: "Unbreak pinky promise",
-            successLabel: "View promise",
-            successAction: () => `/${fullPromiseId}`,
-            onCancel: () => {
-              router.push(`/${fullPromiseId}`);
-            },
-          });
-        },
-      )
-      .with(
-        ["sign", {
-          connectedSigningState: "Pending",
-          state: "Draft",
-        }],
+        ["sign", { connectedSigningState: "Pending", state: "Draft" }],
         () => {
           setTxBag({
             config: {
@@ -178,7 +149,7 @@ export function PromiseScreen({
           });
         },
       )
-      .with([P.union("break", "unbreak", "sign"), P.any], () => {
+      .with([P.union("discard", "sign"), P.any], () => {
         router.push(`/${fullPromiseId}`);
       })
       .otherwise(() => {
@@ -302,35 +273,18 @@ export function PromiseScreen({
                             color={buttonColor}
                             info={PROMISE_NOTICE_DRAFT_SIGNED[0]}
                             onButtonClick={() => {
-                              router.push(`/${fullPromiseId}/break`);
+                              router.push(`/${fullPromiseId}/discard`);
                             }}
                           />
                         ))
-                        // The connected user requested to nullify and the contract is fully signed
-                        .with(
-                          ["NullRequest", "Signed"],
-                          () => (
-                            <Action
-                              buttonLabel={PROMISE_NOTICE_NULLREQUEST[1]}
-                              color={buttonColor}
-                              info={PROMISE_NOTICE_NULLREQUEST[0]}
-                              onButtonClick={() => {
-                                router.push(`/${fullPromiseId}/unbreak`);
-                              }}
-                            />
-                          ),
-                        )
                         // The connected user is a signee and the contract is fully signed
                         .with(
                           ["Signed", "Signed"],
                           () => (
                             <Action
-                              buttonLabel={PROMISE_NOTICE_SIGNED[1]}
+                              buttonLabel={null}
                               color={buttonColor}
                               info={PROMISE_NOTICE_SIGNED[0]}
-                              onButtonClick={() => {
-                                router.push(`/${fullPromiseId}/break`);
-                              }}
                             />
                           ),
                         )

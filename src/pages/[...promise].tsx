@@ -18,6 +18,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { notFound: true };
   }
 
+  if (action && action !== "discard" && action !== "sign") {
+    return { notFound: true };
+  }
+
   return {
     props: {
       action,

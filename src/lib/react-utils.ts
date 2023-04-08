@@ -56,8 +56,7 @@ export function useChainedProgress(
     props?: Parameters<typeof useProgress>[0];
   } = {},
 ) {
-  options.duration ??= 1000;
-  options.enabled ??= true;
+  const { duration = 1000, enabled = true } = options;
 
   const springs = steps.reduce<
     Record<
@@ -73,7 +72,7 @@ export function useChainedProgress(
         index === steps.length - 1
           ? { ...props_, onRest: () => options.onComplete?.() }
           : props_,
-        options.enabled,
+        enabled,
       ),
       /* eslint-enable react-hooks/rules-of-hooks */
     });
@@ -82,7 +81,7 @@ export function useChainedProgress(
   useChain(
     steps.map(([, name]) => springs[name].ref),
     steps.map(([value]) => value),
-    options.duration,
+    duration,
   );
 
   return springs;

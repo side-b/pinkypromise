@@ -23,7 +23,7 @@
     "buffer": "^6.0.3",
     "colord": "^2.9.3",
     "dnum": "^2.3.2",
-    "eslint": "8.37.0",
+    "eslint": "8.38.0",
     "eslint-config-next": "13.3.0",
     "ethereum-blockies-base64": "^1.0.2",
     "ethers": "^5.7.2",
@@ -37,7 +37,7 @@
     "sharp": "^0.32.0",
     "ts-pattern": "^4.2.2",
     "tsx": "^3.12.6",
-    "typescript": "5.0.3",
+    "typescript": "5.0.4",
     "use-debounce": "^9.0.4",
     "wagmi": "^0.12.10",
     "zod": "^3.21.4"

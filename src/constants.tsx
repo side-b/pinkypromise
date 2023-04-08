@@ -67,40 +67,28 @@ export const EDITOR_CONFIRM_NOTICE = `
 
 export const PROMISE_NOTICE_DISCARDED = [
   `
-  This broken promise is still on chain but it can’t get signed anymore.
+  This broken promise is still on chain but it has been discarded and can not get signed anymore.
   `.trim(),
 ];
 
 export const PROMISE_NOTICE_DRAFT_UNSIGNED = [
   `
-  You can share the link to this promise with the other signees for them to sign
-  it, or discard this promise.
+  Share the address of this promise with the other signees for them to sign it.
   `.trim(),
   "Sign", // sign()
 ];
 
 export const PROMISE_NOTICE_DRAFT_SIGNED = [
   `
-  You can share the link to this promise with the other signees for them to sign
-  it, or discard this promise.
+  Share the address of this promise with the other signees for them to sign it, or discard it.
 `.trim(),
   "Discard", // discard()
 ];
 
-export const PROMISE_NOTICE_NULLREQUEST = [
-  `
-  You have requested to break this promise. If all the other signees break it,
-  the soulbound tokens will be destroyed.
-`.trim(),
-  "Unbreak", // cancelNullify()
-];
-
 export const PROMISE_NOTICE_SIGNED = [
   `
-  All signees have signed and this promise is now minted
-  as soulbound token that can be seen in each signee wallet.
+  This promise has been minted as soulbound tokens that can be seen in each signee wallet.
 `.trim(),
-  "Break", // nullify()
 ];
 
 export const GH_REPO_URL = "https://github.com/bpierre/pinkypromise";

@@ -26,7 +26,7 @@ export function ActionBox({
       }}
     >
       <div css={{ color: infoColor }}>{info}</div>
-      <div>{button}</div>
+      {button && <div>{button}</div>}
     </div>
   );
 }
