@@ -181,9 +181,9 @@ export const FAQ_ITEMS = [
     "What networks are supported?",
     <>
       <p>
-        Pinky Promise is deployed on the following networks: Ethereum, Goerli and
-        Polygon. This app supports creating promises in any of these networks and you
-        can switch between them using the button in the header.
+        Pinky Promise is deployed Ethereum, Goerli and Polygon. This app supports
+        creating promises in any of these networks and you can switch between them
+        using the button in the header.
       </p>
       <p>
         To start, we recommend you to try creating a promise on Goerli since it is
@@ -221,7 +221,7 @@ export const FAQ_ITEMS = [
   [
     "Is Pinky Promise open source?",
     <p>
-      Of course! The codebase is fully open source and available{" "}
+      Of course, the codebase is fully open source and available{" "}
       <a
         href={GH_REPO_URL}
         rel="nofollow"
