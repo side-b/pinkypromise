@@ -150,11 +150,13 @@ export function appChainFromName(name: string) {
   return APP_CHAINS.find((chain) => chain.name === name);
 }
 
+const IS_NUM_RE = /^\d+$/;
+
 export function parseFullPromiseId(
   fullPromiseId: string,
 ): undefined | [prefix: NetworkPrefix, id: number] {
   let parts = fullPromiseId.split("-");
-  const id = parseInt(parts[1], 10);
+  const id = IS_NUM_RE.test(parts[1]) ? parseInt(parts[1], 10) : NaN;
   return (isNetworkPrefix(parts[0]) && !isNaN(id))
     ? [parts[0], id]
     : undefined;
