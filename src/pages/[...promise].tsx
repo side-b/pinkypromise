@@ -38,7 +38,7 @@ export default function Promise({
   networkPrefix,
   promiseId,
 }: {
-  action: string;
+  action: "" | "discard" | "sign";
   fullPromiseId: string;
   networkPrefix: NetworkPrefix;
   promiseId: number;
