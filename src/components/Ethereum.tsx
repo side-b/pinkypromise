@@ -22,21 +22,26 @@ const hostname = typeof document === "undefined"
   ? "localhost"
   : document.location.hostname;
 
+const NETWORKS_KEYS = Object.keys(NETWORKS).filter(isNetworkName);
+
 const { chains, provider, webSocketProvider } = configureChains(
-  Object.keys(NETWORKS)
-    .filter(isNetworkName)
-    .map((name: NetworkName) => (
-      match(name)
-        .with("arbitrum", () => arbitrum)
-        .with("optimism", () => optimism)
-        .with("mainnet", () => mainnet)
-        .with("polygon", () => polygon)
-        .with("goerli", () => goerli)
-        .with("local", () => hardhat)
-        .otherwise(() => {
-          throw new Error(`Unsupported network: ${name}`);
-        })
-    )),
+  [
+    // mainnet is always defined for ENS queries
+    mainnet,
+    ...NETWORKS_KEYS
+      .filter((name) => name !== "mainnet")
+      .map((name: NetworkName) => (
+        match(name)
+          .with("arbitrum", () => arbitrum)
+          .with("optimism", () => optimism)
+          .with("polygon", () => polygon)
+          .with("goerli", () => goerli)
+          .with("local", () => hardhat)
+          .otherwise(() => {
+            throw new Error(`Unsupported network: ${name}`);
+          })
+      )),
+  ],
   [
     infuraProvider({ priority: 1, apiKey: INFURA_KEY }),
     publicProvider({ priority: 2 }),
@@ -66,10 +71,14 @@ const wagmiClient = createClient({
   webSocketProvider,
 });
 
+const rainbowChains = NETWORKS_KEYS.includes("mainnet")
+  ? chains
+  : chains.filter((chain) => chain.id !== 1);
+
 export function Ethereum({ children }: { children: ReactNode }) {
   return (
     <WagmiConfig client={wagmiClient}>
-      <RainbowKitProvider chains={chains} modalSize="compact">
+      <RainbowKitProvider chains={rainbowChains} modalSize="compact">
         {children}
       </RainbowKitProvider>
     </WagmiConfig>

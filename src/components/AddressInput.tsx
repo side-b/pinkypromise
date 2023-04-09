@@ -113,8 +113,13 @@ export function AddressInput({
 function useResolveAddress(value: string, onChange: (value: string) => void) {
   const [nameToResolve, setNameToResolve] = useState<null | EnsName>(null);
 
-  // To replace with wagmi’s useEnsAddress() eventually (it currently has too many reliability issues when doing quick query updates)
-  const provider = useProvider();
+  // useProvider() should get replaced by wagmi’s useEnsAddress() eventually.
+  // (useEnsAddress() was too unreliable with quick query updates when this hook was added.)
+  const provider = useProvider({
+    // ENS team recommends to only resolve names on mainnet
+    // See https://makoto-inoue.medium.com/how-to-support-ens-for-multi-chain-dapps-b0a7ff043d77
+    chainId: 1,
+  });
   const resolvedAddress = useQuery({
     enabled: Boolean(nameToResolve),
     onSettled() {
