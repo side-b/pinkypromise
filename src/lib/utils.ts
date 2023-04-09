@@ -127,15 +127,8 @@ export function formatPromiseState(state: PromiseState) {
   return "Broken";
 }
 
-export function shortNetworkName(id: number) {
-  return match(id)
-    .with(31337, () => "lcl")
-    .with(1, () => "eth")
-    .with(5, () => "grl")
-    .with(137, () => "plg")
-    .with(42161, () => "abt")
-    .with(42161, () => "opt")
-    .otherwise(() => "???");
+export function shortNetworkName(chainId: number) {
+  return appChainFromId(chainId)?.shortName ?? "???";
 }
 
 export function appChainFromPrefix(prefix: NetworkPrefix) {

@@ -48,6 +48,7 @@ export type AppChain = {
   prefix: NetworkPrefix;
   name: string;
   chainId: number;
+  shortName: string;
 };
 
 export type PromiseId = `${number}`;

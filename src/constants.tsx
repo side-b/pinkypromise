@@ -2,13 +2,13 @@ import type { ReactNode } from "react";
 import type { AppChain, ColorId } from "./types";
 
 export const APP_CHAINS = [
-  { chainId: 42161, prefix: "A", name: "arbitrum" },
-  { chainId: 8453, prefix: "B", name: "base" },
-  { chainId: 5, prefix: "G", name: "goerli" },
-  { chainId: 31337, prefix: "L", name: "local" },
-  { chainId: 1, prefix: "E", name: "mainnet" },
-  { chainId: 10, prefix: "O", name: "optimism" },
-  { chainId: 137, prefix: "P", name: "polygon" },
+  { chainId: 42161, prefix: "A", name: "arbitrum", shortName: "abt" },
+  { chainId: 8453, prefix: "B", name: "base", shortName: "bse" },
+  { chainId: 5, prefix: "G", name: "goerli", shortName: "grl" },
+  { chainId: 31337, prefix: "L", name: "local", shortName: "lcl" },
+  { chainId: 1, prefix: "E", name: "mainnet", shortName: "eth" },
+  { chainId: 10, prefix: "O", name: "optimism", shortName: "opt" },
+  { chainId: 137, prefix: "P", name: "polygon", shortName: "plg" },
 ] satisfies AppChain[];
 
 export const PROMISE_SYNONYMS = [
