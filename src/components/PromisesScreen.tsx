@@ -139,7 +139,7 @@ export const PromisesScreen = memo(function PromisesScreen({
     config: { mass: 1, friction: 80, tension: 1800 },
   });
 
-  return (
+  return breakpoint && (
     <div
       css={{
         flexGrow: 1,
@@ -167,9 +167,7 @@ export const PromisesScreen = memo(function PromisesScreen({
           ))
           .with(P.union("loading", "idle"), () => (
             <Appear appear={style}>
-              <div css={{ paddingTop: 80 }}>
-                <LoadingFingers />
-              </div>
+              <LoadingFingers />
             </Appear>
           ))
           .with("error", () => (

@@ -123,8 +123,13 @@ export function NewPromiseScreen() {
     background.set(mode === "transaction" ? "pink" : editorData.color);
   }, [background, editorData.color, mode]);
 
-  const modeTransitions = useTransition({ mode, editorColor: editorData.color }, {
-    keys: ({ mode, editorColor }) => String(mode + editorColor),
+  const modeTransitions = useTransition({
+    breakpoint,
+    mode,
+    editorColor: editorData.color,
+  }, {
+    keys: ({ breakpoint, mode, editorColor }) =>
+      String(breakpoint + mode + editorColor),
     from: { opacity: 0, transform: "scale3d(0.9, 0.9, 1)" },
     enter: { opacity: 1, transform: "scale3d(1, 1, 1)" },
     leave: { opacity: 0, immediate: true },

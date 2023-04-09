@@ -196,7 +196,7 @@ export function PromiseScreen({
     height: containerDimensions.height + (small ? 40 : 112),
   };
 
-  return (
+  return breakpoint && (
     <>
       <div
         css={{
