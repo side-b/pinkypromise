@@ -58,7 +58,7 @@ fi
 
 if [[ -n "$ETHERSCAN_API_KEY" ]]; then
     echo "Using --verify"
-    VERIFY="--verify $VERIFIER_URL"
+    VERIFY="--verify $VERIFIER_URL --etherscan-api-key $ETHERSCAN_API_KEY"
 fi
 
 export NETWORK_PREFIX
