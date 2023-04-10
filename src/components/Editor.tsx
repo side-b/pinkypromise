@@ -5,6 +5,7 @@ import type { ColorId } from "../types";
 import { a, useTransition } from "@react-spring/web";
 import * as dn from "dnum";
 import { useEffect, useState } from "react";
+import { useNetwork } from "wagmi";
 import {
   COLORS,
   EDITOR_CONFIRM_NOTICE,
@@ -42,6 +43,8 @@ export function Editor({
 }) {
   const breakpoint = useBreakpoint();
   const [signeeFocusRequest, setSigneeFocusRequest] = useState<number>(-1);
+  const { chain } = useNetwork();
+  const chainSymbol = chain?.nativeCurrency?.symbol ?? "ETH";
 
   const addFormSignee = () => {
     setSigneeFocusRequest(data.signees.length);
@@ -221,9 +224,9 @@ export function Editor({
                   <span
                     title={`Estimated transaction fee: ${
                       dn.format(feeEstimate, 4)
-                    } ETH`}
+                    } ${chainSymbol}`}
                   >
-                    <span>tx fee</span> ~{dn.format(feeEstimate, 4)} ETH
+                    <span>tx fee</span> ~{dn.format(feeEstimate, 4)} {chainSymbol}
                   </span>
                 )}
               </div>
