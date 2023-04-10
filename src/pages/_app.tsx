@@ -7,6 +7,7 @@ import { Ethereum } from "../components/Ethereum";
 import { FocusVisible } from "../components/FocusVisible";
 import { GlobalStyles } from "../components/GlobalStyles";
 import { Header } from "../components/Header";
+import { TAGLINE } from "../constants";
 
 const queryClient = new QueryClient();
 
@@ -15,10 +16,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <>
       <Head>
         <title>Pinky Promise</title>
-        <meta
-          name="description"
-          content="Onchain accountability from jolly commitments between friends and foes"
-        />
+        <meta name="description" content={`${TAGLINE}.`} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta property="og:site_name" content="Pinky Promise" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
