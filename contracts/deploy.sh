@@ -12,6 +12,7 @@ RPC_URL=""
 VERIFY=""
 LEDGER=""
 ETHERSCAN_API_KEY=""
+VERIFIER_URL=""
 
 if [[ "$1" == "local" ]]; then
     CHAIN_ID="31337"
@@ -35,6 +36,7 @@ elif [[ "$1" == "polygon" ]]; then
     ENS_REGISTRY=$ENS_REGISTRY_POLYGON
     RPC_URL=$RPC_URL_POLYGON
     ETHERSCAN_API_KEY=$ETHERSCAN_API_KEY_POLYGON
+    VERIFIER_URL="--verifier-url https://api.polygonscan.com/api/"
 
 else
     echo "Must provide a network:" 1>&2
@@ -56,7 +58,7 @@ fi
 
 if [[ -n "$ETHERSCAN_API_KEY" ]]; then
     echo "Using --verify"
-    VERIFY="--verify"
+    VERIFY="--verify $VERIFIER_URL"
 fi
 
 export NETWORK_PREFIX
