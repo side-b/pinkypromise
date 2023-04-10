@@ -32,9 +32,9 @@ const PromisePage: NextPage<PromisePageProps> = ({
     <>
       <Head>
         <title>{`Pinky Promise ${fullPromiseId}`}</title>
-        <meta property="og:title" content={fullPromiseId} />
+        <meta property="og:title" content={`Pinky Promise ${fullPromiseId}`} />
         <meta property="og:description" content={`${TAGLINE}.`} />
-        <meta name="twitter:title" content={fullPromiseId} />
+        <meta name="twitter:title" content={`Pinky Promise ${fullPromiseId}`} />
         <meta name="twitter:description" content={`${TAGLINE}.`} />
 
         <meta property="og:image" content={previewImage} />
