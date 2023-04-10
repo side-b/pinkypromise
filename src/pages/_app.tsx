@@ -18,9 +18,23 @@ export default function App({ Component, pageProps }: AppProps) {
         <title>Pinky Promise</title>
         <meta name="description" content={`${TAGLINE}.`} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta property="og:site_name" content="Pinky Promise" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="icon" href="data:," />
+
+        <meta property="og:site_name" content="Pinky Promise" />
+        <meta property="og:title" content="Pinky Promise" />
+        <meta property="og:description" content={`${TAGLINE}.`} />
+        <meta name="twitter:title" content="Pinky Promise" />
+        <meta name="twitter:description" content={`${TAGLINE}.`} />
+
+        <meta property="og:image" content="/pinky-promise.png" />
+        <meta property="og:image:type" content="image/png" />
+        <meta property="og:image:width" content="1280" />
+        <meta property="og:image:height" content="640" />
+        <meta name="twitter:image:src" content="/pinky-promise.png" />
+
+        <meta name="twitter:site" content="@pinkypromise_gg" />
+        <meta name="twitter:card" content="summary_large_image" />
       </Head>
       <QueryClientProvider client={queryClient}>
         <Ethereum>
