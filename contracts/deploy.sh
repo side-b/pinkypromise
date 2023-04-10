@@ -38,10 +38,18 @@ elif [[ "$1" == "polygon" ]]; then
     ETHERSCAN_API_KEY=$ETHERSCAN_API_KEY_POLYGON
     VERIFIER_URL="--verifier-url https://api.polygonscan.com/api/"
 
+elif [[ "$1" == "mainnet" ]]; then
+    CHAIN_ID="1"
+    NETWORK_PREFIX=$NETWORK_PREFIX_MAINNET
+    BPB_DATETIME=$BPB_DATETIME_MAINNET
+    ENS_REGISTRY=$ENS_REGISTRY_MAINNET
+    RPC_URL=$RPC_URL_MAINNET
+    ETHERSCAN_API_KEY=$ETHERSCAN_API_KEY_MAINNET
+
 else
     echo "Must provide a network:" 1>&2
     echo "  " 1>&2
-    echo "  ./deploy.sh <local | goerli | polygon>" 1>&2
+    echo "  ./deploy.sh <local | goerli | polygon mainnet>" 1>&2
     echo "  " 1>&2
     exit 1
 fi
@@ -50,9 +58,9 @@ fi
 if [[ $(echo -n $DEPLOYER | wc -c) == 42 ]]; then
     echo "Using --ledger"
     if [[ -n "$DEPLOYER_PATH" ]]; then
-        LEDGER="--ledger $DEPLOYER --hd-paths $DEPLOYER_PATH"
+        LEDGER="--ledger $DEPLOYER --sender $DEPLOYER --hd-paths $DEPLOYER_PATH"
     else
-        LEDGER="--ledger $DEPLOYER"
+        LEDGER="--ledger $DEPLOYER --sender $DEPLOYER"
     fi
 fi
 
@@ -70,7 +78,6 @@ forge script \
     --chain-id $CHAIN_ID \
     --rpc-url $RPC_URL \
     --broadcast \
-    --sender $DEPLOYER \
     $LEDGER \
     $VERIFY \
     -vvvv
