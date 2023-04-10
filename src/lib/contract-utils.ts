@@ -21,8 +21,14 @@ import { appChainFromId, appChainFromName } from "./utils";
 export function promiseIdFromTxLogs(logs: Log[]): string | null {
   const PinkyPromiseInterface = new ethersUtils.Interface(PinkyPromiseAbi);
   const draftUpdateEvent = logs
-    .map((log: Log) => PinkyPromiseInterface.parseLog(log))
-    .find((event) => event.name === "PromiseUpdate" && event.args.state === 1);
+    .map((log: Log) => {
+      try {
+        return PinkyPromiseInterface.parseLog(log);
+      } catch (err) {
+        return null;
+      }
+    })
+    .find((event) => event?.name === "PromiseUpdate" && event.args.state === 1);
 
   return draftUpdateEvent?.args.promiseId?.toString() ?? null;
 }
