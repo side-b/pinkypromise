@@ -87,7 +87,7 @@ export const PROMISE_NOTICE_DRAFT_SIGNED = [
 
 export const PROMISE_NOTICE_SIGNED = [
   `
-  This promise has been minted as soulbound tokens that can be seen in each signee wallet.
+  This promise has been minted as soulbound tokens that can be seen in each signee’s wallet.
 `.trim(),
 ];
 
