@@ -106,7 +106,7 @@ export function lerp(value: number, low: number, high: number): number {
 
 export function formatDate(value: Date = new Date()) {
   return [
-    String(value.getDay() + 1).padStart(2, "0"),
+    String(value.getDate() + 1).padStart(2, "0"),
     String(value.getMonth() + 1).padStart(2, "0"),
     value.getFullYear(),
   ].join(".");
