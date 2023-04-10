@@ -1,6 +1,6 @@
 # Pinky Promise
 
-<img width="1440" alt="banner" src="https://user-images.githubusercontent.com/36158/230726389-c8bba5e8-88d5-4e26-8e17-9c9f35825b76.png">
+<img width="1280" alt="" src="https://user-images.githubusercontent.com/36158/230962408-53a87e1e-8bf1-4ca8-bb56-76c8f7819d7f.png">
 
 Onchain accountability from jolly commitments between friends and foes.
 
