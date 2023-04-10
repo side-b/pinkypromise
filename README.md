@@ -31,8 +31,8 @@ Where `<network>` is a supported network (run `./deploy.sh` without arguments to
 
 Addresses of the deployed contracts:
 
-| Network  | Address |
-| -------- | ------- |
-| Ethereum | 0x      |
-| Goerli   | 0x      |
-| Polygon  | 0x      |
+| Network  | Address                                    |
+| -------- | ------------------------------------------ |
+| Ethereum | 0xeFb7c8F4a52D6478e862821fD3017A98A7Ba6877 |
+| Goerli   | 0x59D8A9f7bE3a6D498ca4dF7f67ff58fBC808e95F |
+| Polygon  | 0xE66e42A4623706ca48f56b16EE505E3441b48049 |
