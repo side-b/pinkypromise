@@ -30,15 +30,17 @@ export function HomeFaq() {
           padding: "0 24px",
         }}
       >
-        {FAQ_ITEMS.map(([question, answer], index) => (
+        {FAQ_ITEMS.map(([question, shortQuestion, answer], index) => (
           <HomeFaqItem
             key={index}
-            answer={answer ?? FAQ_ITEMS[1][1]}
+            answer={answer}
             opened={index === openedItem}
             onToggle={() => {
               setOpenedItem((index_) => index_ === index ? -1 : index);
             }}
-            question={question}
+            question={breakpoint === "small" && shortQuestion
+              ? shortQuestion
+              : question}
             small={breakpoint === "small"}
           />
         ))}
