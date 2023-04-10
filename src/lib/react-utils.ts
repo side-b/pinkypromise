@@ -90,10 +90,17 @@ export function useChainedProgress(
 export function useExplorerBaseUrl(chainId?: number) {
   const ready = useReady();
   const { chain, chains } = useNetwork();
+
   if (!ready) {
     return undefined;
   }
+
   chainId ??= chain?.id;
+
+  if (chainId === 1) {
+    return "https://etherscan.io";
+  }
+
   const chain_ = chains.find((chain) => chain.id === chainId);
   return chain_?.blockExplorers?.etherscan.url ?? undefined;
 }
