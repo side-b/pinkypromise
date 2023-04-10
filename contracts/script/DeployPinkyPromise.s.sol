@@ -6,7 +6,11 @@ import {PinkyPromise} from "src/PinkyPromise.sol";
 
 contract DeployPinkyPromiseScript is Script {
     function run() external {
-        vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
+        if (vm.envBytes("DEPLOYER").length == 20) {
+            vm.startBroadcast(vm.envAddress("DEPLOYER"));
+        } else {
+            vm.startBroadcast(vm.envUint("DEPLOYER"));
+        }
 
         new PinkyPromise(
             vm.envString("NETWORK_PREFIX"),

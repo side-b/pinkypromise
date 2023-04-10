@@ -10,6 +10,8 @@ ENS_REGISTRY=
 BPB_DATETIME=
 RPC_URL=""
 VERIFY=""
+LEDGER=""
+ETHERSCAN_API_KEY=""
 
 if [[ "$1" == "local" ]]; then
     CHAIN_ID="31337"
@@ -24,14 +26,37 @@ elif [[ "$1" == "goerli" ]]; then
     BPB_DATETIME=$BPB_DATETIME_GOERLI
     ENS_REGISTRY=$ENS_REGISTRY_GOERLI
     RPC_URL=$RPC_URL_GOERLI
-    VERIFY="--verify"
+    ETHERSCAN_API_KEY=$ETHERSCAN_API_KEY_GOERLI
+
+elif [[ "$1" == "polygon" ]]; then
+    CHAIN_ID="137"
+    NETWORK_PREFIX=$NETWORK_PREFIX_POLYGON
+    BPB_DATETIME=$BPB_DATETIME_POLYGON
+    ENS_REGISTRY=$ENS_REGISTRY_POLYGON
+    RPC_URL=$RPC_URL_POLYGON
+    ETHERSCAN_API_KEY=$ETHERSCAN_API_KEY_POLYGON
 
 else
     echo "Must provide a network:" 1>&2
     echo "  " 1>&2
-    echo "  ./deploy.sh <local | goerli>" 1>&2
+    echo "  ./deploy.sh <local | goerli | polygon>" 1>&2
     echo "  " 1>&2
     exit 1
+fi
+
+# If DEPLOYER is an address, sign with a ledger
+if [[ $(echo -n $DEPLOYER | wc -c) == 42 ]]; then
+    echo "Using --ledger"
+    if [[ -n "$DEPLOYER_PATH" ]]; then
+        LEDGER="--ledger $DEPLOYER --hd-paths $DEPLOYER_PATH"
+    else
+        LEDGER="--ledger $DEPLOYER"
+    fi
+fi
+
+if [[ -n "$ETHERSCAN_API_KEY" ]]; then
+    echo "Using --verify"
+    VERIFY="--verify"
 fi
 
 export NETWORK_PREFIX
@@ -40,8 +65,11 @@ export BPB_DATETIME
 
 forge script \
     script/DeployPinkyPromise.s.sol:DeployPinkyPromiseScript \
+    --chain-id $CHAIN_ID \
     --rpc-url $RPC_URL \
     --broadcast \
+    --sender $DEPLOYER \
+    $LEDGER \
     $VERIFY \
     -vvvv
 
