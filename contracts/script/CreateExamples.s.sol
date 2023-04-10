@@ -66,6 +66,8 @@ contract CreateExamplesScript is Script {
             unicode"\n"
             unicode"This digital certificate is verifiable at guildeducation.org";
         // forgefmt: disable-end
+
+        data.height = 892;
         data.color = PinkyPromise.PromiseColor.Electric;
 
         address[] memory addrs = new address[](2);
@@ -110,6 +112,7 @@ contract CreateExamplesScript is Script {
             unicode"Signatures:";
         // forgefmt: disable-end
 
+        data.height = 2276;
         data.color = PinkyPromise.PromiseColor.Solemn;
 
         address[] memory addrs = new address[](2);
@@ -148,6 +151,7 @@ contract CreateExamplesScript is Script {
             unicode"Signatures:";
         // forgefmt: disable-end
 
+        data.height = 2060;
         data.color = PinkyPromise.PromiseColor.RedAlert;
 
         address[] memory addrs = new address[](2);
@@ -177,6 +181,7 @@ contract CreateExamplesScript is Script {
             unicode"Marie & 3frizzz";
         // forgefmt: disable-end
 
+        data.height = 1388;
         data.color = PinkyPromise.PromiseColor.Solemn;
 
         address[] memory addrs = new address[](2);
@@ -194,15 +199,21 @@ contract CreateExamplesScript is Script {
             unicode"We, the B0xK collective, are a community of designers, developers, and innovators committed to shaping creative, engaging, and vibrant blockchain ecosystems. Our Playful Design Manifesto highlights the principles that inspire our imaginative and user-centric creations.\n"
             unicode"\n"
             unicode"1. Joyful User Experience. We prioritize the creation of delightful, engaging, and intuitive experiences for our users. We design blockchain solutions that are not only functional but also foster joy, curiosity, and a sense of wonder in diverse users.\n"
+            unicode"\n"
             unicode"2. Creativity and Innovation. We embrace the transformative potential of blockchain technology and strive to develop novel, imaginative solutions that challenge conventions and push boundaries. We believe in the power of creative thinking to drive positive change and shape a more inclusive and equitable world.\n"
+            unicode"\n"
             unicode"3. Exploration and Experimentation. We cultivate a spirit of exploration and experimentation, encouraging our community to test new ideas, iterate, and learn from both successes and failures. We view each project as an opportunity to grow, adapt, and evolve as creators and individuals.\n"
+            unicode"\n"
             unicode"4. Collaboration and Shared Inspiration. We value the power of collaboration and actively engage with our peers, clients, and communities. We celebrate the collective creativity that emerges from diverse perspectives and strive to create a supportive, inclusive environment that fosters open dialogue and shared ownership of our work.\n"
+            unicode"\n"
             unicode"5. Gamification and Play. We incorporate elements of play and gamification into our blockchain designs, making complex concepts and systems more approachable, accessible, and engaging. We believe that playful interactions can inspire learning, motivate user engagement, and build stronger, more vibrant communities.\n"
+            unicode"\n"
             unicode"6. Ethical Creativity. We act with integrity, transparency, and responsibility in all aspects of our work. We acknowledge the social and environmental impact of our creations, and we strive to develop playful blockchain solutions that are not only fun but also promote fairness, inclusivity, and sustainability.\n"
             unicode"\n"
             unicode"By adhering to these principles, we reaffirm our dedication to the power of playful design as a catalyst for positive transformation of blockchain ecosystems. We pledge to navigate the complexities and challenges of our work with empathy, humility, and unwavering ethical commitment, striving to create a better, more vibrant world for present and future generations.";
         // forgefmt: disable-end
 
+        data.height = 1706;
         data.color = PinkyPromise.PromiseColor.RedAlert;
 
         address[] memory addrs = new address[](3);
@@ -236,6 +247,7 @@ contract CreateExamplesScript is Script {
             unicode"May the best futurist win!";
         // forgefmt: disable-end
 
+        data.height = 1192;
         data.color = PinkyPromise.PromiseColor.Pinky;
 
         address[] memory addrs = new address[](2);
@@ -261,6 +273,7 @@ contract CreateExamplesScript is Script {
             unicode"I invite you all to join me, hold me accountable, and share your own eco-adventures! Together, we can create a vibrant, healthy, and sustainable world that’s bursting with fun and joy! 🌍🌈🎉";
         // forgefmt: disable-end
 
+        data.height = 1008;
         data.color = PinkyPromise.PromiseColor.Electric;
 
         address[] memory addrs = new address[](1);
@@ -298,6 +311,7 @@ contract CreateExamplesScript is Script {
             unicode"Either party may decide to discontinue the collaboration by providing a written notice two weeks in advance.";
         // forgefmt: disable-end
 
+        data.height = 1392;
         data.color = PinkyPromise.PromiseColor.Solemn;
 
         address[] memory addrs = new address[](2);
