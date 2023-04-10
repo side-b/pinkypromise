@@ -3,8 +3,7 @@ import type { Networks } from "../types";
 import { isAddress, isNetworkName } from "../types";
 
 export const INFURA_KEY = process.env.NEXT_PUBLIC_INFURA_KEY ?? "";
-export const REACT_STRICT =
-  (process.env.NEXT_PUBLIC_REACT_STRICT ?? "true").trim() !== "false";
+export const ALCHEMY_KEY = process.env.NEXT_PUBLIC_ALCHEMY_KEY ?? "";
 
 export const NETWORK_DEFAULT = (
   process.env.NEXT_PUBLIC_NETWORK_DEFAULT ?? "local"

@@ -10,10 +10,11 @@ import {
 import { match } from "ts-pattern";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
 import { arbitrum, goerli, hardhat, mainnet, optimism, polygon } from "wagmi/chains";
+import { alchemyProvider } from "wagmi/providers/alchemy";
 import { infuraProvider } from "wagmi/providers/infura";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 import { publicProvider } from "wagmi/providers/public";
-import { INFURA_KEY, NETWORKS } from "../lib/environment";
+import { ALCHEMY_KEY, INFURA_KEY, NETWORKS } from "../lib/environment";
 import { isNetworkName } from "../types";
 
 import "@rainbow-me/rainbowkit/styles.css";
@@ -43,6 +44,7 @@ const { chains, provider, webSocketProvider } = configureChains(
       )),
   ],
   [
+    alchemyProvider({ priority: 1, apiKey: ALCHEMY_KEY }),
     infuraProvider({ priority: 1, apiKey: INFURA_KEY }),
     publicProvider({ priority: 2 }),
     jsonRpcProvider({
