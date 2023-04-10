@@ -298,7 +298,10 @@ export function SvgDocSigneeEns({
   explorerBaseUrl?: string;
   signature: string | ReactNode;
 }) {
-  const ensName = useEnsName({ address: isAddress(address) ? address : undefined });
+  const ensName = useEnsName({
+    chainId: 1,
+    address: isAddress(address) ? address : undefined,
+  });
   const title = `${ensName.data ? `${ensName.data} − ` : ""}${address}`;
   const label = ensName.data ?? address;
   return (
