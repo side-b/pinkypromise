@@ -352,7 +352,7 @@ const PromiseCard = memo(function PromiseCard({
               wordBreak: "break-word",
             }}
           >
-            {promiseData.bodyText}
+            <div dangerouslySetInnerHTML={{ __html: promiseData.bodyText }} />
           </div>
           <div
             css={{
