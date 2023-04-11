@@ -85,6 +85,6 @@ export default function App({
 }
 
 App.getInitialProps = async ({ ctx }: AppContext) => {
-  const host = ctx.req?.headers.host;
+  const host = ctx.req?.headers.host ?? "";
   return { host };
 };
