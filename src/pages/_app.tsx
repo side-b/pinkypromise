@@ -1,4 +1,4 @@
-import type { AppProps } from "next/app";
+import type { AppContext, AppProps } from "next/app";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Head from "next/head";
@@ -11,7 +11,13 @@ import { TAGLINE } from "../constants";
 
 const queryClient = new QueryClient();
 
-export default function App({ Component, pageProps }: AppProps) {
+export default function App({
+  Component,
+  pageProps,
+  host,
+}: AppProps & { host: "string" }) {
+  const protocol = host.startsWith("localhost") ? "http" : "https";
+  const baseUrl = host ? `${protocol}://${host}` : "";
   return (
     <>
       <Head>
@@ -27,11 +33,11 @@ export default function App({ Component, pageProps }: AppProps) {
         <meta name="twitter:title" content="Pinky Promise" />
         <meta name="twitter:description" content={`${TAGLINE}.`} />
 
-        <meta property="og:image" content="/pinky-promise.png" />
+        <meta name="twitter:image:src" content={`${baseUrl}/pinky-promise.png`} />
+        <meta property="og:image" content={`${baseUrl}/pinky-promise.png`} />
         <meta property="og:image:type" content="image/png" />
         <meta property="og:image:width" content="1280" />
         <meta property="og:image:height" content="640" />
-        <meta name="twitter:image:src" content="/pinky-promise.png" />
 
         <meta name="twitter:site" content="@pinkypromise_gg" />
         <meta name="twitter:card" content="summary_large_image" />
@@ -77,3 +83,8 @@ export default function App({ Component, pageProps }: AppProps) {
     </>
   );
 }
+
+App.getInitialProps = async ({ ctx }: AppContext) => {
+  const host = ctx.req?.headers.host;
+  return { host };
+};
