@@ -34,5 +34,5 @@ Addresses of the deployed contracts:
 | Network  | Address                                    |
 | -------- | ------------------------------------------ |
 | Ethereum | [0xeFb7c8F4a52D6478e862821fD3017A98A7Ba6877](https://etherscan.io/address/0xeFb7c8F4a52D6478e862821fD3017A98A7Ba6877) |
-| Goerli   | [0x59D8A9f7bE3a6D498ca4dF7f67ff58fBC808e95F](https://etherscan.io/address/0x59D8A9f7bE3a6D498ca4dF7f67ff58fBC808e95F) |
-| Polygon  | [0xE66e42A4623706ca48f56b16EE505E3441b48049](https://etherscan.io/address/0xE66e42A4623706ca48f56b16EE505E3441b48049) |
+| Goerli   | [0x59D8A9f7bE3a6D498ca4dF7f67ff58fBC808e95F](https://goerli.etherscan.io/address/0x59D8A9f7bE3a6D498ca4dF7f67ff58fBC808e95F) |
+| Polygon  | [0xE66e42A4623706ca48f56b16EE505E3441b48049](https://polygonscan.com/address/0xE66e42A4623706ca48f56b16EE505E3441b48049) |
